@@ -1,16 +1,38 @@
-#include "ofMain.h"
-#include "ofApp.h"
+#include "raylib.h"
+#include "raymath.h"
 
-//========================================================================
-int main( ){
+constexpr unsigned int WIDTH = 1280;
+constexpr unsigned int HEIGHT = 720;
 
-	//Use ofGLFWWindowSettings for more options like multi-monitor fullscreen
-	ofGLWindowSettings settings;
-	settings.setSize(1280, 720);
-	settings.windowMode = OF_WINDOW; //can also be OF_FULLSCREEN
+void draw();
 
-	auto window = ofCreateWindow(settings);
-	ofRunApp(window, make_shared<ofApp>());
-	ofRunMainLoop();
+int main(void)
+{
+    InitWindow(WIDTH, HEIGHT, "GemuPG");
+    InitAudioDevice();
+    //--------------------------------------------------------------------------------------
 
-}	
+    // Main game loop
+    while (!WindowShouldClose())
+    {
+        
+
+        BeginDrawing();
+            ClearBackground(RAYWHITE);
+            draw();
+        EndDrawing();
+    }
+
+
+
+    //--------------------------------------------------------------------------------------
+    CloseAudioDevice();
+    CloseWindow();
+    //--------------------------------------------------------------------------------------
+    return 0;
+}
+
+void draw()
+{
+    return;
+}

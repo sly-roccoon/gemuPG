@@ -3,3 +3,5 @@
 /obj/x64/Debug
 *.obj
 *.tlog
+
+/build

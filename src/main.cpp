@@ -1,5 +1,4 @@
 #include "raylib.h"
-#include "raymath.h"
 
 constexpr unsigned int WIDTH = 1280;
 constexpr unsigned int HEIGHT = 720;

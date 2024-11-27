@@ -10,8 +10,8 @@ public:
         return instance;
     }
 
-    void addBlock(blockType, Vec2);
-    void removeBlock(Vec2);
+    void addBlock(blockType, Vector2);
+    void removeBlock(Vector2);
 
 private:
     Interface() {}

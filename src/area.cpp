@@ -1,9 +1,11 @@
 #include "area.h"
+#include <algorithm>
+#include "raymath.h"
 
-bool Area::isInside(Vec2 pos)
+bool Area::isInside(Vector2 pos)
 {
-	for (Vec2 field : positions_)
-		if (pos == field)
+	for (Vector2 field : positions_)
+		if (Vector2Equals(field, pos))
 			return true;
 
 	return false;
@@ -22,7 +24,7 @@ void Area::removeBlock(std::shared_ptr<Block> block)
 		blocks_.end());
 }
 
-void Area::removeBlock(Vec2 pos)
+void Area::removeBlock(Vector2 pos)
 {
 	blocks_.erase(
 		std::remove_if(blocks_.begin(), blocks_.end(),

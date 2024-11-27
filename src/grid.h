@@ -1,6 +1,9 @@
 #pragma once
 
 #include "area.h"
+#include <memory>
+#include <vector>
+#include <algorithm>
 
 class Grid
 {
@@ -13,7 +16,7 @@ public:
 
     void update();
     void addBlock(std::shared_ptr<Block>);
-    void removeBlock(Vec2);
+    void removeBlock(Vector2);
 
 private:
     Grid() {} // private constructor to prevent instantiation

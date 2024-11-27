@@ -1,7 +1,6 @@
 #pragma once
-#include "ofMain.h"
-#include "ofxPDSP.h"
-#include <cstdint>
+// #include <cstdint>
+#include <memory>
 
 #pragma region BASE BLOCK
 
@@ -14,17 +13,15 @@ typedef enum {
 	BLOCK_MODULATOR
 } blockType;
 
-typedef glm::ivec2 Vec2;
-
 class Block
 {
 public:
 	Block();
-	Vec2 getPos() { return pos_; }
+	Vector2 getPos() { return pos_; }
 
 protected:
 	blockType type_;
-	Vec2 pos_;
+	Vector2 pos_;
 	bool bypass_;
 };
 
@@ -43,11 +40,11 @@ typedef enum {
 class BlockGenerator : public Block
 {
 public:
-	BlockGenerator(Vec2);
+	BlockGenerator(Vector2);
 
 private:
-	pdsp::TableOscillator	osc_;
-	pdsp::ADSR				adsr_;
+	// Oscillator				osc_;
+	// ADSR					adsr_;
 	float					amp_;
 	float					pan_;
 };
@@ -64,7 +61,7 @@ public:
         return instance;
     }
 
-    std::shared_ptr<Block> createBlock(const blockType type, const Vec2 pos)
+    std::shared_ptr<Block> createBlock(const blockType type, const Vector2 pos)
     {
         switch (type)
         {

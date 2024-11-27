@@ -15,7 +15,7 @@ void Grid::addBlock(std::shared_ptr<Block> block)
 	blocks_.push_back(block);
 }
 
-void Grid::removeBlock(Vec2 pos)
+void Grid::removeBlock(Vector2 pos)
 {
 	blocks_.erase(
 		std::remove_if(blocks_.begin(), blocks_.end(),

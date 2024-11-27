@@ -1,6 +1,6 @@
 #include "interface.h"
 
-void Interface::addBlock(blockType type, Vec2 pos)
+void Interface::addBlock(blockType type, Vector2 pos)
 {
 	BlockFactory& block_factory = BlockFactory::getInstance();
 	Grid& grid = Grid::getInstance();

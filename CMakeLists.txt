@@ -27,6 +27,7 @@ endif()
 add_executable(${PROJECT_NAME} src/main.cpp)
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib)
+include_directories(src)
 set(CMAKE_CXX_STANDARD 14)
 
 

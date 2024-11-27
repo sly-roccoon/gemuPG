@@ -1,15 +1,16 @@
 #include "raylib.h"
+#include "interface.h"
 
 constexpr unsigned int WIDTH = 1280;
 constexpr unsigned int HEIGHT = 720;
-
-void draw();
 
 int main(void)
 {
     InitWindow(WIDTH, HEIGHT, "GemuPG");
     InitAudioDevice();
     //--------------------------------------------------------------------------------------
+
+    Interface& interface = Interface::getInstance();
 
     // Main game loop
     while (!WindowShouldClose())
@@ -18,7 +19,7 @@ int main(void)
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            draw();
+            interface.draw();
         EndDrawing();
     }
 
@@ -29,9 +30,4 @@ int main(void)
     CloseWindow();
     //--------------------------------------------------------------------------------------
     return 0;
-}
-
-void draw()
-{
-    return;
 }

@@ -24,7 +24,18 @@ endif()
 
 # GEMUPG
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+file (GLOB_RECURSE gemupg_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
+file (GLOB_RECURSE gemupg_HEADERS CONFIGURE_DEPENDS "src/*.h")
+
+set (gemupg_INCLUDE_DIRS "")
+foreach (_headerFile ${gemupg_HEADERS})
+    get_filename_component(_dir ${_headerFile} PATH)
+    list (APPEND geumpg_INCLUDE_DIRS ${_dir})
+endforeach()
+list (REMOVE_DUPLICATES gemupg_INCLUDE_DIRS)
+
+add_executable(${PROJECT_NAME} ${gemupg_SOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib)
 include_directories(src)

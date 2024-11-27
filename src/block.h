@@ -1,8 +1,7 @@
 #pragma once
 // #include <cstdint>
 #include <memory>
-
-#pragma region BASE BLOCK
+#include "raylib.h"
 
 typedef enum {
 	BLOCK_NONE,
@@ -48,36 +47,3 @@ private:
 	float					amp_;
 	float					pan_;
 };
-
-#pragma endregion
-
-#pragma region BLOCK FACTORY
-
-class BlockFactory
-{
-public:
-    static BlockFactory& getInstance() {
-        static BlockFactory instance;
-        return instance;
-    }
-
-    std::shared_ptr<Block> createBlock(const blockType type, const Vector2 pos)
-    {
-        switch (type)
-        {
-        case BLOCK_GENERATOR:
-            return std::make_unique<BlockGenerator>(pos);
-        default:
-            return nullptr;
-        }
-    }
-
-private:
-    BlockFactory() = default;
-    BlockFactory(const BlockFactory&) = delete;
-    BlockFactory& operator=(const BlockFactory&) = delete;
-};
-
-
-
-#pragma endregion

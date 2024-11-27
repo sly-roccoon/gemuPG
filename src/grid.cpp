@@ -1,4 +1,5 @@
 #include "grid.h"
+#include "raymath.h"
 
 void Grid::update() //will def need optimization	
 {
@@ -19,6 +20,14 @@ void Grid::removeBlock(Vector2 pos)
 {
 	blocks_.erase(
 		std::remove_if(blocks_.begin(), blocks_.end(),
-			[pos](auto block) { return block->getPos() == pos; }),
+			[pos](auto block) { return Vector2Equals(block->getPos(), pos); }),
+		blocks_.end());
+}
+
+void Grid::removeBlock(std::shared_ptr<Block> block)
+{
+	blocks_.erase(
+		std::remove_if(blocks_.begin(), blocks_.end(),
+			[block](auto b) { return b == block; }),
 		blocks_.end());
 }

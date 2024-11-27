@@ -17,6 +17,7 @@ public:
     void update();
     void addBlock(std::shared_ptr<Block>);
     void removeBlock(Vector2);
+    void removeBlock(std::shared_ptr<Block>);
 
 private:
     Grid() {} // private constructor to prevent instantiation
@@ -26,4 +27,3 @@ private:
 	std::vector<std::unique_ptr<Area>> areas_;
 	std::vector<std::shared_ptr<Block>> blocks_;
 };
-

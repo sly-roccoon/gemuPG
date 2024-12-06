@@ -4,7 +4,8 @@
 class BlockFactory
 {
 public:
-    static BlockFactory& getInstance() {
+    static BlockFactory &getInstance()
+    {
         static BlockFactory instance;
         return instance;
     }
@@ -22,6 +23,6 @@ public:
 
 private:
     BlockFactory() = default;
-    BlockFactory(const BlockFactory&) = delete;
-    BlockFactory& operator=(const BlockFactory&) = delete;
+    BlockFactory(const BlockFactory &) = delete;
+    BlockFactory &operator=(const BlockFactory &) = delete;
 };

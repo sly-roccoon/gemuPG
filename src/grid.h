@@ -5,25 +5,20 @@
 #include <vector>
 #include <algorithm>
 
+constexpr int GRID_SIZE = 256;
+constexpr int GRID_SPACING = 64;
+
 class Grid
 {
 public:
-    static Grid& getInstance()
-    {
-        static Grid instance;
-        return instance;
-    }
-
     void update();
+    void draw();
+
     void addBlock(std::shared_ptr<Block>);
     void removeBlock(Vector2);
     void removeBlock(std::shared_ptr<Block>);
 
 private:
-    Grid() {} // private constructor to prevent instantiation
-    Grid(const Grid&) = delete; // delete copy constructor
-    Grid& operator=(const Grid&) = delete; // delete assignment operator
-
-	std::vector<std::unique_ptr<Area>> areas_;
-	std::vector<std::shared_ptr<Block>> blocks_;
+    std::vector<std::unique_ptr<Area>> areas_;
+    std::vector<std::shared_ptr<Block>> blocks_;
 };

@@ -3,7 +3,8 @@
 #include <memory>
 #include "raylib.h"
 
-typedef enum {
+typedef enum
+{
 	BLOCK_NONE,
 	BLOCK_GENERATOR,
 	BLOCK_SEQUENCER,
@@ -28,7 +29,8 @@ protected:
 
 #pragma region GENERATOR BLOCK
 
-typedef enum {
+typedef enum
+{
 	WAVE_SAMPLE,
 	WAVE_SAW,
 	WAVE_SINE,
@@ -44,6 +46,6 @@ public:
 private:
 	// Oscillator				osc_;
 	// ADSR					adsr_;
-	float					amp_;
-	float					pan_;
+	float amp_;
+	float pan_;
 };

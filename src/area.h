@@ -3,7 +3,6 @@
 #include "raylib.h"
 #include <vector>
 
-
 class Area
 {
 public:
@@ -18,5 +17,5 @@ public:
 private:
 	std::vector<Vector2> positions_;
 	Color color_;
-	std::vector < std::shared_ptr<Block> > blocks_;
+	std::vector<std::shared_ptr<Block>> blocks_;
 };

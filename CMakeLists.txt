@@ -36,6 +36,7 @@ list (REMOVE_DUPLICATES gemupg_INCLUDE_DIRS)
 
 add_executable(${PROJECT_NAME} ${gemupg_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib)
 include_directories(src)

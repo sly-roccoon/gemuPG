@@ -20,7 +20,8 @@ void Area::removeBlock(std::shared_ptr<Block> block)
 {
 	blocks_.erase(
 		std::remove_if(blocks_.begin(), blocks_.end(),
-			[block](auto b) { return b == block; }),
+					   [block](auto b)
+					   { return b == block; }),
 		blocks_.end());
 }
 
@@ -28,6 +29,7 @@ void Area::removeBlock(Vector2 pos)
 {
 	blocks_.erase(
 		std::remove_if(blocks_.begin(), blocks_.end(),
-			[pos](auto block) { return block->getPos() == pos; }),
+					   [pos](auto block)
+					   { return block->getPos() == pos; }),
 		blocks_.end());
 }

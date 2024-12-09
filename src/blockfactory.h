@@ -10,12 +10,12 @@ public:
         return instance;
     }
 
-    std::unique_ptr<Block> createBlock(const blockType type, const Vector2 pos)
+    std::shared_ptr<Block> createBlock(const blockType type, const Vector2 pos)
     {
         switch (type)
         {
         case BLOCK_GENERATOR:
-            return std::make_unique<BlockGenerator>(pos);
+            return std::make_shared<BlockGenerator>(pos);
         default:
             return nullptr;
         }

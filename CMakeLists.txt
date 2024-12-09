@@ -40,7 +40,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib)
 include_directories(src)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
 
 # Web Configurations

@@ -18,6 +18,7 @@ class Block
 public:
 	Block();
 	Vector2 getPos() { return pos_; }
+	void draw();
 
 protected:
 	blockType type_;

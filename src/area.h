@@ -13,6 +13,7 @@ public:
 	void removeBlock(Vector2);
 	void setColor(Color color) { color_ = color; }
 	auto getColor() { return color_; }
+	auto getBlocks() { return blocks_; }
 
 private:
 	std::vector<Vector2> positions_;

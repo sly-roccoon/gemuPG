@@ -1,18 +1,28 @@
 #include "interface.h"
 #include "blockfactory.h"
 
-void Interface::addBlock(blockType type, Vector2 pos)
+bool Interface::addBlock(blockType type, Vector2 pos)
 {
 	BlockFactory &block_factory = BlockFactory::getInstance();
 
+	if (grid.getBlock(pos) != nullptr)
+		return false;
+
 	std::shared_ptr<Block> block = block_factory.createBlock(type, pos);
-	grid.removeBlock(pos);
+	grid.removeBlock(pos); //? shouldn't be necessary
+	grid.addBlock(block);
+
+	return true;
+}
+
+void Interface::addBlock(std::shared_ptr<Block> block)
+{
 	grid.addBlock(block);
 }
 
-void Interface::removeBlock(Vector2 pos)
+bool Interface::removeBlock(Vector2 pos)
 {
-	grid.removeBlock(pos);
+	return grid.removeBlock(pos);
 }
 
 void Interface::removeBlock(std::shared_ptr<Block> block)
@@ -45,6 +55,7 @@ void Interface::drawAreas()
 
 void Interface::drawBlocks()
 {
+	grid.drawBlocks();
 }
 
 void Interface::drawGUI()

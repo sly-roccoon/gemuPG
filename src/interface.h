@@ -1,5 +1,6 @@
 #pragma once
 #include "grid.h"
+#include "util.h"
 
 class Interface
 {
@@ -10,16 +11,19 @@ public:
         return instance;
     }
 
-    void addBlock(blockType, Vector2);
-    void removeBlock(Vector2);
+    bool addBlock(blockType, Vector2);
+    void addBlock(std::shared_ptr<Block>);
+    bool removeBlock(Vector2);
     void removeBlock(std::shared_ptr<Block>);
     void draw();
     Camera2D &getCamera() { return camera; }
+    Grid &getGrid() { return grid; }
+    std::shared_ptr<Block> getBlock(Vector2 pos) { return grid.getBlock(pos); }
 
 private:
     Interface() : grid{}
     {
-        camera.zoom = 1.0f;
+        camera.zoom = DEFAULT_CAMERA_ZOOM;
         camera.offset = {0.0f, 0.0f};
         camera.rotation = 0.0f;
     }

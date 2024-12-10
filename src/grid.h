@@ -7,7 +7,7 @@
 
 constexpr int GRID_SIZE = 512;
 constexpr int GRID_SPACING = 1;
-constexpr Color GRID_COLOR = GREEN;
+constexpr Color GRID_COLOR = LIGHTGRAY;
 
 class Grid
 {
@@ -20,6 +20,8 @@ public:
     bool removeBlock(Vector2);
     void removeBlock(std::shared_ptr<Block>);
     std::shared_ptr<Block> getBlock(Vector2);
+
+    std::vector<std::shared_ptr<Block>> &getBlocks() { return blocks_; };
 
 private:
     std::vector<std::unique_ptr<Area>> areas_;

@@ -1,5 +1,6 @@
 #pragma once
 #include "interface.h"
+#include "blockfactory.h"
 
 class Command
 {
@@ -41,7 +42,7 @@ public:
         if (!block)
             return false;
 
-        block_ = *block;
+        block_ = block->clone();
         interface_.removeBlock(floorVec(pos_));
 
         return true;
@@ -49,12 +50,12 @@ public:
 
     void undo()
     {
-        interface_.addBlock(std::make_shared<Block>(block_));
+        interface_.addBlock(block_->clone()); // TODO: smart pointers
     }
 
 private:
     Vector2 pos_;
-    Block block_;
+    std::shared_ptr<Block> block_;
 };
 
 //----------------------------

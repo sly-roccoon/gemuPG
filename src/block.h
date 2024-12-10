@@ -2,6 +2,7 @@
 // #include <cstdint>
 #include <memory>
 #include "raylib.h"
+#include "util.h"
 
 typedef enum
 {
@@ -18,7 +19,9 @@ class Block
 public:
 	Block();
 	Vector2 getPos() { return pos_; }
-	void draw();
+	blockType getType() { return type_; }
+	virtual void draw() = 0;
+	virtual std::shared_ptr<Block> clone() = 0;
 
 protected:
 	blockType type_;
@@ -43,10 +46,24 @@ class BlockGenerator : public Block
 {
 public:
 	BlockGenerator(Vector2);
+	~BlockGenerator();
+
+	void draw() override;
+	std::shared_ptr<Block> clone() override;
+	void processAudio();
 
 private:
-	// Oscillator				osc_;
-	// ADSR					adsr_;
-	float amp_;
-	float pan_;
+	AudioStream stream_;
+
+	struct Audio
+	{
+		float amp;
+		float pan;
+		float freq;
+		float idx;
+	};
+
+	Audio audio_;
+
+	void audioCallback(void *bufferData, unsigned int frames);
 };

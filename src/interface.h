@@ -3,9 +3,6 @@
 #include "grid.h"
 #include "camera.h"
 
-constexpr unsigned int WIDTH = 1280;
-constexpr unsigned int HEIGHT = 720;
-
 class Interface
 {
 public:
@@ -14,6 +11,7 @@ public:
 		static Interface instance;
 		return instance;
 	}
+	void destroy();
 
 	bool addBlock(blockType, Vector2f);
 	void addBlock(Block *);

@@ -3,12 +3,12 @@
 #include "util.h"
 #include "command.h"
 
-class InputHandler
+class Input
 {
 public:
-	static InputHandler &getInstance()
+	static Input &getInstance()
 	{
-		static InputHandler instance;
+		static Input instance;
 		return instance;
 	}
 
@@ -18,17 +18,20 @@ private:
 	CommandManager cmd_mgr;
 	Camera &camera_;
 
-	void handleKeys();
-
-	void handleCamera();
-	void handleEdit();
-
-	void handleUndoRedo();
-
 	void handleMouseWheel(SDL_Event *);
 	void handleMouse(SDL_Event *);
+	void handleKeys(SDL_Event *);
+	void handleLoseFocus();
 
-	InputHandler() : camera_(Camera::getInstance()) {}
-	InputHandler(const InputHandler &) = delete;
-	InputHandler &operator=(const InputHandler &) = delete;
+	void handleUndoRedo(SDL_Event *);
+
+	bool isKeyDown(SDL_Keycode);
+	void updateKeys(SDL_Event *);
+	std::vector<SDL_Keycode> keys_down_;
+
+	Input() : camera_(Camera::getInstance())
+	{
+	}
+	Input(const Input &) = delete;
+	Input &operator=(const Input &) = delete;
 };

@@ -3,6 +3,9 @@
 #include <numbers>
 #include <SDL3/SDL.h>
 
+constexpr unsigned int WIDTH = 1280;
+constexpr unsigned int HEIGHT = 720;
+
 constexpr int GRID_SIZE = 512;
 constexpr SDL_Color GRID_COLOR = {128, 128, 128, SDL_ALPHA_OPAQUE};
 
@@ -36,6 +39,7 @@ struct Vector2
 	Vector2 operator-(const Vector2 &other) const { return Vector2(x - other.x, y - other.y); }
 	Vector2 operator*(T scalar) const { return Vector2(x * scalar, y * scalar); }
 	bool operator==(const Vector2 &other) const { return x == other.x && y == other.y; }
+	Vector2 operator+=(const Vector2 &other) const { return {x + other.x, y + other.y}; }
 };
 
 using Vector2f = Vector2<float>;

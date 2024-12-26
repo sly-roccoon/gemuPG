@@ -11,6 +11,13 @@ Interface::Interface() : camera_{Camera::getInstance()}
 		exit(SDL_APP_FAILURE);
 }
 
+void Interface::destroy()
+{
+	SDL_DestroyRenderer(renderer_);
+	SDL_DestroyWindow(window_);
+	renderer_, window_ = nullptr;
+}
+
 bool Interface::addBlock(blockType type, Vector2f pos)
 {
 	BlockFactory &block_factory = BlockFactory::getInstance();

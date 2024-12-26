@@ -1,40 +1,45 @@
 #pragma once
+#include <SDL3/SDL.h>
 #include "grid.h"
-#include "util.h"
+#include "camera.h"
+
+constexpr unsigned int WIDTH = 1280;
+constexpr unsigned int HEIGHT = 720;
 
 class Interface
 {
 public:
-    static Interface &getInstance()
-    {
-        static Interface instance;
-        return instance;
-    }
+	static Interface &getInstance()
+	{
+		static Interface instance;
+		return instance;
+	}
 
-    bool addBlock(blockType, Vector2);
-    void addBlock(std::shared_ptr<Block>);
-    bool removeBlock(Vector2);
-    void removeBlock(std::shared_ptr<Block>);
-    void draw();
-    Camera2D &getCamera() { return camera; }
-    Grid &getGrid() { return grid; }
-    std::shared_ptr<Block> getBlock(Vector2 pos) { return grid.getBlock(pos); }
+	bool addBlock(blockType, Vector2f);
+	void addBlock(Block *);
+	bool removeBlock(Vector2f);
+	void removeBlock(Block *);
+	void draw();
+	Grid &getGrid() { return grid_; }
+	Block *getBlock(Vector2f pos) { return grid_.getBlock(pos); }
 
 private:
-    Interface() : grid{}
-    {
-        camera.zoom = DEFAULT_CAMERA_ZOOM;
-        camera.offset = {0.0f, 0.0f};
-        camera.rotation = 0.0f;
-    }
-    Interface(const Interface &) = delete;
-    Interface &operator=(const Interface &) = delete;
+	Interface();
+	Interface(const Interface &) = delete;
+	Interface &operator=(const Interface &) = delete;
 
-    Camera2D camera = {};
-    Grid grid;
+	unsigned int width_ = WIDTH;
+	unsigned int height_ = HEIGHT;
 
-    void drawGrid();
-    void drawAreas();
-    void drawBlocks();
-    void drawGUI();
+	Camera &camera_;
+	Grid grid_{};
+
+	SDL_Window *window_ = nullptr;
+	SDL_Renderer *renderer_ = nullptr;
+
+	void drawGrid();
+	void drawAreas();
+	void drawBlocks();
+	void drawGUI();
+	void debug();
 };

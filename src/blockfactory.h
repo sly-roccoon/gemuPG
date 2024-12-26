@@ -1,5 +1,5 @@
 #include "block.h"
-#include "raymath.h"
+#include "util.h"
 
 class BlockFactory
 {
@@ -10,12 +10,12 @@ public:
         return instance;
     }
 
-    std::shared_ptr<Block> createBlock(const blockType type, const Vector2 pos)
+    Block *createBlock(const blockType type, const Vector2f pos)
     {
         switch (type)
         {
         case BLOCK_GENERATOR:
-            return std::make_shared<BlockGenerator>(pos);
+            return new BlockGenerator(pos);
         default:
             return nullptr;
         }

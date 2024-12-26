@@ -1,59 +1,68 @@
 #include "block.h"
-#include "raymath.h"
-#include "raylib.h"
+#include <SDL3/SDL.h>
 
-Block::Block()
+Block::Block(Vector2f pos)
 {
-	type_ = BLOCK_NONE;
-	bypass_ = true;
-	pos_ = Vector2Zero();
+    type_ = BLOCK_NONE;
+    bypass_ = true;
+    rect_ = {pos.x, pos.y, 1.0f, 1.0f};
 }
 
-void BlockGenerator::draw()
+SDL_FRect *Block::getFRect()
 {
-	DrawRectangle(pos_.x, pos_.y, 1, 1, BLUE); //! magic :(
+    render_rect_ = Camera::resizeFRect(rect_);
+    return &render_rect_;
 }
 
-std::shared_ptr<Block> BlockGenerator::clone()
+Block *BlockGenerator::clone()
 {
-	std::shared_ptr<BlockGenerator> copy = std::make_shared<BlockGenerator>(pos_);
+    BlockGenerator *copy = new BlockGenerator({rect_.x, rect_.y});
 
-	copy->audio_ = audio_;
-	return copy;
+    copy->amp = amp;
+    copy->freq = freq;
+    copy->pan = pan;
+
+    return copy;
 }
 
-BlockGenerator::BlockGenerator(Vector2 pos) : Block()
+BlockGenerator::BlockGenerator(Vector2f pos) : Block(pos)
 {
-	type_ = BLOCK_GENERATOR;
-	pos_ = pos;
-	audio_.amp = 32000.0f;
-	audio_.freq = 440.0f;
-	audio_.pan = 0.0f;
+    type_ = BLOCK_GENERATOR;
+    amp = 1.0f;
+    freq = 440.0f;
+    pan = 0.0f;
 
-	stream_ = LoadAudioStream(SAMPLE_RATE, BIT_DEPTH, CHANNELS);
-	SetAudioStreamCallback(stream_, (AudioCallback)&audioCallback);
-
-	PlayAudioStream(stream_);
+    stream_ = SDL_CreateAudioStream(&DEFAULT_SPEC, nullptr);
+    SDL_SetAudioStreamGetCallback(stream_, audioCallback, this);
 }
 
 BlockGenerator::~BlockGenerator()
 {
-	UnloadAudioStream(stream_);
+    /*UnloadAudioStream(stream_);*/
 }
 
 void BlockGenerator::processAudio()
 {
 }
 
-void BlockGenerator::audioCallback(void *buffer, unsigned int frames)
+void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
 {
-	float delta = audio_.freq / SAMPLE_RATE;
-	short *d = (short *)buffer;
-	for (int i = 0; i < frames; i++)
-	{
-		d[i] = audio_.amp * sin(2 * PI * audio_.idx);
-		audio_.idx += delta;
-		if (audio_.idx >= 1.0f)
-			audio_.idx -= 1.0f;
-	}
+    BlockGenerator *block = (BlockGenerator *)userdata;
+    float delta = block->freq / SAMPLE_RATE;
+    additional_amount /= sizeof(float);
+    while (additional_amount > 0)
+    {
+        float samples[BUFFER_SIZE];
+        const int total = SDL_min(additional_amount, SDL_arraysize(samples));
+        int i;
+
+        for (i = 0; i < total; i++)
+        {
+            samples[i] = SDL_sinf(TWOPI * block->freq * block->phase / SAMPLE_RATE);
+            block->phase++;
+        }
+
+        SDL_PutAudioStreamData(stream, samples, total * sizeof(float));
+        additional_amount -= total;
+    }
 }

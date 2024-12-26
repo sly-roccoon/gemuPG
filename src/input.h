@@ -1,5 +1,4 @@
 #pragma once
-#include "raylib.h"
 #include "interface.h"
 #include "util.h"
 #include "command.h"
@@ -7,27 +6,29 @@
 class InputHandler
 {
 public:
-    static InputHandler &getInstance()
-    {
-        static InputHandler instance;
-        return instance;
-    }
+	static InputHandler &getInstance()
+	{
+		static InputHandler instance;
+		return instance;
+	}
 
-    void handleInput();
+	void handleEvent(SDL_Event *);
 
 private:
-    CommandManager cmd_mgr;
-    Camera2D &camera;
+	CommandManager cmd_mgr;
+	Camera &camera_;
 
-    void handleMouse();
-    void handleKeys();
+	void handleKeys();
 
-    void handleCamera();
-    void handleEdit();
+	void handleCamera();
+	void handleEdit();
 
-    void handleUndoRedo();
+	void handleUndoRedo();
 
-    InputHandler() : camera(Interface::getInstance().getCamera()) {}
-    InputHandler(const InputHandler &) = delete;
-    InputHandler &operator=(const InputHandler &) = delete;
+	void handleMouseWheel(SDL_Event *);
+	void handleMouse(SDL_Event *);
+
+	InputHandler() : camera_(Camera::getInstance()) {}
+	InputHandler(const InputHandler &) = delete;
+	InputHandler &operator=(const InputHandler &) = delete;
 };

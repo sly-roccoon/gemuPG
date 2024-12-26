@@ -1,69 +1,65 @@
 #pragma once
-// #include <cstdint>
 #include <memory>
-#include "raylib.h"
+#include <SDL3/SDL.h>
 #include "util.h"
+#include "camera.h"
 
 typedef enum
 {
-	BLOCK_NONE,
-	BLOCK_GENERATOR,
-	BLOCK_SEQUENCER,
-	BLOCK_SETTINGS,
-	BLOCK_EFFECT,
-	BLOCK_MODULATOR
+    BLOCK_NONE,
+    BLOCK_GENERATOR,
+    BLOCK_SEQUENCER,
+    BLOCK_SETTINGS,
+    BLOCK_EFFECT,
+    BLOCK_MODULATOR
 } blockType;
 
 class Block
 {
 public:
-	Block();
-	Vector2 getPos() { return pos_; }
-	blockType getType() { return type_; }
-	virtual void draw() = 0;
-	virtual std::shared_ptr<Block> clone() = 0;
+    Block(Vector2f);
+    SDL_FRect *getFRect();
+    Vector2f getPos() { return Vector2f(rect_.x, rect_.y); }
+    void setPos(Vector2f pos)
+    {
+        pos = floorVec(pos);
+        rect_.x = pos.x;
+        rect_.y = pos.y;
+    }
+    blockType getType() { return type_; }
+    virtual Block *clone() = 0;
 
 protected:
-	blockType type_;
-	Vector2 pos_;
-	bool bypass_;
+    blockType type_;
+    bool bypass_ = false;
+    SDL_FRect rect_{0, 0, 1.0f, 1.0f};
+    SDL_FRect render_rect_;
 };
-
-#pragma endregion
-
-#pragma region GENERATOR BLOCK
 
 typedef enum
 {
-	WAVE_SAMPLE,
-	WAVE_SAW,
-	WAVE_SINE,
-	WAVE_SQUARE,
-	WAVE_TRIANGLE
+    WAVE_SAMPLE,
+    WAVE_SAW,
+    WAVE_SINE,
+    WAVE_SQUARE,
+    WAVE_TRIANGLE
 } WAVE_FORMS;
 
 class BlockGenerator : public Block
 {
 public:
-	BlockGenerator(Vector2);
-	~BlockGenerator();
+    BlockGenerator(Vector2f);
+    ~BlockGenerator();
+    Block *clone() override;
 
-	void draw() override;
-	std::shared_ptr<Block> clone() override;
-	void processAudio();
+    void processAudio();
+    float amp;
+    float pan;
+    float freq;
+    float phase;
 
 private:
-	AudioStream stream_;
+    SDL_AudioStream *stream_;
 
-	struct Audio
-	{
-		float amp;
-		float pan;
-		float freq;
-		float idx;
-	};
-
-	Audio audio_;
-
-	void audioCallback(void *bufferData, unsigned int frames);
+    static void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
 };

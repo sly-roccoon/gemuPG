@@ -82,5 +82,5 @@ void Interface::drawGUI()
 void Interface::debug()
 {
 	SDL_SetRenderDrawColor(renderer_, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderDebugText(renderer_, 0, 0, std::format("CamPos: {}, {}", std::to_string(Camera::getPos().x), std::to_string(Camera::getPos().y)).c_str());
+	SDL_RenderDebugTextFormat(renderer_, 0, 0, "CamPos: %.2f, %.2f", Camera::getPos().x, Camera::getPos().y);
 }

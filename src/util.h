@@ -18,6 +18,8 @@ constexpr unsigned int SAMPLE_RATE = 44100;
 constexpr unsigned int BIT_DEPTH = 16;
 constexpr unsigned int CHANNELS = 1;
 
+static unsigned int PHASE;
+
 constexpr double TWOPI = 2.0f * std::numbers::pi;
 
 constexpr SDL_AudioSpec DEFAULT_SPEC = {

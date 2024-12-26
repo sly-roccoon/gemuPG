@@ -16,7 +16,6 @@ public:
 
 private:
 	CommandManager cmd_mgr;
-	Camera &camera_;
 
 	void handleMouseWheel(SDL_Event *);
 	void handleMouse(SDL_Event *);
@@ -29,9 +28,7 @@ private:
 	void updateKeys(SDL_Event *);
 	std::vector<SDL_Keycode> keys_down_;
 
-	Input() : camera_(Camera::getInstance())
-	{
-	}
+	Input() = default;
 	Input(const Input &) = delete;
 	Input &operator=(const Input &) = delete;
 };

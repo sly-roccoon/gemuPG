@@ -15,7 +15,18 @@ public:
         switch (type)
         {
         case BLOCK_GENERATOR:
+        {
+            auto blocks = Interface::getInstance().getGrid().getBlocks();
+            for (auto block : blocks)
+            {
+                if (block->getType() == BLOCK_GENERATOR)
+                {
+                    float phase = ((BlockGenerator *)block)->phase;
+                    return new BlockGenerator(pos, phase);
+                }
+            }
             return new BlockGenerator(pos);
+        }
         default:
             return nullptr;
         }

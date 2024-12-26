@@ -25,24 +25,22 @@ Block *BlockGenerator::clone()
     return copy;
 }
 
-BlockGenerator::BlockGenerator(Vector2f pos) : Block(pos)
+BlockGenerator::BlockGenerator(Vector2f pos, float phase) : Block(pos)
 {
     type_ = BLOCK_GENERATOR;
     amp = 1.0f;
     freq = 440.0f;
     pan = 0.0f;
 
-    stream_ = SDL_CreateAudioStream(&DEFAULT_SPEC, nullptr);
+    this->phase = phase;
+
+    stream_ = SDL_CreateAudioStream(&DEFAULT_SPEC, &DEFAULT_SPEC);
     SDL_SetAudioStreamGetCallback(stream_, audioCallback, this);
 }
 
 BlockGenerator::~BlockGenerator()
 {
-    /*UnloadAudioStream(stream_);*/
-}
-
-void BlockGenerator::processAudio()
-{
+    SDL_DestroyAudioStream(stream_);
 }
 
 void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
@@ -52,7 +50,7 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
     additional_amount /= sizeof(float);
     while (additional_amount > 0)
     {
-        float samples[BUFFER_SIZE];
+        float samples[BUFFER_SIZE] = {};
         const int total = SDL_min(additional_amount, SDL_arraysize(samples));
         int i;
 

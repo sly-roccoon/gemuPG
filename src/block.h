@@ -48,11 +48,11 @@ typedef enum
 class BlockGenerator : public Block
 {
 public:
-    BlockGenerator(Vector2f);
+    BlockGenerator(Vector2f, float phase = 0.0f);
     ~BlockGenerator();
     Block *clone() override;
 
-    void processAudio();
+    SDL_AudioStream *getStream() { return stream_; }
     float amp;
     float pan;
     float freq;

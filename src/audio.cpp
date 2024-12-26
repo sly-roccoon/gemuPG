@@ -1,48 +1,61 @@
-//#include "audio.h"
-//#include "stdio.h"
-//
-//
-//static int total_samples_generated = 0;
-//
-//void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
-//{ //TODO: replace
-//	additional_amount /= sizeof(float);  /* convert from bytes to samples */
-//	while (additional_amount > 0) {
-//		float samples[128];  /* this will feed 128 samples each iteration until we have enough. */
-//		const int total = SDL_min(additional_amount, SDL_arraysize(samples));
-//		int i;
-//
-//		for (i = 0; i < total; i++) {
-//			/* You don't have to care about this math; we're just generating a simple sine wave as we go.
-//			   https://en.wikipedia.org/wiki/Sine_wave */
-//			const float time = total_samples_generated / 8000.0f;
-//			const int sine_freq = 500;   /* run the wave at 500Hz */
-//			samples[i] = SDL_sinf(6.283185f * sine_freq * time);
-//			total_samples_generated++;
-//		}
-//
-//		/* feed the new data to the stream. It will queue at the end, and trickle out as the hardware needs more data. */
-//		SDL_PutAudioStreamData(stream, samples, total * sizeof(float));
-//		additional_amount -= total;  /* subtract what we've just fed the stream. */
-//	}
-//}
-//
-//AudioEngine::AudioEngine()
-//{
-//	if (!SDL_Init(SDL_INIT_AUDIO)) {
-//		SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
-//		exit(SDL_APP_FAILURE);
-//	}
-//
-//	spec_.channels = CHANNELS;
-//	spec_.format = SDL_AUDIO_F32;
-//	spec_.freq = SAMPLE_RATE;
-//	stream_ = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec_, audioCallback, this);
-//
-//	if (!stream_) {
-//		SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
-//		exit(SDL_APP_FAILURE);
-//	}
-//	
-//	SDL_ResumeAudioStreamDevice(stream_);
-//}
+#include "audio.h"
+#include "stdio.h"
+
+static int total_samples_generated = 0;
+
+float *getStreams(int n_samples, AudioEngine *audio);
+
+void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
+{
+	AudioEngine *audio = (AudioEngine *)userdata;
+
+	while (additional_amount > 0)
+	{
+		float samples[BUFFER_SIZE] = {};
+		float new_samples[BUFFER_SIZE];
+		const int n_samples = SDL_min(additional_amount, BUFFER_SIZE);
+
+		Grid &grid = Interface::getInstance().getGrid();
+
+		for (auto block : grid.getBlocks())
+		{
+			if (block->getType() != BLOCK_GENERATOR)
+				continue;
+
+			BlockGenerator *gen_block = (BlockGenerator *)block;
+			SDL_GetAudioStreamData(gen_block->getStream(), new_samples, n_samples * sizeof(float));
+
+			for (int i = 0; i < n_samples; i++)
+				samples[i] += new_samples[i];
+		}
+
+		SDL_PutAudioStreamData(stream, samples, n_samples * sizeof(float));
+		additional_amount -= n_samples;
+	}
+}
+
+AudioEngine::AudioEngine()
+{
+	if (!SDL_Init(SDL_INIT_AUDIO))
+	{
+		SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+		exit(SDL_APP_FAILURE);
+	}
+
+	spec_ = DEFAULT_SPEC;
+	stream_ = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec_, audioCallback, this);
+
+	if (!stream_)
+	{
+		SDL_Log("Couldn't create audio stream: %s", SDL_GetError());
+		exit(SDL_APP_FAILURE);
+	}
+
+	SDL_ResumeAudioStreamDevice(stream_);
+}
+
+void AudioEngine::destroy()
+{
+	SDL_DestroyAudioStream(stream_);
+	SDL_CloseAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK);
+}

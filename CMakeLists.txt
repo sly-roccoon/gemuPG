@@ -8,6 +8,12 @@ project(gemupg VERSION 0.1)
 # SDL
 add_subdirectory(include/SDL EXCLUDE_FROM_ALL)
 
+# IMGUI
+file (GLOB IMGUI_SOURCES CONFIGURE_DEPENDS "include/imgui/*.cpp")
+add_library(IMGUI ${IMGUI_SOURCES})
+target_link_libraries(IMGUI PUBLIC SDL3::SDL3)
+target_include_directories(IMGUI PUBLIC "include/imgui")
+
 # GEMUPG
 add_compile_options(-Wno-pmf-conversions)
 
@@ -24,8 +30,8 @@ list (REMOVE_DUPLICATES gemupg_INCLUDE_DIRS)
 add_executable(${PROJECT_NAME} ${gemupg_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 IMGUI)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
-  COMMAND_EXPAND_LISTS
+	COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+	COMMAND_EXPAND_LISTS
 )

@@ -78,7 +78,7 @@ void Input::handleMouse(SDL_Event *event)
 	}
 
 	SDL_MouseButtonEvent button = event->button;
-	if (button.button == SDL_BUTTON_MIDDLE || (button.button == SDL_BUTTON_LEFT && isKeyDown(SDLK_LCTRL)))
+	if (button.button == SDL_BUTTON_MIDDLE || (button.button == SDL_BUTTON_LEFT && (isKeyDown(SDLK_LCTRL) || isKeyDown(SDLK_RCTRL))))
 	{
 		if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 			isDragging = true;

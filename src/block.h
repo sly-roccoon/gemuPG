@@ -6,60 +6,80 @@
 
 typedef enum
 {
-    BLOCK_NONE,
-    BLOCK_GENERATOR,
-    BLOCK_SEQUENCER,
-    BLOCK_SETTINGS,
-    BLOCK_EFFECT,
-    BLOCK_MODULATOR
+	BLOCK_NONE,
+	BLOCK_GENERATOR,
+	BLOCK_SEQUENCER,
+	BLOCK_SETTINGS,
+	BLOCK_EFFECT,
+	BLOCK_MODULATOR
 } blockType;
 
 class Block
 {
 public:
-    Block(Vector2f);
-    SDL_FRect *getFRect();
-    Vector2f getPos() { return Vector2f(rect_.x, rect_.y); }
-    void setPos(Vector2f pos)
-    {
-        pos = floorVec(pos);
-        rect_.x = pos.x;
-        rect_.y = pos.y;
-    }
-    blockType getType() { return type_; }
-    virtual Block *clone() = 0;
+	Block(Vector2f);
+	SDL_FRect *getFRect();
+	Vector2f getPos() { return Vector2f(rect_.x, rect_.y); }
+	void setPos(Vector2f pos)
+	{
+		pos = floorVec(pos);
+		rect_.x = pos.x;
+		rect_.y = pos.y;
+	}
+	blockType getType() { return type_; }
+	virtual Block *clone() = 0;
+
+	virtual void drawGUI() = 0;
+	void toggleGUI() { viewGUI_ = !viewGUI_; }
 
 protected:
-    blockType type_;
-    bool bypass_ = false;
-    SDL_FRect rect_{0, 0, 1.0f, 1.0f};
-    SDL_FRect render_rect_;
+	bool viewGUI_ = false;
+	blockType type_;
+	bool bypass_ = false;
+	SDL_FRect rect_{0, 0, 1.0f, 1.0f};
+	SDL_FRect render_rect_;
 };
 
 typedef enum
 {
-    WAVE_SAMPLE,
-    WAVE_SAW,
-    WAVE_SINE,
-    WAVE_SQUARE,
-    WAVE_TRIANGLE
+	WAVE_SAMPLE,
+	WAVE_SAW,
+	WAVE_SINE,
+	WAVE_SQUARE,
+	WAVE_TRIANGLE
 } WAVE_FORMS;
+
+typedef struct generator_data_t
+{
+	WAVE_FORMS wave;
+	float amp;
+	float pan;
+	float freq;
+	float phase;
+} generator_data_t;
 
 class BlockGenerator : public Block
 {
 public:
-    BlockGenerator(Vector2f, float phase = 0.0f);
-    ~BlockGenerator();
-    Block *clone() override;
+	BlockGenerator(Vector2f, float phase = 0.0f);
+	~BlockGenerator();
+	Block *clone() override;
 
-    SDL_AudioStream *getStream() { return stream_; }
-    float amp;
-    float pan;
-    float freq;
-    float phase;
+	SDL_AudioStream *getStream() { return stream_; }
+	void drawGUI() override;
+
+	generator_data_t getData() { return data_; }
+	void setData(generator_data_t data) { data_ = data; }
+	void incrPhase() { data_.phase++; }
 
 private:
-    SDL_AudioStream *stream_;
+	SDL_AudioStream *stream_;
+	generator_data_t data_ = {
+		.wave = WAVE_SINE,
+		.amp = 1.0f,
+		.pan = 0.0f,
+		.freq = 440.0f,
+		.phase = 0.0f};
 
-    static void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
+	static void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
 };

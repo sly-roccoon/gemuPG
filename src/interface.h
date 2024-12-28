@@ -13,6 +13,9 @@ public:
 	}
 	void destroy();
 
+	SDL_Window *getWindow() { return window_; }
+	SDL_Renderer *getRenderer() { return renderer_; }
+
 	bool addBlock(blockType, Vector2f);
 	void addBlock(Block *);
 	bool removeBlock(Vector2f);

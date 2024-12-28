@@ -1,8 +1,14 @@
 #include "input.h"
+#include "gui.h"
 #include <cstdio>
 
 void Input::handleEvent(SDL_Event *event)
 {
+	ImGui_ImplSDL3_ProcessEvent(event);
+
+	if (ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard)
+		return;
+
 	switch (event->type)
 	{
 	case SDL_EVENT_MOUSE_WHEEL:
@@ -28,7 +34,7 @@ void Input::updateKeys(SDL_Event *event)
 	if (event->type != SDL_EVENT_KEY_DOWN && event->type != SDL_EVENT_KEY_UP)
 		return;
 
-	if (event->type == SDL_EVENT_KEY_DOWN)
+	if (event->type == SDL_EVENT_KEY_DOWN && !isKeyDown(event->key.key))
 	{
 		keys_down_.push_back(event->key.key);
 	}
@@ -72,7 +78,7 @@ void Input::handleMouse(SDL_Event *event)
 	}
 
 	SDL_MouseButtonEvent button = event->button;
-	if (button.button == SDL_BUTTON_MIDDLE)
+	if (button.button == SDL_BUTTON_MIDDLE || (button.button == SDL_BUTTON_LEFT && isKeyDown(SDLK_LCTRL)))
 	{
 		if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 			isDragging = true;
@@ -83,9 +89,17 @@ void Input::handleMouse(SDL_Event *event)
 		Camera::setPos(Camera::getPos() + delta * -1.0f / Camera::getZoom());
 
 	//---------------------PLACING-----------------------------
-	if (button.button == SDL_BUTTON_LEFT && button.down)
+	if (button.button == SDL_BUTTON_LEFT && button.down && !isKeyDown(SDLK_LCTRL))
 	{
 		Vector2f mouse_pos = {button.x, button.y};
+		Grid &grid = Interface::getInstance().getGrid();
+		Vector2f world_pos = Camera::screenToWorld(mouse_pos);
+		Block *block_at_mouse = grid.getBlock(world_pos);
+		if (block_at_mouse)
+		{
+			block_at_mouse->toggleGUI();
+			return;
+		}
 		auto cmd = std::make_unique<AddBlockCommand>(Camera::screenToWorld(mouse_pos));
 		cmd_mgr.executeCommand(std::move(cmd));
 	}

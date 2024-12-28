@@ -1,4 +1,5 @@
 #include "block.h"
+#include "gui.h"
 #include <SDL3/SDL.h>
 
 Block::Block(Vector2f pos)
@@ -18,9 +19,7 @@ Block *BlockGenerator::clone()
 {
     BlockGenerator *copy = new BlockGenerator({rect_.x, rect_.y});
 
-    copy->amp = amp;
-    copy->freq = freq;
-    copy->pan = pan;
+    copy->setData({data_.wave, data_.amp, data_.freq, data_.pan, data_.phase});
 
     return copy;
 }
@@ -28,11 +27,7 @@ Block *BlockGenerator::clone()
 BlockGenerator::BlockGenerator(Vector2f pos, float phase) : Block(pos)
 {
     type_ = BLOCK_GENERATOR;
-    amp = 1.0f;
-    freq = 440.0f;
-    pan = 0.0f;
-
-    this->phase = phase;
+    data_.phase = phase;
 
     stream_ = SDL_CreateAudioStream(&DEFAULT_SPEC, &DEFAULT_SPEC);
     SDL_SetAudioStreamGetCallback(stream_, audioCallback, this);
@@ -46,7 +41,7 @@ BlockGenerator::~BlockGenerator()
 void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
 {
     BlockGenerator *block = (BlockGenerator *)userdata;
-    float delta = block->freq / SAMPLE_RATE;
+    float delta = block->getData().freq / SAMPLE_RATE;
     additional_amount /= sizeof(float);
     while (additional_amount > 0)
     {
@@ -56,11 +51,26 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 
         for (i = 0; i < total; i++)
         {
-            samples[i] = SDL_sinf(TWOPI * block->freq * block->phase / SAMPLE_RATE);
-            block->phase++;
+            samples[i] = block->getData().amp * sinf(TWOPI * block->getData().freq * block->getData().phase / SAMPLE_RATE);
+            block->incrPhase();
         }
 
         SDL_PutAudioStreamData(stream, samples, total * sizeof(float));
         additional_amount -= total;
     }
+}
+
+void BlockGenerator::drawGUI()
+{
+    if (!viewGUI_)
+        return;
+
+    ImGui::Begin(std::format("Generator Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_);
+
+    ImGuiSliderFlags log = ImGuiSliderFlags_Logarithmic;
+    ImGui::SliderFloat("Amplitude", &data_.amp, 0.0f, 1.0f, "% .2f");
+    ImGui::SliderFloat("Frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", log);
+    ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
+
+    ImGui::End();
 }

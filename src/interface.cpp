@@ -1,5 +1,6 @@
 #include "interface.h"
 #include "blockfactory.h"
+#include "gui.h"
 #include <format>
 
 Interface::Interface() : camera_{Camera::getInstance()}
@@ -77,6 +78,15 @@ void Interface::drawBlocks()
 
 void Interface::drawGUI()
 {
+	ImGui_ImplSDLRenderer3_NewFrame();
+	ImGui_ImplSDL3_NewFrame();
+	ImGui::NewFrame();
+
+	for (auto &block : grid_.getBlocks())
+		block->drawGUI(); // TODO: crackling when changing values
+
+	ImGui::Render();
+	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer_);
 }
 
 void Interface::debug()

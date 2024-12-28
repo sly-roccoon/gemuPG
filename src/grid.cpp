@@ -71,6 +71,7 @@ void Grid::removeBlock(Block *block)
 
 Block *Grid::getBlock(Vector2f pos)
 {
+	pos = floorVec(pos);
 	for (auto &block : blocks_)
 		if (block->getPos() == pos)
 			return block;

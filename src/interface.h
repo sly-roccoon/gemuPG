@@ -24,6 +24,9 @@ public:
 	Grid &getGrid() { return grid_; }
 	Block *getBlock(Vector2f pos) { return grid_.getBlock(pos); }
 
+	void setSelection(selectionType selection) { cur_selection_ = selection; }
+	selectionType getSelection() { return cur_selection_; }
+
 private:
 	Interface();
 	Interface(const Interface &) = delete;
@@ -31,6 +34,8 @@ private:
 
 	unsigned int width_ = WIDTH;
 	unsigned int height_ = HEIGHT;
+
+	selectionType cur_selection_ = SELECT_GENERATOR;
 
 	Camera &camera_;
 	Grid grid_{};

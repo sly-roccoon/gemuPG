@@ -39,19 +39,40 @@ void Grid::draw(SDL_Renderer *renderer)
 
 void Grid::drawBlocks(SDL_Renderer *renderer)
 {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 255, SDL_ALPHA_OPAQUE);
+	SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
 	for (auto block : blocks_)
 	{
 		SDL_RenderFillRect(renderer, block->getFRect());
 	}
 }
 
+void Grid::drawAreas(SDL_Renderer *renderer)
+{
+	SDL_SetRenderDrawColor(renderer, AREA_COLOR.r, AREA_COLOR.g, AREA_COLOR.b, AREA_COLOR.a);
+	for (auto &area : areas_)
+	{
+		for (auto &pos : area->getPositions())
+		{
+			SDL_FRect rect = {Camera::worldToScreen(pos).x, Camera::worldToScreen(pos).y, Camera::getZoom(), Camera::getZoom()};
+			SDL_RenderFillRect(renderer, &rect);
+		}
+	}
+}
+
 void Grid::addBlock(Block *block)
 {
+	if (!block)
+		return;
+
+	if (getArea(block->getPos()))
+	{
+		getArea(block->getPos())->addBlock(block);
+		return;
+	}
 	blocks_.push_back(std::move(block));
 }
 
-bool Grid::removeBlock(Vector2f pos)
+bool Grid::removeGlobalBlock(Vector2f pos)
 {
 	return (blocks_.end() == blocks_.erase(
 								 std::remove_if(blocks_.begin(), blocks_.end(),
@@ -60,13 +81,39 @@ bool Grid::removeBlock(Vector2f pos)
 								 blocks_.end()));
 }
 
-void Grid::removeBlock(Block *block)
+bool Grid::removeAreaBlock(Vector2f pos)
+{
+	for (auto &area : areas_)
+		if (area->removeBlock(pos))
+			return true;
+
+	return false;
+}
+
+bool Grid::removeBlock(Vector2f pos)
+{
+	return (removeGlobalBlock(pos) || removeAreaBlock(pos));
+}
+
+void Grid::removeGlobalBlock(Block *block)
 {
 	blocks_.erase(
 		std::remove_if(blocks_.begin(), blocks_.end(),
 					   [block](auto b)
 					   { return b == block; }),
 		blocks_.end());
+}
+
+void Grid::removeAreaBlock(Block *block)
+{
+	for (auto &area : areas_)
+		area->removeBlock(block);
+}
+
+void Grid::removeBlock(Block *block)
+{
+	removeGlobalBlock(block);
+	removeAreaBlock(block);
 }
 
 Block *Grid::getBlock(Vector2f pos)
@@ -77,9 +124,97 @@ Block *Grid::getBlock(Vector2f pos)
 			return block;
 
 	for (auto &area : areas_)
-		for (auto &block : area->getBlocks())
-			if (block->getPos() == pos)
-				return block;
+		area->getBlock(pos);
 
 	return nullptr;
+}
+
+//--------------------------------------------------------
+Area *Grid::getArea(Vector2f pos)
+{
+	for (auto &area : areas_)
+		if (area->isInside(pos))
+			return area;
+
+	return nullptr;
+}
+
+Area **Grid::getAdjacentAreas(Vector2f pos) // in order UP, LEFT, DOWN, RIGHT
+{
+	Area **adjacentAreas = (Area **)malloc(4 * sizeof(Area *));
+	adjacentAreas[0] = getArea({pos.x, pos.y - 1});
+	adjacentAreas[1] = getArea({pos.x - 1, pos.y});
+	adjacentAreas[2] = getArea({pos.x, pos.y + 1});
+	adjacentAreas[3] = getArea({pos.x + 1, pos.y});
+
+	return adjacentAreas;
+}
+
+void Grid::mergeAreas(Area *into, Area *from)
+{
+	into->addPositions(from->getPositions());
+	for (auto &block : from->getBlocks())
+	{
+		into->addBlock(block);
+		from->removeBlock(block);
+	}
+}
+
+Area *Grid::connectAreas(Vector2f pos)
+{
+	Area **adjacent = getAdjacentAreas(pos);
+	Area *area = nullptr;
+	if (adjacent[0])
+	{
+		adjacent[0]->addPosition(pos);
+		return adjacent[0]; // TODO: finish this :)
+	}
+
+	delete adjacent;
+	return area;
+}
+
+bool Grid::addArea(Vector2f pos)
+{
+	if (getArea(pos))
+		return false;
+
+	Area *area = connectAreas(pos);
+	if (!area)
+	{
+		area = new Area();
+		area->addPosition(pos);
+		areas_.push_back(area);
+	}
+
+	area->addBlock(getBlock(pos));
+	removeGlobalBlock(pos);
+	return true;
+}
+
+bool Grid::removeArea(Vector2f pos)
+{
+	Area *area = getArea(pos);
+	if (!area)
+		return false;
+
+	area->removePosition(pos);
+	addBlock(area->getBlock(pos));
+	if (area->getPositions().empty())
+		removeArea(area);
+
+	return true;
+
+	// TODO: check if area is still connected and split if not
+}
+
+void Grid::removeArea(Area *area)
+{
+	areas_.erase(
+		std::remove_if(areas_.begin(), areas_.end(),
+					   [area](auto a)
+					   { return a == area; }),
+		areas_.end());
+
+	delete area;
 }

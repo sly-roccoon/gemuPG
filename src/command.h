@@ -71,6 +71,44 @@ private:
 	Block *block_;
 };
 
+class AddAreaCommand : public Command
+{
+public:
+	AddAreaCommand(Vector2f pos) : pos_{pos} {}
+
+	bool execute() override
+	{
+		return interface_.getGrid().addArea(pos_);
+	}
+
+	void undo() override
+	{
+		interface_.getGrid().removeArea(pos_);
+	}
+
+private:
+	Vector2f pos_;
+};
+
+class RemoveAreaCommand : public Command
+{
+public:
+	RemoveAreaCommand(Vector2f pos) : pos_{pos} {}
+
+	bool execute() override
+	{
+		return interface_.getGrid().removeArea(pos_);
+	}
+
+	void undo() override
+	{
+		interface_.getGrid().addArea(pos_);
+	}
+
+private:
+	Vector2f pos_;
+};
+
 //----------------------------
 class CommandManager
 {

@@ -66,9 +66,8 @@ void Input::handleMouseWheel(SDL_Event *event)
 	Camera::zoomAtPos(mouse_pos, scale_factor);
 }
 
-void Input::handleMouse(SDL_Event *event)
+void Input::handleCamPan(SDL_Event *event)
 {
-	//---------------------PANNING-----------------------------
 	static bool isDragging;
 	static Vector2f delta;
 
@@ -87,28 +86,56 @@ void Input::handleMouse(SDL_Event *event)
 	}
 	if (isDragging)
 		Camera::setPos(Camera::getPos() + delta * -1.0f / Camera::getZoom());
+}
 
-	//---------------------PLACING-----------------------------
+void Input::handlePlacement(SDL_Event *event)
+{
+	SDL_MouseButtonEvent button = event->button;
+	Vector2f mouse_pos = {button.x, button.y};
+	Grid &grid = Interface::getInstance().getGrid();
+	Vector2f world_pos = Camera::screenToWorld(mouse_pos);
+	std::unique_ptr<Command> cmd;
+	selectionType cur_selection = Interface::getInstance().getSelection();
+
 	if (button.button == SDL_BUTTON_LEFT && button.down && !isKeyDown(SDLK_LCTRL))
 	{
-		Vector2f mouse_pos = {button.x, button.y};
-		Grid &grid = Interface::getInstance().getGrid();
-		Vector2f world_pos = Camera::screenToWorld(mouse_pos);
-		Block *block_at_mouse = grid.getBlock(world_pos);
-		if (block_at_mouse)
+		if (cur_selection == SELECT_AREA) // draw area
 		{
-			block_at_mouse->toggleGUI();
-			return;
+			if (grid.getArea(world_pos))
+				return;
+			cmd = std::make_unique<AddAreaCommand>(world_pos);
 		}
-		auto cmd = std::make_unique<AddBlockCommand>(Camera::screenToWorld(mouse_pos));
+		else // place block
+		{
+			Block *block_at_mouse = grid.getBlock(world_pos);
+			if (block_at_mouse)
+			{
+				block_at_mouse->toggleGUI();
+				return;
+			}
+			cmd = std::make_unique<AddBlockCommand>(world_pos);
+		}
 		cmd_mgr.executeCommand(std::move(cmd));
 	}
 	if (button.button == SDL_BUTTON_RIGHT && button.down)
 	{
 		Vector2 mouse_pos = {button.x, button.y};
-		auto cmd = std::make_unique<RemoveBlockCommand>(Camera::screenToWorld(mouse_pos));
+		if (cur_selection == SELECT_AREA) // remove area
+		{
+			cmd = std::make_unique<RemoveAreaCommand>(world_pos);
+		}
+		else // remove block
+		{
+			cmd = std::make_unique<RemoveBlockCommand>(world_pos);
+		}
 		cmd_mgr.executeCommand(std::move(cmd));
 	}
+}
+
+void Input::handleMouse(SDL_Event *event)
+{
+	handleCamPan(event);
+	handlePlacement(event);
 }
 
 void Input::handleKeys(SDL_Event *event)

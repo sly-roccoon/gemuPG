@@ -19,6 +19,8 @@ private:
 
 	void handleMouseWheel(SDL_Event *);
 	void handleMouse(SDL_Event *);
+	void handleCamPan(SDL_Event *);
+	void handlePlacement(SDL_Event *);
 	void handleKeys(SDL_Event *);
 	void handleLoseFocus();
 

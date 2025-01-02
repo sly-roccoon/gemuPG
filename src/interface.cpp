@@ -66,18 +66,6 @@ void Interface::draw()
 	SDL_RenderPresent(renderer_);
 }
 
-void Interface::drawToolbar()
-{
-	ImGui::SetNextWindowPos({0, ImGui::GetMainViewport()->GetCenter().y - ICON_SIZE * 2});
-	ImGui::SetNextWindowSize({ICON_SIZE, ICON_SIZE * 4});
-	ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
-
-	if (ImGui::Button("Generator Block", {ICON_SIZE, ICON_SIZE}))
-		addBlock(BLOCK_GENERATOR, {0, 0});
-
-	ImGui::End();
-}
-
 void Interface::drawGrid()
 {
 	grid_.draw(renderer_);
@@ -85,6 +73,7 @@ void Interface::drawGrid()
 
 void Interface::drawAreas()
 {
+	grid_.drawAreas(renderer_);
 }
 
 void Interface::drawBlocks()
@@ -101,7 +90,7 @@ void Interface::drawGUI()
 	for (auto &block : grid_.getBlocks())
 		block->drawGUI(); // TODO: crackling when changing values
 
-	drawToolbar();
+	GUI::drawToolbar();
 
 	ImGui::Render();
 	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer_);
@@ -111,4 +100,5 @@ void Interface::debug()
 {
 	SDL_SetRenderDrawColor(renderer_, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderDebugTextFormat(renderer_, 0, 0, "CamPos: %.2f, %.2f", Camera::getPos().x, Camera::getPos().y);
+	SDL_RenderDebugTextFormat(renderer_, 0, 20, "Current Selection: %s", cur_selection_ == SELECT_GENERATOR ? "Generator" : "Area");
 }

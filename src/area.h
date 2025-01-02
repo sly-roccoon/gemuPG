@@ -8,16 +8,18 @@ class Area
 {
 public:
     auto getPositions() { return positions_; }
+    void addPositions(std::vector<Vector2f>);
+    bool addPosition(Vector2f);
+    void removePosition(Vector2f);
     bool isInside(Vector2f);
+
     void addBlock(Block *);
     void removeBlock(Block *);
-    void removeBlock(Vector2f);
-    void setColor(SDL_Color color) { color_ = color; }
-    auto getColor() { return color_; }
+    bool removeBlock(Vector2f);
     auto getBlocks() { return blocks_; }
+    Block *getBlock(Vector2f);
 
 private:
     std::vector<Vector2f> positions_;
-    SDL_Color color_;
     std::vector<Block *> blocks_;
 };

@@ -4,73 +4,140 @@
 
 Block::Block(Vector2f pos)
 {
-    type_ = BLOCK_NONE;
-    bypass_ = true;
-    rect_ = {pos.x, pos.y, 1.0f, 1.0f};
+	type_ = BLOCK_NONE;
+	bypass_ = true;
+	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
 }
 
 SDL_FRect *Block::getFRect()
 {
-    render_rect_ = Camera::resizeFRect(rect_);
-    return &render_rect_;
+	render_rect_ = Camera::resizeFRect(rect_);
+	return &render_rect_;
 }
 
-Block *BlockGenerator::clone()
+BlockGenerator *BlockGenerator::clone()
 {
-    BlockGenerator *copy = new BlockGenerator({rect_.x, rect_.y});
+	BlockGenerator *copy = new BlockGenerator({rect_.x, rect_.y});
 
-    copy->setData({data_.wave, data_.amp, data_.freq, data_.pan, data_.phase});
+	copy->setData({data_.waveform, data_.wave, data_.amp, data_.freq, data_.pan, data_.phase});
 
-    return copy;
+	return copy;
 }
 
 BlockGenerator::BlockGenerator(Vector2f pos, float phase) : Block(pos)
 {
-    type_ = BLOCK_GENERATOR;
-    data_.phase = phase;
+	type_ = BLOCK_GENERATOR;
+	data_.phase = phase;
+	setWave(WAVE_SINE);
 
-    stream_ = SDL_CreateAudioStream(&DEFAULT_SPEC, &DEFAULT_SPEC);
-    SDL_SetAudioStreamGetCallback(stream_, audioCallback, this);
+	stream_ = SDL_CreateAudioStream(&DEFAULT_SPEC, &DEFAULT_SPEC);
+	SDL_SetAudioStreamGetCallback(stream_, audioCallback, this);
 }
 
 BlockGenerator::~BlockGenerator()
 {
-    SDL_DestroyAudioStream(stream_);
+	SDL_DestroyAudioStream(stream_);
 }
 
 void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
 {
-    BlockGenerator *block = (BlockGenerator *)userdata;
-    float delta = block->getData().freq / SAMPLE_RATE;
-    additional_amount /= sizeof(float);
-    while (additional_amount > 0)
-    {
-        float samples[BUFFER_SIZE] = {};
-        const int total = SDL_min(additional_amount, SDL_arraysize(samples));
-        int i;
+	BlockGenerator *block = (BlockGenerator *)userdata;
+	float delta = block->getData().freq / SAMPLE_RATE;
+	additional_amount /= sizeof(float);
+	while (additional_amount > 0)
+	{
+		float samples[BUFFER_SIZE] = {};
+		const int total = SDL_min(additional_amount, SDL_arraysize(samples));
+		int i;
 
-        for (i = 0; i < total; i++)
-        {
-            samples[i] = block->getData().amp * sinf(TWOPI * block->getData().freq * block->getData().phase / SAMPLE_RATE);
-            block->incrPhase();
-        }
+		generator_data_t data = block->getData();
 
-        SDL_PutAudioStreamData(stream, samples, total * sizeof(float));
-        additional_amount -= total;
-    }
+		for (i = 0; i < total; i++)
+		{
+			unsigned int idx = (int)(std::floorf(i * data.freq * data.phase / SAMPLE_RATE)) % WAVE_SIZE;
+			samples[i] = data.amp * data.wave[idx];
+			block->incrPhase();
+		}
+
+		SDL_PutAudioStreamData(stream, samples, total * sizeof(float));
+		additional_amount -= total;
+	}
+}
+
+void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
+{
+	data_.waveform = waveform;
+
+	if (waveform == WAVE_SAMPLE)
+	{
+		if (wave)
+			data_.wave = wave;
+	}
+	else if (waveform == WAVE_SAW)
+	{
+		for (int i = 0; i < WAVE_SIZE; i++)
+			data_.wave[i] = 1.0f - (2.0f * i / WAVE_SIZE);
+	}
+
+	else if (waveform == WAVE_SINE)
+	{
+		for (int i = 0; i < WAVE_SIZE; i++)
+			data_.wave[i] = sinf(TWOPI * i / WAVE_SIZE);
+	}
+
+	else if (waveform == WAVE_SQUARE)
+	{
+		for (int i = 0; i < WAVE_SIZE; i++)
+			data_.wave[i] = (i < WAVE_SIZE / 2) ? 1.0f : -1.0f;
+	}
+
+	else if (waveform == WAVE_TRIANGLE) // TODO: fix 90 degree phase shift
+	{
+		for (int i = 0; i < WAVE_SIZE; i++)
+		{
+			if (i < WAVE_SIZE / 4)
+				data_.wave[i] = 4.0f * i / WAVE_SIZE;
+			else if (i < 3 * WAVE_SIZE / 4)
+				data_.wave[i] = 2.0f - 4.0f * i / WAVE_SIZE;
+			else
+				data_.wave[i] = -4.0f + 4.0f * i / WAVE_SIZE;
+		}
+	}
 }
 
 void BlockGenerator::drawGUI()
 {
-    if (!viewGUI_)
-        return;
+	if (!viewGUI_)
+		return;
 
-    ImGui::Begin(std::format("Generator Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_);
+	ImGui::Begin(std::format("Generator Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_);
 
-    ImGuiSliderFlags log = ImGuiSliderFlags_Logarithmic;
-    ImGui::SliderFloat("Amplitude", &data_.amp, 0.0f, 1.0f, "% .2f");
-    ImGui::SliderFloat("Frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", log);
-    ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
+	ImGuiSliderFlags log = ImGuiSliderFlags_Logarithmic;
+	ImGui::SliderFloat("Amplitude", &data_.amp, 0.0f, 1.0f, "% .2f");
+	ImGui::SliderFloat("Frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", log);
+	ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
 
-    ImGui::End();
+	const char *preview = data_.waveform == WAVE_SAW ? "Saw" : data_.waveform == WAVE_SINE	 ? "Sine"
+														   : data_.waveform == WAVE_SQUARE	 ? "Square"
+														   : data_.waveform == WAVE_TRIANGLE ? "Triangle"
+																							 : "Sample";
+
+	if (ImGui::BeginCombo("Waveform", preview))
+	{
+		// if (ImGui::Selectable("Sample"))
+		// 	setWave(WAVE_SAMPLE); //TODO: implement sample loading
+		if (ImGui::Selectable("Saw"))
+			setWave(WAVE_SAW);
+		if (ImGui::Selectable("Sine"))
+			setWave(WAVE_SINE);
+		if (ImGui::Selectable("Square"))
+			setWave(WAVE_SQUARE);
+		if (ImGui::Selectable("Triangle"))
+			setWave(WAVE_TRIANGLE);
+		ImGui::EndCombo();
+	}
+
+	ImGui::PlotLines("##Waveform", data_.wave, WAVE_SIZE, 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));
+
+	ImGui::End();
 }

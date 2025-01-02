@@ -51,7 +51,8 @@ typedef enum
 
 typedef struct generator_data_t
 {
-	WAVE_FORMS wave;
+	WAVE_FORMS waveform;
+	float *wave;
 	float amp;
 	float pan;
 	float freq;
@@ -63,7 +64,7 @@ class BlockGenerator : public Block
 public:
 	BlockGenerator(Vector2f, float phase = 0.0f);
 	~BlockGenerator();
-	Block *clone() override;
+	BlockGenerator *clone() override;
 
 	SDL_AudioStream *getStream() { return stream_; }
 	void drawGUI() override;
@@ -72,10 +73,13 @@ public:
 	void setData(generator_data_t data) { data_ = data; }
 	void incrPhase() { data_.phase++; }
 
+	void setWave(WAVE_FORMS waveform, float *wave = nullptr);
+
 private:
 	SDL_AudioStream *stream_;
 	generator_data_t data_ = {
-		.wave = WAVE_SINE,
+		.waveform = WAVE_SINE,
+		.wave = new float[WAVE_SIZE],
 		.amp = 1.0f,
 		.pan = 0.0f,
 		.freq = 440.0f,

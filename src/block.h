@@ -19,6 +19,7 @@ class Block
 public:
 	Block(Vector2f);
 	SDL_FRect *getFRect();
+	SDL_FRect smallerFRect(SDL_FRect rect);
 	Vector2f getPos() { return Vector2f(rect_.x, rect_.y); }
 	void setPos(Vector2f pos)
 	{

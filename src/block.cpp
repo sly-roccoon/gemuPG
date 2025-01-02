@@ -9,9 +9,19 @@ Block::Block(Vector2f pos)
 	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
 }
 
+SDL_FRect Block::smallerFRect(SDL_FRect rect)
+{
+	rect.x += rect.w * (1 - BLOCK_SIZE_FACTOR) / 2;
+	rect.y += rect.h * (1 - BLOCK_SIZE_FACTOR) / 2;
+	rect.w *= BLOCK_SIZE_FACTOR;
+	rect.h *= BLOCK_SIZE_FACTOR;
+	return rect;
+}
+
 SDL_FRect *Block::getFRect()
 {
-	render_rect_ = Camera::resizeFRect(rect_);
+	render_rect_ = Block::smallerFRect(rect_);
+	render_rect_ = Camera::resizeFRect(render_rect_);
 	return &render_rect_;
 }
 

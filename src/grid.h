@@ -19,7 +19,8 @@ public:
 	bool removeBlock(Vector2f);
 	void removeBlock(Block *);
 	Block *getBlock(Vector2f);
-	std::vector<Block *> &getBlocks() { return blocks_; };
+	std::vector<Block *> &getGlobalBlocks() { return blocks_; };
+	std::vector<Block *> getBlocks();
 
 	bool addArea(Vector2f);
 	bool removeArea(Vector2f);

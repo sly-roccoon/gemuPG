@@ -57,7 +57,7 @@ bool Area::removeBlock(Vector2f pos)
 {
 	pos = floorVec(pos);
 
-	return (blocks_.end() == blocks_.erase(
+	return (blocks_.end() != blocks_.erase(
 								 std::remove_if(blocks_.begin(), blocks_.end(),
 												[pos](auto block)
 												{ return block->getPos() == pos; }),

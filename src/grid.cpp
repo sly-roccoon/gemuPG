@@ -44,6 +44,14 @@ void Grid::drawBlocks(SDL_Renderer *renderer)
 	{
 		SDL_RenderFillRect(renderer, block->getFRect());
 	}
+
+	for (auto &area : areas_)
+	{
+		for (auto &block : area->getBlocks())
+		{
+			SDL_RenderFillRect(renderer, block->getFRect());
+		}
+	}
 }
 
 void Grid::drawAreas(SDL_Renderer *renderer)
@@ -64,9 +72,10 @@ void Grid::addBlock(Block *block)
 	if (!block)
 		return;
 
-	if (getArea(block->getPos()))
+	Area *area = getArea(block->getPos());
+	if (area)
 	{
-		getArea(block->getPos())->addBlock(block);
+		area->addBlock(block);
 		return;
 	}
 	blocks_.push_back(std::move(block));
@@ -74,7 +83,8 @@ void Grid::addBlock(Block *block)
 
 bool Grid::removeGlobalBlock(Vector2f pos)
 {
-	return (blocks_.end() == blocks_.erase(
+	pos = floorVec(pos);
+	return (blocks_.end() != blocks_.erase(
 								 std::remove_if(blocks_.begin(), blocks_.end(),
 												[pos](auto block)
 												{ return block->getPos() == pos; }),
@@ -83,6 +93,8 @@ bool Grid::removeGlobalBlock(Vector2f pos)
 
 bool Grid::removeAreaBlock(Vector2f pos)
 {
+	pos = floorVec(pos);
+
 	for (auto &area : areas_)
 		if (area->removeBlock(pos))
 			return true;
@@ -92,7 +104,10 @@ bool Grid::removeAreaBlock(Vector2f pos)
 
 bool Grid::removeBlock(Vector2f pos)
 {
-	return (removeGlobalBlock(pos) || removeAreaBlock(pos));
+	if (removeGlobalBlock(pos))
+		return true;
+
+	return removeAreaBlock(pos);
 }
 
 void Grid::removeGlobalBlock(Block *block)
@@ -124,14 +139,32 @@ Block *Grid::getBlock(Vector2f pos)
 			return block;
 
 	for (auto &area : areas_)
-		area->getBlock(pos);
+	{
+		Block *block = area->getBlock(pos);
+		if (block)
+			return block;
+	}
 
 	return nullptr;
+}
+
+std::vector<Block *> Grid::getBlocks()
+{
+	std::vector<Block *> blocks = blocks_;
+	for (auto &area : areas_)
+	{
+		auto area_blocks = area->getBlocks();
+		blocks.insert(std::end(blocks), std::begin(area_blocks), std::end(area_blocks));
+	}
+
+	return blocks;
 }
 
 //--------------------------------------------------------
 Area *Grid::getArea(Vector2f pos)
 {
+	pos = floorVec(pos);
+
 	for (auto &area : areas_)
 		if (area->isInside(pos))
 			return area;
@@ -141,6 +174,8 @@ Area *Grid::getArea(Vector2f pos)
 
 Area **Grid::getAdjacentAreas(Vector2f pos) // in order UP, LEFT, DOWN, RIGHT
 {
+	pos = floorVec(pos);
+
 	Area **adjacentAreas = (Area **)malloc(4 * sizeof(Area *));
 	adjacentAreas[0] = getArea({pos.x, pos.y - 1});
 	adjacentAreas[1] = getArea({pos.x - 1, pos.y});
@@ -162,6 +197,8 @@ void Grid::mergeAreas(Area *into, Area *from)
 
 Area *Grid::connectAreas(Vector2f pos)
 {
+	pos = floorVec(pos);
+
 	Area **adjacent = getAdjacentAreas(pos);
 	Area *area = nullptr;
 	if (adjacent[0])

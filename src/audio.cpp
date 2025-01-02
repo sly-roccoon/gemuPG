@@ -17,7 +17,8 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 
 		Grid &grid = Interface::getInstance().getGrid();
 
-		for (auto block : grid.getBlocks())
+		auto blocks = grid.getBlocks();
+		for (auto block : blocks)
 		{
 			if (block->getType() != BLOCK_GENERATOR)
 				continue;

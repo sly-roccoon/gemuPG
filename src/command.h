@@ -78,6 +78,7 @@ public:
 
 	bool execute() override
 	{
+		pos_ = floorVec(pos_);
 		return interface_.getGrid().addArea(pos_);
 	}
 

@@ -71,7 +71,12 @@ public:
 	void drawGUI() override;
 
 	generator_data_t getData() { return data_; }
-	void setData(generator_data_t data) { data_ = data; }
+	void setData(generator_data_t data)
+	{
+		float tmp_phase = data_.phase;
+		data_ = data;
+		data_.phase = tmp_phase;
+	}
 	void incrPhase() { data_.phase++; }
 
 	void setWave(WAVE_FORMS waveform, float *wave = nullptr);

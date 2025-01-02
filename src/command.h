@@ -20,16 +20,23 @@ public:
 
 	bool execute() override
 	{
+		if (block_)
+		{
+			interface_.addBlock(std::move(block_));
+			return true;
+		}
 		return interface_.addBlock(cur_blocktype_, floorVec(pos_));
 	}
 
 	void undo() override
 	{
+		block_ = interface_.getBlock(floorVec(pos_));
 		interface_.removeBlock(floorVec(pos_));
 	}
 
 private:
 	Vector2f pos_;
+	Block *block_ = nullptr;
 };
 
 class RemoveBlockCommand : public Command
@@ -48,9 +55,15 @@ public:
 		return true;
 	}
 
+	~RemoveBlockCommand()
+	{
+		if (block_)
+			delete block_;
+	}
+
 	void undo() override
 	{
-		interface_.addBlock(block_->clone()); // TODO: smart pointers
+		interface_.addBlock(std::move(block_));
 	}
 
 private:

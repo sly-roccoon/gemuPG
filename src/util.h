@@ -8,6 +8,18 @@
 constexpr unsigned int WIDTH = 1280;
 constexpr unsigned int HEIGHT = 720;
 
+constexpr unsigned int ICON_SIZE = 64;
+
+typedef enum
+{
+	SELECT_GENERATOR,
+	SELECT_SEQUENCER,
+	SELECT_AREA
+} selectionType;
+
+static selectionType cur_selection = SELECT_GENERATOR;
+static SDL_Color cur_color = {255, 128, 128, SDL_ALPHA_OPAQUE};
+
 constexpr int GRID_SIZE = 512;
 constexpr SDL_Color GRID_COLOR = {128, 128, 128, SDL_ALPHA_OPAQUE};
 
@@ -21,8 +33,6 @@ constexpr unsigned int BIT_DEPTH = 16;
 constexpr unsigned int CHANNELS = 1;
 
 constexpr unsigned int WAVE_SIZE = 512;
-static unsigned int PHASE;
-
 constexpr double TWOPI = 2.0f * std::numbers::pi;
 
 constexpr SDL_AudioSpec DEFAULT_SPEC = {

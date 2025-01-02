@@ -19,7 +19,7 @@ BlockGenerator *BlockGenerator::clone()
 {
 	BlockGenerator *copy = new BlockGenerator({rect_.x, rect_.y});
 
-	copy->setData({data_.waveform, data_.wave, data_.amp, data_.freq, data_.pan, data_.phase});
+	copy->setData(data_);
 
 	return copy;
 }
@@ -96,7 +96,7 @@ void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
 			data_.wave[i] = (i < WAVE_SIZE / 2) ? 1.0f : -1.0f;
 	}
 
-	else if (waveform == WAVE_TRIANGLE) // TODO: fix 90 degree phase shift
+	else if (waveform == WAVE_TRIANGLE)
 	{
 		for (int i = 0; i < WAVE_SIZE; i++)
 		{

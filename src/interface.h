@@ -42,5 +42,6 @@ private:
 	void drawAreas();
 	void drawBlocks();
 	void drawGUI();
+	void drawToolbar();
 	void debug();
 };

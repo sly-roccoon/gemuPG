@@ -54,7 +54,7 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 
 		for (i = 0; i < total; i++)
 		{
-			unsigned int idx = (int)(std::floorf(i * data.freq * data.phase / SAMPLE_RATE)) % WAVE_SIZE;
+			unsigned int idx = (int)(std::floorf(block->getData().phase * data.freq * WAVE_SIZE / SAMPLE_RATE)) % WAVE_SIZE;
 			samples[i] = data.amp * data.wave[idx];
 			block->incrPhase();
 		}
@@ -110,7 +110,9 @@ void BlockGenerator::drawGUI()
 	if (!viewGUI_)
 		return;
 
-	ImGui::Begin(std::format("Generator Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_);
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
+	ImGui::SetNextWindowSize({512, 256});
+	ImGui::Begin(std::format("Generator Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
 	ImGuiSliderFlags log = ImGuiSliderFlags_Logarithmic;
 	ImGui::SliderFloat("Amplitude", &data_.amp, 0.0f, 1.0f, "% .2f");

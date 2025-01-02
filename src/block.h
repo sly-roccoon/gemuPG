@@ -53,6 +53,7 @@ typedef struct generator_data_t
 {
 	WAVE_FORMS waveform;
 	float *wave;
+	float crest;
 	float amp;
 	float pan;
 	float freq;
@@ -80,6 +81,7 @@ private:
 	generator_data_t data_ = {
 		.waveform = WAVE_SINE,
 		.wave = new float[WAVE_SIZE],
+		.crest = 1.0f,
 		.amp = 1.0f,
 		.pan = 0.0f,
 		.freq = 440.0f,

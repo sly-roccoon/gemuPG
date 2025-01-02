@@ -57,6 +57,11 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 			unsigned int idx = (int)(std::floorf(block->getData().phase * data.freq * WAVE_SIZE / SAMPLE_RATE)) % WAVE_SIZE;
 			samples[i] = data.amp * data.wave[idx];
 			block->incrPhase();
+
+			if (ADJUST_AMP_BY_CREST)
+			{
+				samples[i] *= data.crest; // TODO: find better way as to not go over +-1.0f
+			}
 		}
 
 		SDL_PutAudioStreamData(stream, samples, total * sizeof(float));
@@ -103,6 +108,8 @@ void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
 				data_.wave[i] = -4.0f + 4.0f * i / WAVE_SIZE;
 		}
 	}
+
+	data_.crest = calcCrest(data_.wave);
 }
 
 void BlockGenerator::drawGUI()

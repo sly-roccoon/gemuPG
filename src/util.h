@@ -3,6 +3,8 @@
 #include <numbers>
 #include <SDL3/SDL.h>
 
+#define ADJUST_AMP_BY_CREST true
+
 constexpr unsigned int WIDTH = 1280;
 constexpr unsigned int HEIGHT = 720;
 
@@ -49,3 +51,5 @@ using Vector2f = Vector2<float>;
 using Vector2i = Vector2<int>;
 
 Vector2f floorVec(Vector2f vec);
+
+float calcCrest(float *wave);

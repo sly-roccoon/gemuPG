@@ -193,6 +193,7 @@ void Grid::mergeAreas(Area *into, Area *from)
 		into->addBlock(block);
 		from->removeBlock(block);
 	}
+	removeArea(from);
 }
 
 Area *Grid::connectAreas(Vector2f pos)
@@ -201,11 +202,24 @@ Area *Grid::connectAreas(Vector2f pos)
 
 	Area **adjacent = getAdjacentAreas(pos);
 	Area *area = nullptr;
-	if (adjacent[0])
-	{
-		adjacent[0]->addPosition(pos);
-		return adjacent[0]; // TODO: finish this :)
-	}
+
+	int first_neighbour;
+	// sets first_neighbour to the first index of the adjacent array that isn't nullptr: UP, LEFT, DOWN, RIGHT
+	for (first_neighbour = 0; first_neighbour < 4; first_neighbour++)
+		if (adjacent[first_neighbour])
+		{
+			area = adjacent[first_neighbour];
+			break;
+		}
+
+	// adds new position to first found neighbour, if exists
+	if (area)
+		area->addPosition(pos);
+
+	// merges all consecutive neighbours with the first previously found neighbour
+	for (int i = first_neighbour + 1; i < 4; i++)
+		if (adjacent[i])
+			mergeAreas(area, adjacent[i]);
 
 	delete adjacent;
 	return area;
@@ -216,7 +230,7 @@ bool Grid::addArea(Vector2f pos)
 	if (getArea(pos))
 		return false;
 
-	Area *area = connectAreas(pos);
+	Area *area = connectAreas(pos); // adds position already
 	if (!area)
 	{
 		area = new Area();

@@ -1,4 +1,6 @@
 #include "grid.h"
+#include <array>
+#include <queue>
 
 void Grid::update() // will def need optimization
 {
@@ -172,11 +174,11 @@ Area *Grid::getArea(Vector2f pos)
 	return nullptr;
 }
 
-Area **Grid::getAdjacentAreas(Vector2f pos) // in order UP, LEFT, DOWN, RIGHT
+std::array<Area *, 4> Grid::getAdjacentAreas(Vector2f pos) // in order UP, LEFT, DOWN, RIGHT
 {
 	pos = floorVec(pos);
 
-	Area **adjacentAreas = (Area **)malloc(4 * sizeof(Area *));
+	std::array<Area *, 4> adjacentAreas;
 	adjacentAreas[0] = getArea({pos.x, pos.y - 1});
 	adjacentAreas[1] = getArea({pos.x - 1, pos.y});
 	adjacentAreas[2] = getArea({pos.x, pos.y + 1});
@@ -200,15 +202,15 @@ Area *Grid::connectAreas(Vector2f pos)
 {
 	pos = floorVec(pos);
 
-	Area **adjacent = getAdjacentAreas(pos);
+	std::array<Area *, 4> adjacent = getAdjacentAreas(pos);
 	Area *area = nullptr;
 
 	int first_neighbour;
 	// sets first_neighbour to the first index of the adjacent array that isn't nullptr: UP, LEFT, DOWN, RIGHT
 	for (first_neighbour = 0; first_neighbour < 4; first_neighbour++)
-		if (adjacent[first_neighbour])
+		if (adjacent.at(first_neighbour))
 		{
-			area = adjacent[first_neighbour];
+			area = adjacent.at(first_neighbour);
 			break;
 		}
 
@@ -218,10 +220,9 @@ Area *Grid::connectAreas(Vector2f pos)
 
 	// merges all consecutive neighbours with the first previously found neighbour
 	for (int i = first_neighbour + 1; i < 4; i++)
-		if (adjacent[i])
-			mergeAreas(area, adjacent[i]);
+		if (adjacent.at(i))
+			mergeAreas(area, adjacent.at(i));
 
-	delete adjacent;
 	return area;
 }
 
@@ -240,7 +241,38 @@ bool Grid::addArea(Vector2f pos)
 
 	area->addBlock(getBlock(pos));
 	removeGlobalBlock(pos);
+
+	area->updateSequence();
 	return true;
+}
+
+void Grid::splitAreas(Area *area) // TODO: this is probably terrible
+{
+	std::vector<Vector2f> remaining_pos = area->getPositions();
+	std::vector<Area *> new_areas;
+
+	while (!remaining_pos.empty())
+	{
+		std::vector<Vector2f> connected;
+		std::queue<Vector2f> visit_queue;
+
+		visit_queue.push(remaining_pos.at(0));
+
+		while (!visit_queue.empty())
+		{
+			Vector2f current_pos = visit_queue.front();
+			visit_queue.pop();
+
+			if (std::find(connected.begin(), connected.end(), current_pos) != connected.end())
+				continue;
+
+			connected.push_back(current_pos);
+
+			std::array<Area *, 4> adjacent_areas = getAdjacentAreas(current_pos);
+		}
+	}
+
+	area->updateSequence();
 }
 
 bool Grid::removeArea(Vector2f pos)
@@ -250,13 +282,13 @@ bool Grid::removeArea(Vector2f pos)
 		return false;
 
 	area->removePosition(pos);
+	splitAreas(area);
 	addBlock(area->getBlock(pos));
+
 	if (area->getPositions().empty())
 		removeArea(area);
 
 	return true;
-
-	// TODO: check if area is still connected and split if not
 }
 
 void Grid::removeArea(Area *area)

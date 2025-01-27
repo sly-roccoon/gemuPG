@@ -74,3 +74,8 @@ Block *Area::getBlock(Vector2f pos)
 
 	return nullptr;
 }
+
+void Area::updateSequence()
+{
+	// TODO
+}

@@ -19,6 +19,8 @@ public:
     auto getBlocks() { return blocks_; }
     Block *getBlock(Vector2f);
 
+    void updateSequence();
+
 private:
     std::vector<Vector2f> positions_;
     std::vector<Block *> blocks_;

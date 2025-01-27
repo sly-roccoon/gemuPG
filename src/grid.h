@@ -34,9 +34,10 @@ private:
 	bool removeAreaBlock(Vector2f);
 	void removeAreaBlock(Block *);
 
+	std::array<Area *, 4> getAdjacentAreas(Vector2f);
 	void mergeAreas(Area *into, Area *from);
-	Area **getAdjacentAreas(Vector2f);
 	Area *connectAreas(Vector2f);
+	void splitAreas(Area *);
 
 	std::vector<Area *> areas_;
 	std::vector<Block *> blocks_;

@@ -268,11 +268,31 @@ void Grid::splitAreas(Area *area) // TODO: this is probably terrible
 
 			connected.push_back(current_pos);
 
-			std::array<Area *, 4> adjacent_areas = getAdjacentAreas(current_pos);
+			std::array<Vector2f, 4> adjacent_positions = {
+				Vector2f{current_pos.x, current_pos.y - 1},
+				Vector2f{current_pos.x - 1, current_pos.y},
+				Vector2f{current_pos.x, current_pos.y + 1},
+				Vector2f{current_pos.x + 1, current_pos.y}};
+
+			for (auto &adj_pos : adjacent_positions)
+				if (area->isInside(adj_pos))
+					visit_queue.push(adj_pos);
 		}
+
+		for (auto &pos : connected)
+		{
+			remaining_pos.erase(std::remove(remaining_pos.begin(), remaining_pos.end(), pos), remaining_pos.end());
+			area->removePosition(pos);
+		}
+
+		Area *new_area = new Area();
+		new_area->addPositions(connected);
+		new_areas.push_back(new_area);
 	}
 
-	area->updateSequence();
+	removeArea(area);
+	for (auto &new_area : new_areas)
+		areas_.push_back(new_area);
 }
 
 bool Grid::removeArea(Vector2f pos)
@@ -282,11 +302,8 @@ bool Grid::removeArea(Vector2f pos)
 		return false;
 
 	area->removePosition(pos);
-	splitAreas(area);
 	addBlock(area->getBlock(pos));
-
-	if (area->getPositions().empty())
-		removeArea(area);
+	splitAreas(area);
 
 	return true;
 }

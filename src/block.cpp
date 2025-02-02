@@ -4,7 +4,7 @@
 
 Block::Block(Vector2f pos)
 {
-	type_ = BLOCK_NONE;
+	type_ = BLOCK_GENERATOR;
 	bypass_ = true;
 	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
 }
@@ -157,6 +157,31 @@ void BlockGenerator::drawGUI()
 	}
 
 	ImGui::PlotLines("##Waveform", data_.wave, WAVE_SIZE, 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));
+
+	ImGui::End();
+}
+
+//--------------------------------------------------------
+BlockSequencer::BlockSequencer(Vector2f pos) : Block(pos)
+{
+	type_ = BLOCK_SEQUENCER;
+	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
+}
+
+BlockSequencer* BlockSequencer::clone()
+{
+	BlockSequencer* copy = new BlockSequencer({rect_.x, rect_.y});
+	return copy;
+}
+
+void BlockSequencer::drawGUI()
+{
+	if (!viewGUI_)
+		return;
+
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
+	ImGui::SetNextWindowSize({512, 256});
+	ImGui::Begin(std::format("Sequencer Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
 	ImGui::End();
 }

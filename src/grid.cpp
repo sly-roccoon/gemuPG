@@ -41,9 +41,21 @@ void Grid::draw(SDL_Renderer *renderer)
 
 void Grid::drawBlocks(SDL_Renderer *renderer)
 {
-	SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
 	for (auto block : blocks_)
 	{
+		switch (block->getType())
+		{
+		case BLOCK_GENERATOR:
+			SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
+			break;
+		case BLOCK_SEQUENCER:
+			SDL_SetRenderDrawColor(renderer, SEQUENCER_COLOR.r, SEQUENCER_COLOR.g, SEQUENCER_COLOR.b, SEQUENCER_COLOR.a);
+			break;
+		default:
+			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+			break;
+		}
+
 		SDL_RenderFillRect(renderer, block->getFRect());
 	}
 
@@ -172,6 +184,18 @@ Area *Grid::getArea(Vector2f pos)
 			return area;
 
 	return nullptr;
+}
+
+bool Grid::isAreaAdjacent(Vector2f pos)
+{
+	pos = floorVec(pos);
+
+	std::array<Area *, 4> adjacent = getAdjacentAreas(pos);
+	for (auto &area : adjacent)
+		if (area)
+			return true;
+
+	return false;
 }
 
 std::array<Area *, 4> Grid::getAdjacentAreas(Vector2f pos) // in order UP, LEFT, DOWN, RIGHT

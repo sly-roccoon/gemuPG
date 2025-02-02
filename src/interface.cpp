@@ -19,15 +19,15 @@ void Interface::destroy()
 	renderer_, window_ = nullptr;
 }
 
-bool Interface::addBlock(blockType type, Vector2f pos)
+bool Interface::addBlock(Vector2f pos)
 {
 	BlockFactory &block_factory = BlockFactory::getInstance();
 
 	if (grid_.getBlock(pos) != nullptr)
 		return false;
 
-	Block *block = block_factory.createBlock(type, pos);
-	grid_.removeBlock(pos); //? shouldn't be necessary
+	Block *block = block_factory.createBlock(cur_selection_, pos);
+	// grid_.removeBlock(pos); //? shouldn't be necessary
 	grid_.addBlock(block);
 
 	return true;
@@ -100,5 +100,7 @@ void Interface::debug()
 {
 	SDL_SetRenderDrawColor(renderer_, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderDebugTextFormat(renderer_, 0, 0, "CamPos: %.2f, %.2f", Camera::getPos().x, Camera::getPos().y);
-	SDL_RenderDebugTextFormat(renderer_, 0, 20, "Current Selection: %s", cur_selection_ == SELECT_GENERATOR ? "Generator" : "Area");
+	SDL_RenderDebugTextFormat(renderer_, 0, 20, "Current Selection: %s", cur_selection_ == BLOCK_GENERATOR ? "Generator" : cur_selection_ == AREA		   ? "Area"
+																													   : cur_selection_ == BLOCK_SEQUENCER ? "Sequencer"
+																																						   : "Unknown");
 }

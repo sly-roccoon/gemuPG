@@ -1,6 +1,6 @@
 #include "command.h"
 
-blockType Command::cur_blocktype_ = BLOCK_GENERATOR;
+block_type_t Command::cur_blocktype_ = BLOCK_GENERATOR;
 
 //--------------------------
 void CommandManager::executeCommand(std::unique_ptr<Command> cmd)

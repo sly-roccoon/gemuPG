@@ -9,7 +9,7 @@ public:
 	virtual void undo() = 0;
 
 protected:
-	static blockType cur_blocktype_;
+	static block_type_t cur_blocktype_;
 	Interface &interface_ = Interface::getInstance();
 };
 
@@ -25,7 +25,7 @@ public:
 			interface_.addBlock(std::move(block_));
 			return true;
 		}
-		return interface_.addBlock(cur_blocktype_, floorVec(pos_));
+		return interface_.addBlock(floorVec(pos_));
 	}
 
 	void undo() override

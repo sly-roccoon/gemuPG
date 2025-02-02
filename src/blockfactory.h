@@ -10,7 +10,7 @@ public:
         return instance;
     }
 
-    Block *createBlock(const blockType type, const Vector2f pos)
+    Block *createBlock(const block_type_t type, const Vector2f pos)
     {
         switch (type)
         {
@@ -26,6 +26,12 @@ public:
                 }
             }
             return new BlockGenerator(pos);
+        }
+        case BLOCK_SEQUENCER:
+        {
+            if (Interface::getInstance().getGrid().isAreaAdjacent(pos))
+                return new BlockSequencer(pos);
+            return nullptr;
         }
         default:
             return nullptr;

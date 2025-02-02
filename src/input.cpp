@@ -95,11 +95,11 @@ void Input::handlePlacement(SDL_Event *event)
 	Grid &grid = Interface::getInstance().getGrid();
 	Vector2f world_pos = Camera::screenToWorld(mouse_pos);
 	std::unique_ptr<Command> cmd;
-	selectionType cur_selection = Interface::getInstance().getSelection();
+	block_type_t cur_selection = Interface::getInstance().getSelection();
 
 	if (button.button == SDL_BUTTON_LEFT && button.down && !isKeyDown(SDLK_LCTRL))
 	{
-		if (cur_selection == SELECT_AREA) // draw area
+		if (cur_selection == AREA) // draw area
 		{
 			if (grid.getArea(world_pos))
 				return;
@@ -120,7 +120,7 @@ void Input::handlePlacement(SDL_Event *event)
 	if (button.button == SDL_BUTTON_RIGHT && button.down)
 	{
 		Vector2 mouse_pos = {button.x, button.y};
-		if (cur_selection == SELECT_AREA) // remove area
+		if (cur_selection == AREA) // remove area
 		{
 			cmd = std::make_unique<RemoveAreaCommand>(world_pos);
 		}

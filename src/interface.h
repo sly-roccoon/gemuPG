@@ -16,7 +16,7 @@ public:
 	SDL_Window *getWindow() { return window_; }
 	SDL_Renderer *getRenderer() { return renderer_; }
 
-	bool addBlock(blockType, Vector2f);
+	bool addBlock(Vector2f);
 	void addBlock(Block *);
 	bool removeBlock(Vector2f);
 	void removeBlock(Block *);
@@ -24,8 +24,8 @@ public:
 	Grid &getGrid() { return grid_; }
 	Block *getBlock(Vector2f pos) { return grid_.getBlock(pos); }
 
-	void setSelection(selectionType selection) { cur_selection_ = selection; }
-	selectionType getSelection() { return cur_selection_; }
+	void setSelection(block_type_t selection) { cur_selection_ = selection; }
+	block_type_t getSelection() { return cur_selection_; }
 
 private:
 	Interface();
@@ -35,7 +35,7 @@ private:
 	unsigned int width_ = WIDTH;
 	unsigned int height_ = HEIGHT;
 
-	selectionType cur_selection_ = SELECT_GENERATOR;
+	block_type_t cur_selection_ = BLOCK_GENERATOR;
 
 	Camera &camera_;
 	Grid grid_{};

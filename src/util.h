@@ -23,10 +23,13 @@ typedef enum
 } pitch_type_t;
 typedef enum
 {
-	SELECT_GENERATOR,
-	SELECT_SEQUENCER,
-	SELECT_AREA
-} selectionType;
+	AREA,
+	BLOCK_GENERATOR,
+	BLOCK_SEQUENCER,
+	// BLOCK_SETTINGS,
+	// BLOCK_EFFECT,
+	// BLOCK_MODULATOR
+} block_type_t;
 
 constexpr SDL_Color GENERATOR_COLOR = {0, 0, 255, SDL_ALPHA_OPAQUE};
 constexpr SDL_Color AREA_COLOR = {128, 128, 128, SDL_ALPHA_OPAQUE};

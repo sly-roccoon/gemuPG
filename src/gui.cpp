@@ -38,11 +38,11 @@ void GUI::drawToolbar()
 	ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 
 	if (ImGui::ColorButton("Generator Block", toImVec4(GENERATOR_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
-		Interface::getInstance().setSelection(SELECT_GENERATOR);
+		Interface::getInstance().setSelection(BLOCK_GENERATOR);
 	if (ImGui::ColorButton("Area", toImVec4(AREA_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
-		Interface::getInstance().setSelection(SELECT_AREA);
+		Interface::getInstance().setSelection(AREA);
 	if (ImGui::ColorButton("Sequencer", toImVec4(SEQUENCER_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
-		Interface::getInstance().setSelection(SELECT_SEQUENCER);
+		Interface::getInstance().setSelection(BLOCK_SEQUENCER);
 
 	ImGui::End();
 }

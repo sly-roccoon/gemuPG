@@ -4,16 +4,6 @@
 #include "util.h"
 #include "camera.h"
 
-typedef enum
-{
-	BLOCK_NONE,
-	BLOCK_GENERATOR,
-	BLOCK_SEQUENCER,
-	BLOCK_SETTINGS,
-	BLOCK_EFFECT,
-	BLOCK_MODULATOR
-} blockType;
-
 class Block
 {
 public:
@@ -27,15 +17,15 @@ public:
 		rect_.x = pos.x;
 		rect_.y = pos.y;
 	}
-	blockType getType() { return type_; }
-	virtual Block *clone() = 0;
+	block_type_t getType() { return type_; }
+	virtual Block *clone() = 0; //TODO: implement properly with operator overloading
 
 	virtual void drawGUI() = 0;
 	void toggleGUI() { viewGUI_ = !viewGUI_; }
 
 protected:
 	bool viewGUI_ = false;
-	blockType type_;
+	block_type_t type_;
 	bool bypass_ = false;
 	SDL_FRect rect_{0, 0, 1.0f, 1.0f};
 	SDL_FRect render_rect_;
@@ -100,9 +90,9 @@ class BlockSequencer : public Block
 {
 public:
 	BlockSequencer(Vector2f);
-	~BlockSequencer();
-	BlockSequencer *clone() override;
+	~BlockSequencer() = default;
 
+	BlockSequencer *clone() override;
 	void drawGUI() override;
 
 private:

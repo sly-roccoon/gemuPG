@@ -28,16 +28,18 @@ public:
 	Area *getArea(Vector2f);
 	std::vector<Area *> &getAreas() { return areas_; };
 
+	bool isAreaAdjacent(Vector2f);
+
 private:
 	bool removeGlobalBlock(Vector2f);
 	void removeGlobalBlock(Block *);
 	bool removeAreaBlock(Vector2f);
 	void removeAreaBlock(Block *);
 
-	std::array<Area *, 4> getAdjacentAreas(Vector2f);
 	void mergeAreas(Area *into, Area *from);
 	Area *connectAreas(Vector2f);
 	void splitAreas(Area *);
+	std::array<Area *, 4> getAdjacentAreas(Vector2f);
 
 	std::vector<Area *> areas_;
 	std::vector<Block *> blocks_;

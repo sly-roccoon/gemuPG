@@ -11,6 +11,16 @@ constexpr unsigned int HEIGHT = 720;
 
 constexpr unsigned int ICON_SIZE = 64;
 
+typedef float pitch_t;
+
+typedef enum
+{
+
+	PITCH_REL_FREQUENCY,
+	PITCH_ABS_FREQUENCY,
+	PITCH_INTERVAL,
+	PITCH_NOTE
+} pitch_type_t;
 typedef enum
 {
 	SELECT_GENERATOR,

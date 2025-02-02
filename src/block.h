@@ -95,3 +95,20 @@ private:
 
 	static void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
 };
+
+class BlockSequencer : public Block
+{
+public:
+	BlockSequencer(Vector2f);
+	~BlockSequencer();
+	BlockSequencer *clone() override;
+
+	void drawGUI() override;
+
+private:
+	pitch_t pitch_;
+	pitch_type_t pitch_type_;
+
+	std::shared_ptr<BlockSequencer> next_;
+	std::shared_ptr<BlockSequencer> prev_;
+};

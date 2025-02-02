@@ -189,6 +189,9 @@ std::array<Area *, 4> Grid::getAdjacentAreas(Vector2f pos) // in order UP, LEFT,
 
 void Grid::mergeAreas(Area *into, Area *from)
 {
+	if (!from || into == from)
+		return;
+
 	into->addPositions(from->getPositions());
 	for (auto &block : from->getBlocks())
 	{
@@ -279,14 +282,18 @@ void Grid::splitAreas(Area *area) // TODO: this is probably terrible
 					visit_queue.push(adj_pos);
 		}
 
+		Area *new_area = new Area();
+
 		for (auto &pos : connected)
 		{
 			remaining_pos.erase(std::remove(remaining_pos.begin(), remaining_pos.end(), pos), remaining_pos.end());
+			Block *block = area->getBlock(pos);
 			area->removePosition(pos);
+			new_area->addPosition(pos);
+			if (block)
+				new_area->addBlock(block);
 		}
 
-		Area *new_area = new Area();
-		new_area->addPositions(connected);
 		new_areas.push_back(new_area);
 	}
 

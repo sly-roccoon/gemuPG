@@ -29,7 +29,7 @@ public:
         }
         case BLOCK_SEQUENCER:
         {
-            if (Interface::getInstance().getGrid().isAreaAdjacent(pos))
+            if (Interface::getInstance().getGrid().isAreaAdjacent(pos) && !Interface::getInstance().getGrid().getArea(pos))
                 return new BlockSequencer(pos);
             return nullptr;
         }

@@ -166,11 +166,14 @@ BlockSequencer::BlockSequencer(Vector2f pos) : Block(pos)
 {
 	type_ = BLOCK_SEQUENCER;
 	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
+
+	pitch_ = 440.0f;
+	pitch_type_ = PITCH_ABS_FREQUENCY;
 }
 
-BlockSequencer* BlockSequencer::clone()
+BlockSequencer *BlockSequencer::clone()
 {
-	BlockSequencer* copy = new BlockSequencer({rect_.x, rect_.y});
+	BlockSequencer *copy = new BlockSequencer({rect_.x, rect_.y});
 	return copy;
 }
 
@@ -184,4 +187,9 @@ void BlockSequencer::drawGUI()
 	ImGui::Begin(std::format("Sequencer Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
 	ImGui::End();
+}
+
+void BlockSequencer::removeArea(Area *area)
+{
+	areas_.erase(std::remove(areas_.begin(), areas_.end(), area), areas_.end());
 }

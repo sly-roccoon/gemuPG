@@ -32,7 +32,7 @@ typedef enum
 } block_type_t;
 
 constexpr SDL_Color GENERATOR_COLOR = {0, 0, 255, SDL_ALPHA_OPAQUE};
-constexpr SDL_Color AREA_COLOR = {128, 128, 128, SDL_ALPHA_OPAQUE};
+constexpr SDL_Color AREA_COLOR = {128, 128, 128, 128};
 constexpr SDL_Color SEQUENCER_COLOR = {255, 255, 0, SDL_ALPHA_OPAQUE};
 
 constexpr float BLOCK_SIZE_FACTOR = 0.8f;

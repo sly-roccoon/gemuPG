@@ -48,9 +48,6 @@ void Grid::drawBlocks(SDL_Renderer *renderer)
 		case BLOCK_GENERATOR:
 			SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
 			break;
-		case BLOCK_SEQUENCER:
-			SDL_SetRenderDrawColor(renderer, SEQUENCER_COLOR.r, SEQUENCER_COLOR.g, SEQUENCER_COLOR.b, SEQUENCER_COLOR.a);
-			break;
 		default:
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 			break;
@@ -63,7 +60,13 @@ void Grid::drawBlocks(SDL_Renderer *renderer)
 	{
 		for (auto &block : area->getBlocks())
 		{
+			SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
 			SDL_RenderFillRect(renderer, block->getFRect());
+		}
+		for (auto &sequencer : area->getSequencer())
+		{
+			SDL_SetRenderDrawColor(renderer, SEQUENCER_COLOR.r, SEQUENCER_COLOR.g, SEQUENCER_COLOR.b, SEQUENCER_COLOR.a);
+			SDL_RenderFillRect(renderer, sequencer->getFRect());
 		}
 	}
 }
@@ -86,12 +89,28 @@ void Grid::addBlock(Block *block)
 	if (!block)
 		return;
 
+	for (auto &area : areas_)
+		if (area->sequencerExists(block->getPos()))
+		{
+			return;
+		}
+
 	Area *area = getArea(block->getPos());
 	if (area)
 	{
 		area->addBlock(block);
 		return;
 	}
+
+	if (block->getType() == BLOCK_SEQUENCER)
+	{
+		for (auto area : getAdjacentAreas(block->getPos()))
+			if (area)
+				area->addSequencer((BlockSequencer *)block);
+
+		return;
+	}
+
 	blocks_.push_back(std::move(block));
 }
 
@@ -258,6 +277,10 @@ bool Grid::addArea(Vector2f pos)
 	if (getArea(pos))
 		return false;
 
+	for (auto area : areas_)
+		if (area->sequencerExists(pos))
+			return false;
+
 	Area *area = connectAreas(pos); // adds position already
 	if (!area)
 	{
@@ -269,14 +292,13 @@ bool Grid::addArea(Vector2f pos)
 	area->addBlock(getBlock(pos));
 	removeGlobalBlock(pos);
 
-	area->updateSequence();
+	// area->updateSequence();
 	return true;
 }
 
 void Grid::splitAreas(Area *area) // TODO: this is probably terrible
 {
 	std::vector<Vector2f> remaining_pos = area->getPositions();
-	std::vector<Area *> new_areas;
 
 	while (!remaining_pos.empty())
 	{
@@ -316,14 +338,14 @@ void Grid::splitAreas(Area *area) // TODO: this is probably terrible
 			new_area->addPosition(pos);
 			if (block)
 				new_area->addBlock(block);
+
+			new_area->updateSequence();
 		}
 
-		new_areas.push_back(new_area);
+		areas_.push_back(new_area);
 	}
 
 	removeArea(area);
-	for (auto &new_area : new_areas)
-		areas_.push_back(new_area);
 }
 
 bool Grid::removeArea(Vector2f pos)

@@ -19,9 +19,16 @@ public:
     auto getBlocks() { return blocks_; }
     Block *getBlock(Vector2f);
 
+    void addSequencer(BlockSequencer *);
+    void removeSequencer(BlockSequencer *);
     void updateSequence();
+    bool sequencerExists(Vector2f);
+    std::vector<BlockSequencer *> getSequencer() { return sequence_; }
 
 private:
+    void removeDanglingSequencers();
+
     std::vector<Vector2f> positions_;
     std::vector<Block *> blocks_;
+    std::vector<BlockSequencer *> sequence_;
 };

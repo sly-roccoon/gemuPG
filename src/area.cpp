@@ -75,7 +75,62 @@ Block *Area::getBlock(Vector2f pos)
 	return nullptr;
 }
 
+void Area::addSequencer(BlockSequencer *sequencer)
+{
+	sequence_.push_back(sequencer);
+	sequencer->addArea(this);
+
+	updateSequence();
+}
+
+void Area::removeSequencer(BlockSequencer *sequencer)
+{
+	sequence_.erase(
+		std::remove_if(sequence_.begin(), sequence_.end(),
+					   [sequencer](auto s)
+					   { return s == sequencer; }),
+		sequence_.end());
+	sequencer->removeArea(this);
+	if (sequencer->hasNoAreas())
+		delete sequencer;
+
+	updateSequence();
+}
+
+void Area::removeDanglingSequencers()
+{
+	for (auto sequencer : sequence_)
+	{
+		auto pos = sequencer->getPos();
+		if (!isInside({pos.x + 1, pos.y}) &&
+			!isInside({pos.x - 1, pos.y}) &&
+			!isInside({pos.x, pos.y + 1}) &&
+			!isInside({pos.x, pos.y - 1}))
+		{
+			sequence_.erase(
+				std::remove_if(sequence_.begin(), sequence_.end(),
+							   [sequencer](auto s)
+							   { return s == sequencer; }),
+				sequence_.end());
+			sequencer->removeArea(this);
+
+			if (sequencer->hasNoAreas())
+				delete sequencer;
+		}
+	}
+}
+
 void Area::updateSequence()
 {
-	// TODO
+	removeDanglingSequencers();
+	// TODO: sorting algorithm, nullptr signals pause
+}
+
+bool Area::sequencerExists(Vector2f pos)
+{
+	for (auto &sequencer : sequence_)
+		if (sequencer->getPos() == pos)
+			return true;
+
+	return false;
 }

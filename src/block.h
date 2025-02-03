@@ -1,8 +1,11 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include <SDL3/SDL.h>
 #include "util.h"
 #include "camera.h"
+
+class Area;
 
 class Block
 {
@@ -18,7 +21,7 @@ public:
 		rect_.y = pos.y;
 	}
 	block_type_t getType() { return type_; }
-	virtual Block *clone() = 0; //TODO: implement properly with operator overloading
+	virtual Block *clone() = 0; // TODO: implement properly with operator overloading
 
 	virtual void drawGUI() = 0;
 	void toggleGUI() { viewGUI_ = !viewGUI_; }
@@ -95,10 +98,20 @@ public:
 	BlockSequencer *clone() override;
 	void drawGUI() override;
 
+	void setPitch(pitch_t pitch) { pitch_ = pitch; }
+	pitch_t getPitch() { return pitch_; }
+
+	void setPitchType(pitch_type_t pitch_type) { pitch_type_ = pitch_type; }
+	pitch_type_t getPitchType() { return pitch_type_; }
+
+	void addArea(Area *area) { areas_.push_back(area); }
+	void removeArea(Area *area);
+
+	bool hasNoAreas() { return areas_.empty(); }
+
 private:
 	pitch_t pitch_;
 	pitch_type_t pitch_type_;
 
-	std::shared_ptr<BlockSequencer> next_;
-	std::shared_ptr<BlockSequencer> prev_;
+	std::vector<Area *> areas_;
 };

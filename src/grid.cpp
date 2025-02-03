@@ -63,7 +63,7 @@ void Grid::drawBlocks(SDL_Renderer *renderer)
 			SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
 			SDL_RenderFillRect(renderer, block->getFRect());
 		}
-		for (auto &sequencer : area->getSequencer())
+		for (auto &sequencer : area->getSequence())
 		{
 			SDL_SetRenderDrawColor(renderer, SEQUENCER_COLOR.r, SEQUENCER_COLOR.g, SEQUENCER_COLOR.b, SEQUENCER_COLOR.a);
 			SDL_RenderFillRect(renderer, sequencer->getFRect());
@@ -140,7 +140,20 @@ bool Grid::removeBlock(Vector2f pos)
 	if (removeGlobalBlock(pos))
 		return true;
 
-	return removeAreaBlock(pos);
+	if (removeAreaBlock(pos))
+		return true;
+
+	return removeSequencer(pos);
+}
+
+bool Grid::removeSequencer(Vector2f pos)
+{
+	bool removed = false;
+	for (Area *area : areas_)
+		if (area->removeSequencer(pos))
+			removed = true;
+
+	return removed;
 }
 
 void Grid::removeGlobalBlock(Block *block)
@@ -174,6 +187,10 @@ Block *Grid::getBlock(Vector2f pos)
 	for (auto &area : areas_)
 	{
 		Block *block = area->getBlock(pos);
+		if (block)
+			return block;
+
+		block = area->getSequencer(pos);
 		if (block)
 			return block;
 	}
@@ -241,6 +258,15 @@ void Grid::mergeAreas(Area *into, Area *from)
 		into->addBlock(block);
 		from->removeBlock(block);
 	}
+
+	for (auto &sequencer : from->getSequence())
+	{
+		into->addSequencer(sequencer);
+		sequencer->addArea(into);
+		from->removeSequencer(sequencer);
+		sequencer->removeArea(from);
+	}
+
 	removeArea(from);
 }
 
@@ -292,7 +318,7 @@ bool Grid::addArea(Vector2f pos)
 	area->addBlock(getBlock(pos));
 	removeGlobalBlock(pos);
 
-	// area->updateSequence();
+	area->updateSequence();
 	return true;
 }
 
@@ -338,10 +364,11 @@ void Grid::splitAreas(Area *area) // TODO: this is probably terrible
 			new_area->addPosition(pos);
 			if (block)
 				new_area->addBlock(block);
-
-			new_area->updateSequence();
 		}
+		for (auto sequencer : area->getSequence())
+			new_area->addSequencer(sequencer);
 
+		new_area->updateSequence();
 		areas_.push_back(new_area);
 	}
 

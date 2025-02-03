@@ -31,6 +31,7 @@ public:
 	bool isAreaAdjacent(Vector2f);
 
 private:
+	bool removeSequencer(Vector2f);
 	bool removeGlobalBlock(Vector2f);
 	void removeGlobalBlock(Block *);
 	bool removeAreaBlock(Vector2f);

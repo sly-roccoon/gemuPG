@@ -75,6 +75,17 @@ Block *Area::getBlock(Vector2f pos)
 	return nullptr;
 }
 
+Block *Area::getSequencer(Vector2f pos)
+{
+	pos = floorVec(pos);
+
+	for (auto &sequencer : sequence_)
+		if (sequencer->getPos() == pos)
+			return sequencer;
+
+	return nullptr;
+}
+
 void Area::addSequencer(BlockSequencer *sequencer)
 {
 	sequence_.push_back(sequencer);
@@ -85,16 +96,28 @@ void Area::addSequencer(BlockSequencer *sequencer)
 
 void Area::removeSequencer(BlockSequencer *sequencer)
 {
-	sequence_.erase(
-		std::remove_if(sequence_.begin(), sequence_.end(),
-					   [sequencer](auto s)
-					   { return s == sequencer; }),
-		sequence_.end());
-	sequencer->removeArea(this);
-	if (sequencer->hasNoAreas())
-		delete sequencer;
+	if (sequence_.erase(
+			std::remove_if(sequence_.begin(), sequence_.end(),
+						   [sequencer](auto s)
+						   { return s == sequencer; }),
+			sequence_.end()) != sequence_.end())
+	{
+		sequencer->removeArea(this);
+		if (sequencer->hasNoAreas())
+			delete sequencer;
+		updateSequence();
+	}
+}
 
-	updateSequence();
+bool Area::removeSequencer(Vector2f pos)
+{
+	for (auto sequencer : sequence_)
+		if (sequencer->getPos() == pos)
+		{
+			removeSequencer(sequencer);
+			return true;
+		}
+	return false;
 }
 
 void Area::removeDanglingSequencers()

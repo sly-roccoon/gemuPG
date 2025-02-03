@@ -21,9 +21,11 @@ public:
 
     void addSequencer(BlockSequencer *);
     void removeSequencer(BlockSequencer *);
+    bool removeSequencer(Vector2f);
     void updateSequence();
     bool sequencerExists(Vector2f);
-    std::vector<BlockSequencer *> getSequencer() { return sequence_; }
+    std::vector<BlockSequencer *> getSequence() { return sequence_; }
+    Block *getSequencer(Vector2f);
 
 private:
     void removeDanglingSequencers();

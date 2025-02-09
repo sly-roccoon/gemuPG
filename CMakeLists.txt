@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 project(gemupg VERSION 0.1)
 
 # SDL
-add_subdirectory(include/SDL EXCLUDE_FROM_ALL)
+find_package(SDL3 CONFIG REQUIRED)
 
 # IMGUI
 file (GLOB IMGUI_SOURCES CONFIGURE_DEPENDS "include/imgui/*.cpp")
@@ -31,7 +31,7 @@ add_executable(${PROJECT_NAME} ${gemupg_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 IMGUI)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
-	COMMAND_EXPAND_LISTS
-)
+# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+# 	COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+# 	COMMAND_EXPAND_LISTS
+# )

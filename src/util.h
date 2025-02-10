@@ -3,15 +3,16 @@
 #include <numbers>
 #include <SDL3/SDL.h>
 #include <imgui.h>
+#include <array>
 
 #define ADJUST_AMP_BY_CREST true
 
-constexpr unsigned int WIDTH = 1280;
-constexpr unsigned int HEIGHT = 720;
+constexpr unsigned int WIDTH = 1920;
+constexpr unsigned int HEIGHT = 1080;
 
 constexpr unsigned int ICON_SIZE = 64;
 
-typedef float pitch_t;
+using pitch_t = float;
 
 typedef enum
 {
@@ -81,3 +82,5 @@ Vector2f floorVec(Vector2f vec);
 float calcCrest(float *wave);
 
 ImVec4 toImVec4(SDL_Color color);
+
+std::array<Vector2f, 4> getAdjacentPositions(Vector2f pos);

@@ -66,7 +66,8 @@ void Grid::drawBlocks(SDL_Renderer *renderer)
 		for (auto &sequencer : area->getSequence())
 		{
 			SDL_SetRenderDrawColor(renderer, SEQUENCER_COLOR.r, SEQUENCER_COLOR.g, SEQUENCER_COLOR.b, SEQUENCER_COLOR.a);
-			SDL_RenderFillRect(renderer, sequencer->getFRect());
+			if (sequencer)
+				SDL_RenderFillRect(renderer, sequencer->getFRect());
 		}
 	}
 }
@@ -90,7 +91,7 @@ void Grid::addBlock(Block *block)
 		return;
 
 	for (auto &area : areas_)
-		if (area->sequencerExists(block->getPos()))
+		if (area->getSequencer(block->getPos()))
 		{
 			return;
 		}
@@ -144,6 +145,15 @@ bool Grid::removeBlock(Vector2f pos)
 		return true;
 
 	return removeSequencer(pos);
+}
+
+bool Grid::sequencerExists(Vector2f pos)
+{
+	for (auto &area : areas_)
+		if (area->getSequencer(pos))
+			return true;
+
+	return false;
 }
 
 bool Grid::removeSequencer(Vector2f pos)
@@ -238,13 +248,12 @@ std::array<Area *, 4> Grid::getAdjacentAreas(Vector2f pos) // in order UP, LEFT,
 {
 	pos = floorVec(pos);
 
-	std::array<Area *, 4> adjacentAreas;
-	adjacentAreas[0] = getArea({pos.x, pos.y - 1});
-	adjacentAreas[1] = getArea({pos.x - 1, pos.y});
-	adjacentAreas[2] = getArea({pos.x, pos.y + 1});
-	adjacentAreas[3] = getArea({pos.x + 1, pos.y});
+	auto adjacent_pos = getAdjacentPositions(pos);
+	std::array<Area *, 4> adjacent_areas;
+	for (int i = 0; i < 4; i++)
+		adjacent_areas[i] = getArea(adjacent_pos.at(i));
 
-	return adjacentAreas;
+	return adjacent_areas;
 }
 
 void Grid::mergeAreas(Area *into, Area *from)
@@ -304,7 +313,7 @@ bool Grid::addArea(Vector2f pos)
 		return false;
 
 	for (auto area : areas_)
-		if (area->sequencerExists(pos))
+		if (area->getSequencer(pos))
 			return false;
 
 	Area *area = connectAreas(pos); // adds position already
@@ -314,6 +323,10 @@ bool Grid::addArea(Vector2f pos)
 		area->addPosition(pos);
 		areas_.push_back(area);
 	}
+
+	for (auto adj_pos : getAdjacentPositions(pos))
+		if (sequencerExists(adj_pos))
+			area->addSequencer((BlockSequencer *)getBlock(adj_pos));
 
 	area->addBlock(getBlock(pos));
 	removeGlobalBlock(pos);

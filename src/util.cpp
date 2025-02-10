@@ -28,3 +28,16 @@ SDL_Color toSDLColor(ImVec4 color)
 {
   return {static_cast<Uint8>(color.x * 255), static_cast<Uint8>(color.y * 255), static_cast<Uint8>(color.z * 255), static_cast<Uint8>(color.w * 255)};
 }
+
+std::array<Vector2f, 4> getAdjacentPositions(Vector2f pos) // in order UP, LEFT, DOWN, RIGHT
+{
+  pos = floorVec(pos);
+
+  std::array<Vector2f, 4> adjacent_pos;
+  adjacent_pos[0] = Vector2f({pos.x, pos.y - 1});
+  adjacent_pos[1] = Vector2f({pos.x - 1, pos.y});
+  adjacent_pos[2] = Vector2f({pos.x, pos.y + 1});
+  adjacent_pos[3] = Vector2f({pos.x + 1, pos.y});
+
+  return adjacent_pos;
+}

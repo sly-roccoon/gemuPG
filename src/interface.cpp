@@ -27,7 +27,7 @@ bool Interface::addBlock(Vector2f pos)
 		return false;
 
 	Block *block = block_factory.createBlock(cur_selection_, pos);
-	grid_.removeBlock(pos); //? shouldn't be necessary, but causes area drawing over blocks if removed??
+	// grid_.removeBlock(pos); //? shouldn't be necessary, but causes area drawing over blocks if removed??
 	grid_.addBlock(block);
 
 	return true;
@@ -92,7 +92,8 @@ void Interface::drawGUI()
 
 	for (auto area : grid_.getAreas())
 		for (auto sequencer : area->getSequence())
-			sequencer->drawGUI();
+			if (sequencer)
+				sequencer->drawGUI();
 
 	GUI::drawToolbar();
 

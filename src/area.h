@@ -23,12 +23,13 @@ public:
     void removeSequencer(BlockSequencer *);
     bool removeSequencer(Vector2f);
     void updateSequence();
-    bool sequencerExists(Vector2f);
     std::vector<BlockSequencer *> getSequence() { return sequence_; }
-    Block *getSequencer(Vector2f);
+    BlockSequencer *getSequencer(Vector2f);
 
 private:
+    Vector2f getTopLeft();
     void removeDanglingSequencers();
+    void cleanupSequence();
 
     std::vector<Vector2f> positions_;
     std::vector<Block *> blocks_;

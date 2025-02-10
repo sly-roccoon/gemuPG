@@ -75,12 +75,12 @@ Block *Area::getBlock(Vector2f pos)
 	return nullptr;
 }
 
-Block *Area::getSequencer(Vector2f pos)
+BlockSequencer *Area::getSequencer(Vector2f pos)
 {
 	pos = floorVec(pos);
 
 	for (auto &sequencer : sequence_)
-		if (sequencer->getPos() == pos)
+		if (sequencer && sequencer->getPos() == pos)
 			return sequencer;
 
 	return nullptr;
@@ -112,7 +112,7 @@ void Area::removeSequencer(BlockSequencer *sequencer)
 bool Area::removeSequencer(Vector2f pos)
 {
 	for (auto sequencer : sequence_)
-		if (sequencer->getPos() == pos)
+		if (sequencer && sequencer->getPos() == pos)
 		{
 			removeSequencer(sequencer);
 			return true;
@@ -124,6 +124,9 @@ void Area::removeDanglingSequencers()
 {
 	for (auto sequencer : sequence_)
 	{
+		if (!sequencer)
+			continue;
+
 		auto pos = sequencer->getPos();
 		if (!isInside({pos.x + 1, pos.y}) &&
 			!isInside({pos.x - 1, pos.y}) &&
@@ -143,17 +146,76 @@ void Area::removeDanglingSequencers()
 	}
 }
 
-void Area::updateSequence()
+Vector2f Area::getTopLeft()
 {
-	removeDanglingSequencers();
-	// TODO: sorting algorithm, nullptr signals pause
+	Vector2f top_left = {GRID_SIZE + 1, GRID_SIZE + 1};
+
+	for (auto &pos : positions_) // find topleft most position, top > left
+	{
+		if (pos.y < top_left.y)
+			top_left = pos;
+		else if (pos.y == top_left.y && pos.x < top_left.x)
+			top_left = pos;
+	}
+
+	return top_left;
 }
 
-bool Area::sequencerExists(Vector2f pos)
+void Area::cleanupSequence()
 {
-	for (auto &sequencer : sequence_)
-		if (sequencer->getPos() == pos)
-			return true;
+	// remove nullptrs
+	sequence_.erase(
+		std::remove_if(sequence_.begin(), sequence_.end(),
+					   [](BlockSequencer *sequencer)
+					   { return sequencer == nullptr; }),
+		sequence_.end());
 
-	return false;
+	// remove duplicates
+	std::sort(sequence_.begin(), sequence_.end());
+	sequence_.erase(
+		std::unique(sequence_.begin(), sequence_.end()),
+		sequence_.end());
+
+	removeDanglingSequencers();
+}
+
+void Area::updateSequence()
+{
+	std::vector<BlockSequencer *> new_sequence;
+
+	cleanupSequence();
+
+	int dir = 0;
+	auto cur_pos = getAdjacentPositions(getTopLeft()).at(dir);
+	auto start_pos = cur_pos;
+	auto next_dir = [](int dir, int n_times = 1)
+	{ return (dir + n_times) % 4; };
+
+	do // directions: 0 = up, 1 = left, 2 = down, 3 = right | normal direction from side of area
+	{  // i know this looks convoluted, but i swear this makes sense...
+		auto adj_pos = getAdjacentPositions(cur_pos);
+		new_sequence.push_back(getSequencer(cur_pos));
+
+		if (!isInside(getAdjacentPositions(adj_pos.at(next_dir(dir))).at(next_dir(dir, 2)))) // outer corner / left rotation
+		{
+			cur_pos = getAdjacentPositions(adj_pos.at(next_dir(dir))).at(next_dir(dir, 2));
+			dir = next_dir(dir);
+			continue;
+		}
+
+		if (!isInside(adj_pos.at(next_dir(dir)))) // continue straight?
+		{
+			cur_pos = adj_pos.at(next_dir(dir));
+			continue;
+		}
+
+		if (!isInside(adj_pos.at(dir))) // around the inner corner / right rotation
+		{
+			// cur_pos = cur_pos;  //position stays the same because in inner corner two sides of an area block touch sequencer block
+			dir = next_dir(dir, 3); // rotate 3 times effectively
+			continue;
+		}
+	} while (cur_pos != start_pos);
+
+	sequence_ = new_sequence;
 }

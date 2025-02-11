@@ -97,7 +97,7 @@ void Input::handlePlacement(SDL_Event *event)
 	std::unique_ptr<Command> cmd;
 	block_type_t cur_selection = Interface::getInstance().getSelection();
 
-	if (button.button == SDL_BUTTON_LEFT && button.down && !isKeyDown(SDLK_LCTRL))
+	if (button.button == SDL_BUTTON_LEFT && !isKeyDown(SDLK_LCTRL))
 	{
 		if (cur_selection == AREA) // draw area
 		{
@@ -105,7 +105,7 @@ void Input::handlePlacement(SDL_Event *event)
 				return;
 			cmd = std::make_unique<AddAreaCommand>(world_pos);
 		}
-		else // place block
+		else if (button.down) // place block
 		{
 			Block *block_at_mouse = grid.getBlock(world_pos);
 			if (block_at_mouse)
@@ -115,21 +115,22 @@ void Input::handlePlacement(SDL_Event *event)
 			}
 			cmd = std::make_unique<AddBlockCommand>(world_pos);
 		}
-		cmd_mgr.executeCommand(std::move(cmd));
 	}
-	if (button.button == SDL_BUTTON_RIGHT && button.down)
+
+	if (button.button == SDL_BUTTON_RIGHT)
 	{
-		Vector2 mouse_pos = {button.x, button.y};
 		if (cur_selection == AREA) // remove area
 		{
 			cmd = std::make_unique<RemoveAreaCommand>(world_pos);
 		}
-		else // remove block
+		else if (button.down) // remove block
 		{
 			cmd = std::make_unique<RemoveBlockCommand>(world_pos);
 		}
-		cmd_mgr.executeCommand(std::move(cmd));
 	}
+
+	if (cmd)
+		cmd_mgr.executeCommand(std::move(cmd));
 }
 
 void Input::handleMouse(SDL_Event *event)

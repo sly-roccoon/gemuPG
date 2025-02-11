@@ -115,6 +115,9 @@ void Interface::drawGUI()
 	for (auto &block : grid_.getBlocks())
 		block->drawGUI(); // TODO: crackling when changing values
 
+	for (auto &area : grid_.getAreas())
+		area->drawGUI();
+
 	drawSequencerGUI();
 
 	GUI::drawToolbar();

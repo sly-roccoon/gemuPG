@@ -1,6 +1,7 @@
 #include "area.h"
-#include <algorithm>
 #include "util.h"
+#include <algorithm>
+#include <format>
 
 bool Area::isInside(Vector2f pos)
 {
@@ -237,6 +238,9 @@ void Area::setNotes(pitch_t freq)
 
 void Area::stepSequence()
 {
+	if (++subdivision_counter_ % (MAX_SUBDIVISION / bpm_subdivision_) != 0)
+		return;
+
 	last_note_idx_ = cur_note_idx_;
 	cur_note_idx_ = cur_note_idx_ >= sequence_.size() - 1 ? 0 : cur_note_idx_ + 1;
 
@@ -277,4 +281,18 @@ void Area::stopSequence()
 {
 	cur_note_idx_ = 0;
 	last_note_idx_ = sequence_.size() - 1;
+}
+
+void Area::drawGUI()
+{
+	if (!viewGUI_)
+		return;
+
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
+	ImGui::SetNextWindowSize({512, 256});
+	ImGui::Begin(std::format("Area @ [{}, {}]", getTopLeft().x, getTopLeft().y).c_str(), &viewGUI_, flags);
+
+	ImGui::DragInt("bpm subdivision", &bpm_subdivision_, 1, 1, 32, "1/%d", ImGuiSliderFlags_Logarithmic);
+
+	ImGui::End();
 }

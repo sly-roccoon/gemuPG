@@ -231,8 +231,8 @@ void BlockSequencer::drawGUI()
 
 	if (pitch_type_ == PITCH_INTERVAL)
 	{
-		ImGui::SliderFloat("Interval", &interval_, -octave_subdivision_ * 2, octave_subdivision_ * 2, "%.0f", ImGuiSliderFlags_NoRoundToFormat);
-		ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f, "%.0f", ImGuiSliderFlags_NoRoundToFormat);
+		ImGui::SliderFloat("Interval", &interval_, -octave_subdivision_ * 2, octave_subdivision_ * 2, "%f", ImGuiSliderFlags_NoRoundToFormat);
+		ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f, "%f", ImGuiSliderFlags_NoRoundToFormat);
 	}
 
 	if (pitch_type_ == PITCH_NOTE)

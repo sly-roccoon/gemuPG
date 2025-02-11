@@ -101,14 +101,18 @@ void Input::handlePlacement(SDL_Event *event)
 	{
 		if (cur_selection == AREA) // draw area
 		{
-			if (grid.getArea(world_pos))
+			Area *area_at_mouse = grid.getArea(world_pos);
+			if (area_at_mouse && button.down)
+			{
+				area_at_mouse->toggleGUI();
 				return;
+			}
 			cmd = std::make_unique<AddAreaCommand>(world_pos);
 		}
-		else if (button.down) // place block
+		else // place block
 		{
 			Block *block_at_mouse = grid.getBlock(world_pos);
-			if (block_at_mouse)
+			if (block_at_mouse && button.down)
 			{
 				block_at_mouse->toggleGUI();
 				return;
@@ -123,7 +127,7 @@ void Input::handlePlacement(SDL_Event *event)
 		{
 			cmd = std::make_unique<RemoveAreaCommand>(world_pos);
 		}
-		else if (button.down) // remove block
+		else // remove block
 		{
 			cmd = std::make_unique<RemoveBlockCommand>(world_pos);
 		}

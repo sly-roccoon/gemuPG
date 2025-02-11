@@ -1,5 +1,6 @@
 #pragma once
 
+#include "util.h"
 #include <SDL3/SDL_time.h>
 #include <SDL3/SDL_timer.h>
 
@@ -30,5 +31,5 @@ private:
 
     SDL_Time last_time_;
     float delta_;
-    float bpm_ = 120.0f;
+    float bpm_ = DEFAULT_BPM;
 };

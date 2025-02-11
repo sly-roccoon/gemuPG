@@ -28,6 +28,9 @@ public:
     void stepSequence();
     void stopSequence();
 
+    void drawGUI();
+    void toggleGUI() { viewGUI_ = !viewGUI_; };
+
 private:
     Vector2f getTopLeft();
     void removeDanglingSequencers();
@@ -42,4 +45,8 @@ private:
     int cur_note_idx_ = 0;
     int last_note_idx_ = 0;
     pitch_t last_freq_ = 0.0f;
+
+    bool viewGUI_ = false;
+    int bpm_subdivision_ = 4;
+    int subdivision_counter_ = 0;
 };

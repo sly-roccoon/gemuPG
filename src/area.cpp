@@ -290,6 +290,7 @@ void Area::drawGUI()
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
 	ImGui::SetNextWindowSize({512, 256});
+	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
 	ImGui::Begin(std::format("Area @ [{}, {}]", getTopLeft().x, getTopLeft().y).c_str(), &viewGUI_, flags);
 
 	ImGui::DragInt("bpm subdivision", &bpm_subdivision_, 1, 1, 32, "1/%d", ImGuiSliderFlags_Logarithmic);

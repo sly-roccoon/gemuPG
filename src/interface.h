@@ -32,8 +32,8 @@ private:
 	Interface(const Interface &) = delete;
 	Interface &operator=(const Interface &) = delete;
 
-	unsigned int width_ = WIDTH;
-	unsigned int height_ = HEIGHT;
+	unsigned int width_ = DEFAULT_WIDTH;
+	unsigned int height_ = DEFAULT_HEIGHT;
 
 	block_type_t cur_selection_ = BLOCK_GENERATOR;
 

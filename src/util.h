@@ -8,8 +8,8 @@
 
 #define ADJUST_AMP_BY_CREST true
 
-constexpr unsigned int WIDTH = 1920;
-constexpr unsigned int HEIGHT = 1080;
+constexpr unsigned int DEFAULT_WIDTH = 1280;
+constexpr unsigned int DEFAULT_HEIGHT = 960;
 
 constexpr unsigned int ICON_SIZE = 64;
 
@@ -49,7 +49,7 @@ constexpr float MAX_CAMERA_ZOOM = 255.0f;
 const float DEFAULT_CAMERA_ZOOM = std::sqrt(std::pow(MIN_CAMERA_ZOOM, 2) + std::pow(MAX_CAMERA_ZOOM, 2));
 
 constexpr unsigned int BUFFER_SIZE = 512;
-constexpr unsigned int SAMPLE_RATE = 44100;
+constexpr unsigned int SAMPLE_RATE = 96000;
 constexpr unsigned int BIT_DEPTH = 16;
 constexpr unsigned int CHANNELS = 1;
 

@@ -138,6 +138,8 @@ void BlockGenerator::drawGUI()
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
 	ImGui::SetNextWindowSize({512, 256});
+	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
+
 	ImGui::Begin(std::format("generator block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
 	ImGui::SliderFloat("amplitude", &data_.amp, 0.0f, 1.0f, "% .2f");
@@ -202,6 +204,8 @@ void BlockSequencer::drawGUI()
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
 	ImGui::SetNextWindowSize({512, 256});
+	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
+
 	ImGui::Begin(std::format("Sequencer Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
 	const char *preview = pitch_type_ == PITCH_REL_FREQUENCY   ? "relative frequency"
@@ -231,8 +235,8 @@ void BlockSequencer::drawGUI()
 
 	if (pitch_type_ == PITCH_INTERVAL)
 	{
-		ImGui::SliderFloat("Interval", &interval_, -octave_subdivision_ * 2, octave_subdivision_ * 2, "%f", ImGuiSliderFlags_NoRoundToFormat);
-		ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f, "%f", ImGuiSliderFlags_NoRoundToFormat);
+		ImGui::SliderFloat("Interval", &interval_, -octave_subdivision_ * 2, octave_subdivision_ * 2, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
+		ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
 	}
 
 	if (pitch_type_ == PITCH_NOTE)

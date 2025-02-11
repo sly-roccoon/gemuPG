@@ -1,3 +1,5 @@
+#pragma once
+
 #include <SDL3/SDL_time.h>
 #include <SDL3/SDL_timer.h>
 

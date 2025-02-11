@@ -122,6 +122,11 @@ void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
 	data_.crest = calcCrest(data_.wave);
 }
 
+void BlockGenerator::setFrequency(pitch_t freq)
+{
+	data_.freq = (freq + rel_freq_) * freq_factor_;
+}
+
 void BlockGenerator::drawGUI()
 {
 	if (!viewGUI_)
@@ -129,12 +134,16 @@ void BlockGenerator::drawGUI()
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
 	ImGui::SetNextWindowSize({512, 256});
-	ImGui::Begin(std::format("Generator Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
+	ImGui::Begin(std::format("generator block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
-	ImGuiSliderFlags log = ImGuiSliderFlags_Logarithmic;
-	ImGui::SliderFloat("Amplitude", &data_.amp, 0.0f, 1.0f, "% .2f");
+	ImGui::SliderFloat("amplitude", &data_.amp, 0.0f, 1.0f, "% .2f");
 	if (!is_in_area_)
-		ImGui::SliderFloat("Frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", log);
+		ImGui::SliderFloat("frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
+	else
+	{
+		ImGui::SliderFloat("relative frequency", &rel_freq_, -10.0f, 10.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("frequency multiplicator", &freq_factor_, 0.01f, 10.0f, "%.2f");
+	}
 
 	// ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
 
@@ -169,7 +178,7 @@ BlockSequencer::BlockSequencer(Vector2f pos) : Block(pos)
 	type_ = BLOCK_SEQUENCER;
 	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
 
-	pitch_ = 440.0f;
+	pitch_ = SDL_pow(1000, SDL_randf() - 1) * 10000.0f;
 	pitch_type_ = PITCH_ABS_FREQUENCY;
 }
 
@@ -208,15 +217,15 @@ void BlockSequencer::drawGUI()
 	}
 
 	if (pitch_type_ == PITCH_REL_FREQUENCY)
-		ImGui::SliderFloat("frequency diff.", &pitch_, -1000.0f, 1000.0f, "%.2f");
+		ImGui::SliderFloat("frequency diff.", &pitch_, -1000.0f, 1000.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 
 	if (pitch_type_ == PITCH_ABS_FREQUENCY)
-		ImGui::SliderFloat("frequency", &pitch_, 0.0f, 20000.0f, "% .2f");
+		ImGui::SliderFloat("frequency", &pitch_, 0.0f, 20000.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
 
 	if (pitch_type_ == PITCH_INTERVAL)
 	{
-		ImGui::SliderFloat("Interval", &interval_, 0.0f, octave_subdivision_ * 10, "%.1f");
-		ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f, "%.1f");
+		ImGui::SliderFloat("Interval", &interval_, -octave_subdivision_ * 2, octave_subdivision_ * 2, "%.0f", ImGuiSliderFlags_NoRoundToFormat);
+		ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f, "%.0f", ImGuiSliderFlags_NoRoundToFormat);
 	}
 
 	if (pitch_type_ == PITCH_NOTE)
@@ -264,4 +273,15 @@ void BlockSequencer::drawGUI()
 void BlockSequencer::removeArea(Area *area)
 {
 	areas_.erase(std::remove(areas_.begin(), areas_.end(), area), areas_.end());
+}
+
+SDL_FRect *BlockSequencer::getFRect()
+{
+	if (!is_active_)
+		render_rect_ = Block::smallerFRect(rect_);
+	else
+		render_rect_ = rect_;
+
+	render_rect_ = Camera::resizeFRect(render_rect_);
+	return &render_rect_;
 }

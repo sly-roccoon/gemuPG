@@ -12,6 +12,9 @@ public:
 	}
 	void destroy();
 
+	void setVolume(float volume) { volume_ = volume; }
+	float getVolume() { return volume_; }
+
 private:
 	SDL_AudioStream *stream_;
 	SDL_AudioSpec spec_;
@@ -21,4 +24,5 @@ private:
 	AudioEngine();
 	AudioEngine(const AudioEngine &) = delete;
 	AudioEngine &operator=(const AudioEngine &) = delete;
+	static float volume_;
 };

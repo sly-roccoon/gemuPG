@@ -81,6 +81,31 @@ void Interface::drawBlocks()
 	grid_.drawBlocks(renderer_);
 }
 
+void Interface::drawSequencerGUI()
+{
+	std::vector<BlockSequencer *> sequencers;
+	for (auto area : grid_.getAreas())
+		for (auto sequencer : area->getSequence())
+			sequencers.push_back(sequencer);
+
+	// remove nullptrs
+	sequencers.erase(
+		std::remove_if(sequencers.begin(), sequencers.end(),
+					   [](BlockSequencer *sequencer)
+					   { return sequencer == nullptr; }),
+		sequencers.end());
+
+	// remove duplicates
+	std::sort(sequencers.begin(), sequencers.end());
+	sequencers.erase(
+		std::unique(sequencers.begin(), sequencers.end()),
+		sequencers.end());
+
+	for (auto sequencer : sequencers)
+		if (sequencer)
+			sequencer->drawGUI();
+}
+
 void Interface::drawGUI()
 {
 	ImGui_ImplSDLRenderer3_NewFrame();
@@ -90,10 +115,7 @@ void Interface::drawGUI()
 	for (auto &block : grid_.getBlocks())
 		block->drawGUI(); // TODO: crackling when changing values
 
-	for (auto area : grid_.getAreas())
-		for (auto sequencer : area->getSequence())
-			if (sequencer)
-				sequencer->drawGUI();
+	drawSequencerGUI();
 
 	GUI::drawToolbar();
 

@@ -223,7 +223,6 @@ void Area::updateSequence()
 	} while (cur_pos != start_pos);
 
 	sequence_ = new_sequence;
-	cur_note_idx_ = 0;
 }
 
 void Area::setNotes(pitch_t freq)
@@ -233,19 +232,25 @@ void Area::setNotes(pitch_t freq)
 		if (block->getType() == BLOCK_GENERATOR)
 		{
 			auto generator = (BlockGenerator *)block;
-			generator_data_t data = generator->getData();
-			data.freq = freq;
-			generator->setData(data);
+			generator->setFrequency(freq);
 		}
 	}
 };
 
 void Area::stepSequence()
 {
+	last_note_idx_ = cur_note_idx_;
+	cur_note_idx_ = cur_note_idx_ >= sequence_.size() - 1 ? 0 : cur_note_idx_ + 1;
+
+	if (sequence_.at(last_note_idx_))
+		sequence_.at(last_note_idx_)->setActive(false);
+
 	if (!sequence_.at(cur_note_idx_))
 		setNotes(0.0f);
 	else
 	{
+		sequence_.at(cur_note_idx_)->setActive(true);
+
 		switch (sequence_.at(cur_note_idx_)->getPitchType())
 		{
 		case PITCH_ABS_FREQUENCY:
@@ -260,8 +265,12 @@ void Area::stepSequence()
 			last_freq_ = last_freq_ * intervalToRatio(interval, oct_sub);
 			break;
 		}
+
+		if (last_freq_ < 20.0f)
+			last_freq_ += 20000.0f;
+		else if (last_freq_ > 20000.0f)
+			last_freq_ -= 20000.0f;
+
 		setNotes(last_freq_);
 	}
-
-	cur_note_idx_ = cur_note_idx_ == sequence_.size() - 1 ? 0 : cur_note_idx_ + 1;
 };

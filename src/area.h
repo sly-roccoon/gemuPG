@@ -37,6 +37,8 @@ private:
     std::vector<Vector2f> positions_;
     std::vector<Block *> blocks_;
     std::vector<BlockSequencer *> sequence_;
-    unsigned int cur_note_idx_ = 0;
+
+    int cur_note_idx_ = 0;
+    int last_note_idx_ = 0;
     pitch_t last_freq_ = 0.0f;
 };

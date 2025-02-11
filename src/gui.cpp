@@ -1,5 +1,6 @@
 #include "gui.h"
 #include "command.h"
+#include "audio.h"
 
 ImGuiContext *GUI::context_ = nullptr;
 SDL_Window *GUI::window_ = nullptr;
@@ -35,7 +36,7 @@ void GUI::drawToolbar()
 {
 	ImGui::SetNextWindowPos({0, ImGui::GetMainViewport()->GetCenter().y - (ICON_SIZE + 4) * 2});
 	ImGui::SetNextWindowSize({ICON_SIZE + ICON_SIZE / 4, (ICON_SIZE + 4) * 4}); // TODO: find better way to adjust margins of button border
-	ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
+	ImGui::Begin("Side", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 
 	if (ImGui::ColorButton("Generator Block", toImVec4(GENERATOR_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
 		Interface::getInstance().setSelection(BLOCK_GENERATOR);
@@ -43,6 +44,21 @@ void GUI::drawToolbar()
 		Interface::getInstance().setSelection(AREA);
 	if (ImGui::ColorButton("Sequencer", toImVec4(SEQUENCER_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
 		Interface::getInstance().setSelection(BLOCK_SEQUENCER);
+
+	ImGui::End();
+
+	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->GetCenter().x, ImGui::GetMainViewport()->Size.y - ICON_SIZE});
+	ImGui::SetNextWindowSize({ICON_SIZE * 4, ICON_SIZE});
+	ImGui::Begin("Bottom", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
+
+	float bpm = Clock::getInstance().getBPM();
+	float vol = AudioEngine::getInstance().getVolume();
+
+	ImGui::InputFloat("BPM", &bpm, 1.0f, 5.0f, "%.1f");
+	ImGui::SliderFloat("Volume", &vol, 0.0f, 1.0f, "%.5f", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_Logarithmic);
+
+	Clock::getInstance().setBPM(bpm);
+	AudioEngine::getInstance().setVolume(vol);
 
 	ImGui::End();
 }

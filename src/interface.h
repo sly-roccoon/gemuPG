@@ -46,7 +46,7 @@ private:
 	void drawGrid();
 	void drawAreas();
 	void drawBlocks();
+	void drawSequencerGUI();
 	void drawGUI();
-	void drawToolbar();
 	void debug();
 };

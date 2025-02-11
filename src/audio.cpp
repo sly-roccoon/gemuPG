@@ -2,6 +2,7 @@
 #include "stdio.h"
 
 static int total_samples_generated = 0;
+float AudioEngine::volume_ = 0.5f;
 
 float *getStreams(int n_samples, AudioEngine *audio);
 
@@ -27,7 +28,7 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 			SDL_GetAudioStreamData(gen_block->getStream(), new_samples, n_samples * sizeof(float));
 
 			for (int i = 0; i < n_samples; i++)
-				samples[i] += new_samples[i];
+				samples[i] += new_samples[i] * audio->getVolume();
 		}
 
 		SDL_PutAudioStreamData(stream, samples, n_samples * sizeof(float));

@@ -74,6 +74,9 @@ public:
 		data_ = data;
 		data_.phase = tmp_phase;
 	}
+
+	void setFrequency(pitch_t freq);
+
 	void incrPhase() { data_.phase++; }
 
 	void setWave(WAVE_FORMS waveform, float *wave = nullptr);
@@ -89,6 +92,9 @@ private:
 		.freq = 440.0f,
 		.phase = 0.0f};
 
+	pitch_t rel_freq_ = 0.0f;
+	float freq_factor_ = 1.0f;
+
 	static void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
 };
 
@@ -100,6 +106,9 @@ public:
 
 	BlockSequencer *clone() override;
 	void drawGUI() override;
+	SDL_FRect *getFRect();
+
+	void setActive(bool active) { is_active_ = active; }
 
 	void setPitch(pitch_t pitch) { pitch_ = pitch; }
 	pitch_t getPitch() { return pitch_; }
@@ -115,6 +124,7 @@ public:
 	bool hasNoAreas() { return areas_.empty(); }
 
 private:
+	bool is_active_;
 	pitch_t pitch_;
 	pitch_type_t pitch_type_;
 

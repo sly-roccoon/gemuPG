@@ -10,6 +10,8 @@ Interface::Interface() : camera_{Camera::getInstance()}
 
 	if (!SDL_CreateWindowAndRenderer("GemuPG", width_, height_, 0, &window_, &renderer_))
 		exit(SDL_APP_FAILURE);
+
+	SDL_SetWindowResizable(window_, true);
 }
 
 void Interface::destroy()

@@ -65,6 +65,5 @@ private:
 	Camera &operator=(const Camera &) = delete;
 
 	static Vector2f pos_;
-	static Vector2f screen_;
 	static float zoom_;
 };

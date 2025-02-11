@@ -1,4 +1,5 @@
 #include "util.h"
+#include <map>
 
 Vector2f floorVec(Vector2f vec)
 {
@@ -40,4 +41,47 @@ std::array<Vector2f, 4> getAdjacentPositions(Vector2f pos) // in order UP, LEFT,
   adjacent_pos[3] = Vector2f({pos.x + 1, pos.y});
 
   return adjacent_pos;
+}
+
+std::map<std::string, pitch_t> noteToFreqMap = {
+    {"C", 16.35f},
+    {"C#", 17.32f},
+    {"D", 18.35f},
+    {"D#", 19.45f},
+    {"E", 20.60f},
+    {"F", 21.83f},
+    {"F#", 23.12f},
+    {"G", 24.50f},
+    {"G#", 25.96f},
+    {"A", 27.50f},
+    {"A#", 29.14f},
+    {"B", 30.87f}};
+
+std::pair<std::string, int>
+freqToNote(pitch_t freq)
+{
+  freq = std::abs(freq);
+  int octave = 0;
+  while (freq > 31.7762f)
+  {
+    freq /= 2.0f;
+    octave++;
+  }
+
+  std::pair<std::string, pitch_t> closest = {"C", 16.35f};
+  for (auto &note : noteToFreqMap)
+    if (std::abs(freq - note.second) < std::abs(freq - closest.second))
+      closest = note;
+
+  return {closest.first, octave};
+}
+
+pitch_t noteToFreq(std::string note, int octave)
+{
+  return noteToFreqMap.at(note) * pow(2, octave);
+}
+
+pitch_t intervalToRatio(float interval, float octave_subdivision)
+{
+  return pow(2, interval / octave_subdivision);
 }

@@ -26,10 +26,13 @@ public:
 	virtual void drawGUI() = 0;
 	void toggleGUI() { viewGUI_ = !viewGUI_; }
 
+	void setInArea(bool in_area) { is_in_area_ = in_area; }
+
 protected:
 	bool viewGUI_ = false;
 	block_type_t type_;
 	bool bypass_ = false;
+	bool is_in_area_ = false;
 	SDL_FRect rect_{0, 0, 1.0f, 1.0f};
 	SDL_FRect render_rect_;
 };
@@ -107,11 +110,16 @@ public:
 	void addArea(Area *area) { areas_.push_back(area); }
 	void removeArea(Area *area);
 
+	std::pair<float, float> getInterval() { return {interval_, octave_subdivision_}; }
+
 	bool hasNoAreas() { return areas_.empty(); }
 
 private:
 	pitch_t pitch_;
 	pitch_type_t pitch_type_;
+
+	float interval_ = 7;
+	float octave_subdivision_ = 12;
 
 	std::vector<Area *> areas_;
 };

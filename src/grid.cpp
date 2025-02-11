@@ -113,6 +113,7 @@ void Grid::addBlock(Block *block)
 	}
 
 	blocks_.push_back(std::move(block));
+	block->setInArea(false);
 }
 
 bool Grid::removeGlobalBlock(Vector2f pos)
@@ -270,6 +271,8 @@ void Grid::mergeAreas(Area *into, Area *from)
 
 	for (auto &sequencer : from->getSequence())
 	{
+		if (!sequencer)
+			continue;
 		into->addSequencer(sequencer);
 		sequencer->addArea(into);
 		from->removeSequencer(sequencer);
@@ -379,7 +382,11 @@ void Grid::splitAreas(Area *area) // TODO: this is probably terrible
 				new_area->addBlock(block);
 		}
 		for (auto sequencer : area->getSequence())
+		{
+			if (!sequencer)
+				continue;
 			new_area->addSequencer(sequencer);
+		}
 
 		new_area->updateSequence();
 		areas_.push_back(new_area);

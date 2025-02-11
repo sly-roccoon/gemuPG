@@ -133,8 +133,10 @@ void BlockGenerator::drawGUI()
 
 	ImGuiSliderFlags log = ImGuiSliderFlags_Logarithmic;
 	ImGui::SliderFloat("Amplitude", &data_.amp, 0.0f, 1.0f, "% .2f");
-	ImGui::SliderFloat("Frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", log);
-	ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
+	if (!is_in_area_)
+		ImGui::SliderFloat("Frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", log);
+
+	// ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
 
 	const char *preview = data_.waveform == WAVE_SAW ? "Saw" : data_.waveform == WAVE_SINE	 ? "Sine"
 														   : data_.waveform == WAVE_SQUARE	 ? "Square"
@@ -186,7 +188,75 @@ void BlockSequencer::drawGUI()
 	ImGui::SetNextWindowSize({512, 256});
 	ImGui::Begin(std::format("Sequencer Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
-	// TODO
+	const char *preview = pitch_type_ == PITCH_REL_FREQUENCY   ? "relative frequency"
+						  : pitch_type_ == PITCH_ABS_FREQUENCY ? "absolute frequency"
+						  : pitch_type_ == PITCH_INTERVAL	   ? "interval"
+						  : pitch_type_ == PITCH_NOTE		   ? "note"
+															   : "unknown";
+
+	if (ImGui::BeginCombo("Type", preview))
+	{
+		if (ImGui::Selectable("relative frequency"))
+			setPitchType(PITCH_REL_FREQUENCY);
+		if (ImGui::Selectable("absolute frequency"))
+			setPitchType(PITCH_ABS_FREQUENCY);
+		if (ImGui::Selectable("interval"))
+			setPitchType(PITCH_INTERVAL);
+		if (ImGui::Selectable("note"))
+			setPitchType(PITCH_NOTE);
+		ImGui::EndCombo();
+	}
+
+	if (pitch_type_ == PITCH_REL_FREQUENCY)
+		ImGui::SliderFloat("frequency diff.", &pitch_, -1000.0f, 1000.0f, "%.2f");
+
+	if (pitch_type_ == PITCH_ABS_FREQUENCY)
+		ImGui::SliderFloat("frequency", &pitch_, 0.0f, 20000.0f, "% .2f");
+
+	if (pitch_type_ == PITCH_INTERVAL)
+	{
+		ImGui::SliderFloat("Interval", &interval_, 0.0f, octave_subdivision_ * 10, "%.1f");
+		ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f, "%.1f");
+	}
+
+	if (pitch_type_ == PITCH_NOTE)
+	{
+		auto [note, octave] = freqToNote(pitch_);
+		ImGui::SetNextItemWidth(128);
+		ImGui::SliderInt("octave", &octave, 0, 10);
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(128);
+		if (ImGui::BeginCombo("note", note.c_str()))
+		{
+			if (ImGui::Selectable("C"))
+				note = "C";
+			if (ImGui::Selectable("C#"))
+				note = "C#";
+			if (ImGui::Selectable("D"))
+				note = "D";
+			if (ImGui::Selectable("D#"))
+				note = "D#";
+			if (ImGui::Selectable("E"))
+				note = "E";
+			if (ImGui::Selectable("F"))
+				note = "F";
+			if (ImGui::Selectable("F#"))
+				note = "F#";
+			if (ImGui::Selectable("G"))
+				note = "G";
+			if (ImGui::Selectable("G#"))
+				note = "G#";
+			if (ImGui::Selectable("A"))
+				note = "A";
+			if (ImGui::Selectable("A#"))
+				note = "A#";
+			if (ImGui::Selectable("B"))
+				note = "B";
+			ImGui::EndCombo();
+		}
+
+		pitch_ = noteToFreq(note, octave);
+	}
 
 	ImGui::End();
 }

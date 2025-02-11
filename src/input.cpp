@@ -141,7 +141,7 @@ void Input::handleMouse(SDL_Event *event)
 void Input::handleKeys(SDL_Event *event)
 {
 	updateKeys(event);
-	handleUndoRedo(event);
+	// handleUndoRedo(event); //buggy, no time to fix :)
 }
 
 void Input::handleLoseFocus()

@@ -41,7 +41,10 @@ void Area::removePosition(Vector2f pos)
 void Area::addBlock(Block *block)
 {
 	if (block)
+	{
 		blocks_.push_back(block);
+		block->setInArea(true);
+	}
 }
 
 void Area::removeBlock(Block *block)
@@ -51,6 +54,8 @@ void Area::removeBlock(Block *block)
 					   [block](auto b)
 					   { return b == block; }),
 		blocks_.end());
+	if (block)
+		block->setInArea(false);
 }
 
 bool Area::removeBlock(Vector2f pos)
@@ -218,4 +223,45 @@ void Area::updateSequence()
 	} while (cur_pos != start_pos);
 
 	sequence_ = new_sequence;
+	cur_note_idx_ = 0;
 }
+
+void Area::setNotes(pitch_t freq)
+{
+	for (auto block : blocks_)
+	{
+		if (block->getType() == BLOCK_GENERATOR)
+		{
+			auto generator = (BlockGenerator *)block;
+			generator_data_t data = generator->getData();
+			data.freq = freq;
+			generator->setData(data);
+		}
+	}
+};
+
+void Area::stepSequence()
+{
+	if (!sequence_.at(cur_note_idx_))
+		setNotes(0.0f);
+	else
+	{
+		switch (sequence_.at(cur_note_idx_)->getType())
+		{
+		case PITCH_REL_FREQUENCY:
+			last_freq_ += sequence_.at(cur_note_idx_)->getPitch();
+			break;
+		case PITCH_ABS_FREQUENCY:
+		case PITCH_NOTE:
+			last_freq_ = sequence_.at(cur_note_idx_)->getPitch();
+			break;
+		case PITCH_INTERVAL:
+			auto [interval, oct_sub] = sequence_.at(cur_note_idx_)->getInterval();
+			last_freq_ = last_freq_ * intervalToRatio(interval, oct_sub);
+			break;
+		}
+		setNotes(last_freq_);
+	}
+
+	cur_note_idx_ = cur_note_idx_ == sequence_.size() ? 0 : cur_note_idx_ + 1;
+};

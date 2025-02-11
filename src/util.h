@@ -4,6 +4,7 @@
 #include <SDL3/SDL.h>
 #include <imgui.h>
 #include <array>
+#include <string>
 
 #define ADJUST_AMP_BY_CREST true
 
@@ -16,12 +17,12 @@ using pitch_t = float;
 
 typedef enum
 {
-
 	PITCH_REL_FREQUENCY,
 	PITCH_ABS_FREQUENCY,
 	PITCH_INTERVAL,
 	PITCH_NOTE
 } pitch_type_t;
+
 typedef enum
 {
 	AREA,
@@ -84,3 +85,7 @@ float calcCrest(float *wave);
 ImVec4 toImVec4(SDL_Color color);
 
 std::array<Vector2f, 4> getAdjacentPositions(Vector2f pos);
+
+std::pair<std::string, int> freqToNote(pitch_t);
+pitch_t noteToFreq(std::string, int);
+pitch_t intervalToRatio(float interval, float octave_subdivision);

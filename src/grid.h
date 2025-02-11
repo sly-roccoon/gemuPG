@@ -30,6 +30,9 @@ public:
 
 	bool isAreaAdjacent(Vector2f);
 
+	void setBPM(float bpm) { bpm_ = bpm; };
+	float getBPM() { return bpm_; };
+
 private:
 	bool sequencerExists(Vector2f);
 	bool removeSequencer(Vector2f);
@@ -45,4 +48,6 @@ private:
 
 	std::vector<Area *> areas_;
 	std::vector<Block *> blocks_;
+
+	float bpm_ = 120.0f;
 };

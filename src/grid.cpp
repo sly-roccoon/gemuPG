@@ -418,3 +418,9 @@ void Grid::removeArea(Area *area)
 
 	delete area;
 }
+
+void Grid::stepSequence()
+{
+	for (auto &area : areas_)
+		area->stepSequence();
+}

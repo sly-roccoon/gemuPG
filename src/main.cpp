@@ -6,6 +6,7 @@
 #include "input.h"
 #include "audio.h"
 #include "gui.h"
+#include "clock.h"
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
@@ -22,6 +23,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
 	Interface::getInstance().draw();
+
+	if (Clock::getInstance().isTime())
+	{
+		Interface::getInstance().getGrid().stepSequence();
+	}
 
 	return SDL_APP_CONTINUE;
 }

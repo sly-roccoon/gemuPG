@@ -246,14 +246,14 @@ void Area::stepSequence()
 		setNotes(0.0f);
 	else
 	{
-		switch (sequence_.at(cur_note_idx_)->getType())
+		switch (sequence_.at(cur_note_idx_)->getPitchType())
 		{
-		case PITCH_REL_FREQUENCY:
-			last_freq_ += sequence_.at(cur_note_idx_)->getPitch();
-			break;
 		case PITCH_ABS_FREQUENCY:
 		case PITCH_NOTE:
 			last_freq_ = sequence_.at(cur_note_idx_)->getPitch();
+			break;
+		case PITCH_REL_FREQUENCY:
+			last_freq_ += sequence_.at(cur_note_idx_)->getPitch();
 			break;
 		case PITCH_INTERVAL:
 			auto [interval, oct_sub] = sequence_.at(cur_note_idx_)->getInterval();
@@ -263,5 +263,5 @@ void Area::stepSequence()
 		setNotes(last_freq_);
 	}
 
-	cur_note_idx_ = cur_note_idx_ == sequence_.size() ? 0 : cur_note_idx_ + 1;
+	cur_note_idx_ = cur_note_idx_ == sequence_.size() - 1 ? 0 : cur_note_idx_ + 1;
 };

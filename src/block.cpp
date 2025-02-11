@@ -5,7 +5,6 @@
 Block::Block(Vector2f pos)
 {
 	type_ = BLOCK_GENERATOR;
-	bypass_ = true;
 	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
 }
 
@@ -52,6 +51,7 @@ BlockGenerator::~BlockGenerator()
 void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
 {
 	BlockGenerator *block = (BlockGenerator *)userdata;
+
 	float delta = block->getData().freq / SAMPLE_RATE;
 	additional_amount /= sizeof(float);
 	while (additional_amount > 0)
@@ -65,13 +65,17 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 		for (i = 0; i < total; i++)
 		{
 			unsigned int idx = (int)(std::floorf(block->getData().phase * data.freq * WAVE_SIZE / SAMPLE_RATE)) % WAVE_SIZE;
-			samples[i] = data.amp * data.wave[idx];
-			block->incrPhase();
 
-			if (ADJUST_AMP_BY_CREST)
+			if (block->getBypass())
+				samples[i] = 0.0f;
+			else
 			{
-				samples[i] *= data.crest; // TODO: find better way as to not go over +-1.0f
+				samples[i] = data.amp * data.wave[idx];
+				if (ADJUST_AMP_BY_CREST)
+					samples[i] *= data.crest; // TODO: find better way as to not go over +-1.0f
 			}
+
+			block->incrPhase();
 		}
 
 		SDL_PutAudioStreamData(stream, samples, total * sizeof(float));
@@ -178,7 +182,10 @@ BlockSequencer::BlockSequencer(Vector2f pos) : Block(pos)
 	type_ = BLOCK_SEQUENCER;
 	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
 
-	pitch_ = SDL_pow(1000, SDL_randf() - 1) * 10000.0f;
+	// just some random values in decently pleasant ranges...
+	while (pitch_ < 50.0f || pitch_ > 880.0f)
+		pitch_ = SDL_pow(1000, SDL_randf() - 1) * 20000.0f;
+
 	pitch_type_ = PITCH_ABS_FREQUENCY;
 }
 
@@ -220,7 +227,7 @@ void BlockSequencer::drawGUI()
 		ImGui::SliderFloat("frequency diff.", &pitch_, -1000.0f, 1000.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 
 	if (pitch_type_ == PITCH_ABS_FREQUENCY)
-		ImGui::SliderFloat("frequency", &pitch_, 0.0f, 20000.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("frequency", &pitch_, 20.0f, 20000.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
 
 	if (pitch_type_ == PITCH_INTERVAL)
 	{

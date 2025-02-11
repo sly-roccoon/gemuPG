@@ -29,6 +29,9 @@ public:
 	std::vector<Area *> &getAreas() { return areas_; };
 	void stepSequence();
 
+	void stopSequence();
+	void bypassGenerators(bool);
+
 	bool isAreaAdjacent(Vector2f);
 
 private:

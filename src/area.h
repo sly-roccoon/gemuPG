@@ -26,6 +26,7 @@ public:
     std::vector<BlockSequencer *> getSequence() { return sequence_; }
     BlockSequencer *getSequencer(Vector2f);
     void stepSequence();
+    void stopSequence();
 
 private:
     Vector2f getTopLeft();

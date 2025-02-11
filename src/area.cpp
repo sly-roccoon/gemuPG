@@ -214,12 +214,10 @@ void Area::updateSequence()
 			continue;
 		}
 
-		if (!isInside(adj_pos.at(dir))) // around the inner corner / right rotation
-		{
-			// cur_pos = cur_pos;  //position stays the same because in inner corner two sides of an area block touch sequencer block
-			dir = next_dir(dir, 3); // rotate 3 times effectively
-			continue;
-		}
+		// around the inner corner / right rotation
+		// cur_pos = cur_pos;  //position stays the same because in inner corner two sides of an area block touch sequencer block
+		dir = next_dir(dir, 3); // rotate 3 times effectively
+
 	} while (cur_pos != start_pos);
 
 	sequence_ = new_sequence;
@@ -274,3 +272,9 @@ void Area::stepSequence()
 		setNotes(last_freq_);
 	}
 };
+
+void Area::stopSequence()
+{
+	cur_note_idx_ = 0;
+	last_note_idx_ = sequence_.size() - 1;
+}

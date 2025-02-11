@@ -424,3 +424,21 @@ void Grid::stepSequence()
 	for (auto &area : areas_)
 		area->stepSequence();
 }
+
+void Grid::stopSequence()
+{
+	for (auto &area : areas_)
+		area->stopSequence();
+}
+
+void Grid::bypassGenerators(bool bypass)
+{
+	for (auto &block : blocks_)
+		if (block->getType() == BLOCK_GENERATOR)
+			((BlockGenerator *)block)->setBypass(bypass);
+
+	for (auto &area : areas_)
+		for (auto &block : area->getBlocks())
+			if (block->getType() == BLOCK_GENERATOR)
+				((BlockGenerator *)block)->setBypass(bypass);
+}

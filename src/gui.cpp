@@ -47,9 +47,47 @@ void GUI::drawToolbar()
 
 	ImGui::End();
 
+	//------------------------------
+	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->GetCenter().x - ICON_SIZE * 2, ImGui::GetMainViewport()->Size.y - ICON_SIZE});
+	ImGui::SetNextWindowSize({ICON_SIZE * 2, ICON_SIZE});
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
+	ImGui::Begin("Bottom Left", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
+
+	if (Clock::getInstance().isRunning())
+	{
+		if (ImGui::Button("Pause", {ICON_SIZE, ICON_SIZE}))
+		{
+			Clock::getInstance().setRunning(false);
+			Interface::getInstance().getGrid().bypassGenerators(true);
+		}
+	}
+	else
+	{
+		if (ImGui::Button("Play", {ICON_SIZE, ICON_SIZE}))
+		{
+			Clock::getInstance().setRunning(true);
+			Interface::getInstance().getGrid().bypassGenerators(false);
+		}
+	}
+
+	ImGui::SameLine();
+	if (ImGui::Button("Stop", {ICON_SIZE, ICON_SIZE}))
+	{
+		Clock::getInstance().setRunning(false);
+		Interface::getInstance().getGrid().stopSequence();
+		Interface::getInstance().getGrid().bypassGenerators(true);
+	}
+
+	ImGui::End();
+	ImGui::PopStyleVar(2);
+
+	//-----------------------------
+
 	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->GetCenter().x, ImGui::GetMainViewport()->Size.y - ICON_SIZE});
 	ImGui::SetNextWindowSize({ICON_SIZE * 4, ICON_SIZE});
-	ImGui::Begin("Bottom", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
+	ImGui::Begin("Bottom Right", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 
 	float bpm = Clock::getInstance().getBPM();
 	float vol = AudioEngine::getInstance().getVolume();

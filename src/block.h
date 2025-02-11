@@ -31,7 +31,6 @@ public:
 protected:
 	bool viewGUI_ = false;
 	block_type_t type_;
-	bool bypass_ = false;
 	bool is_in_area_ = false;
 	SDL_FRect rect_{0, 0, 1.0f, 1.0f};
 	SDL_FRect render_rect_;
@@ -81,7 +80,11 @@ public:
 
 	void setWave(WAVE_FORMS waveform, float *wave = nullptr);
 
+	void setBypass(bool bypass) { bypass_ = bypass; }
+	bool getBypass() { return bypass_; }
+
 private:
+	bool bypass_ = false;
 	SDL_AudioStream *stream_;
 	generator_data_t data_ = {
 		.waveform = WAVE_SINE,

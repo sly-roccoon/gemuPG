@@ -126,6 +126,8 @@ public:
 
 	bool hasNoAreas() { return areas_.empty(); }
 
+	void randomize();
+
 private:
 	bool is_active_;
 	pitch_t pitch_;

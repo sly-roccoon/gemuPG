@@ -16,6 +16,8 @@ constexpr unsigned int ICON_SIZE = 64;
 constexpr float DEFAULT_BPM = 60.0f;
 constexpr unsigned int MAX_SUBDIVISION = 64;
 
+constexpr bool SEQUENCER_RANDOMIZED = true;
+
 using pitch_t = float;
 
 typedef enum

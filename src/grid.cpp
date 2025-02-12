@@ -96,6 +96,9 @@ void Grid::addBlock(Block *block)
 			return;
 		}
 
+	if (block->getType() == BLOCK_GENERATOR)
+		((BlockGenerator *)block)->setBypass(bypass_);
+
 	Area *area = getArea(block->getPos());
 	if (area)
 	{
@@ -433,6 +436,8 @@ void Grid::stopSequence()
 
 void Grid::bypassGenerators(bool bypass)
 {
+	bypass_ = bypass;
+
 	for (auto &block : blocks_)
 		if (block->getType() == BLOCK_GENERATOR)
 			((BlockGenerator *)block)->setBypass(bypass);

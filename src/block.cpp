@@ -184,11 +184,31 @@ BlockSequencer::BlockSequencer(Vector2f pos) : Block(pos)
 	type_ = BLOCK_SEQUENCER;
 	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
 
-	// just some random values in decently pleasant ranges...
-	while (pitch_ < 50.0f || pitch_ > 880.0f)
-		pitch_ = SDL_pow(1000, SDL_randf() - 1) * 20000.0f;
-
 	pitch_type_ = PITCH_ABS_FREQUENCY;
+	pitch_ = 440.0f;
+
+	if (SEQUENCER_RANDOMIZED)
+		randomize();
+}
+
+void BlockSequencer::randomize()
+{
+	pitch_type_ = (pitch_type_t)SDL_rand(4);
+
+	// just some random values in decently pleasant ranges...
+	if (pitch_type_ == PITCH_ABS_FREQUENCY || pitch_type_ == PITCH_NOTE || pitch_type_ == PITCH_INTERVAL)
+		do
+			pitch_ = SDL_pow(1000, SDL_randf() - 1) * 20000.0f;
+		while (pitch_ < 50.0f || pitch_ > 880.0f);
+
+	if (pitch_type_ == PITCH_REL_FREQUENCY)
+		pitch_ = SDL_randf() * 1000.0f;
+
+	if (pitch_type_ == PITCH_INTERVAL)
+	{
+		octave_subdivision_ = SDL_rand(24) + 1;
+		interval_ = SDL_rand(octave_subdivision_) + 1;
+	}
 }
 
 BlockSequencer *BlockSequencer::clone()

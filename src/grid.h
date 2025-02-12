@@ -49,4 +49,6 @@ private:
 
 	std::vector<Area *> areas_;
 	std::vector<Block *> blocks_;
+
+	bool bypass_ = false;
 };

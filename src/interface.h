@@ -27,6 +27,9 @@ public:
 	void setSelection(block_type_t selection) { cur_selection_ = selection; }
 	block_type_t getSelection() { return cur_selection_; }
 
+	void toggleFullscreen();
+	void togglePlayPause();
+
 private:
 	Interface();
 	Interface(const Interface &) = delete;
@@ -34,8 +37,10 @@ private:
 
 	unsigned int width_ = DEFAULT_WIDTH;
 	unsigned int height_ = DEFAULT_HEIGHT;
+	bool is_fullscreen_ = false;
 
 	block_type_t cur_selection_ = BLOCK_GENERATOR;
+	bool is_playing_ = true;
 
 	Camera &camera_;
 	Grid grid_{};

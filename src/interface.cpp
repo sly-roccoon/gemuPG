@@ -14,6 +14,21 @@ Interface::Interface() : camera_{Camera::getInstance()}
 	SDL_SetWindowResizable(window_, true);
 }
 
+void Interface::toggleFullscreen()
+{
+	is_fullscreen_ = !is_fullscreen_;
+
+	SDL_SetWindowFullscreen(window_, is_fullscreen_);
+}
+
+void Interface::togglePlayPause()
+{
+	is_playing_ = !is_playing_;
+
+	Clock::getInstance().setRunning(is_playing_);
+	Interface::getInstance().getGrid().bypassGenerators(!is_playing_);
+}
+
 void Interface::destroy()
 {
 	SDL_DestroyRenderer(renderer_);

@@ -58,26 +58,21 @@ void GUI::drawToolbar()
 	if (Clock::getInstance().isRunning())
 	{
 		if (ImGui::Button("Pause", {ICON_SIZE, ICON_SIZE}))
-		{
-			Clock::getInstance().setRunning(false);
-			Interface::getInstance().getGrid().bypassGenerators(true);
-		}
+			Interface::getInstance().togglePlayPause();
 	}
 	else
 	{
 		if (ImGui::Button("Play", {ICON_SIZE, ICON_SIZE}))
-		{
-			Clock::getInstance().setRunning(true);
-			Interface::getInstance().getGrid().bypassGenerators(false);
-		}
+			Interface::getInstance().togglePlayPause();
 	}
 
 	ImGui::SameLine();
 	if (ImGui::Button("Stop", {ICON_SIZE, ICON_SIZE}))
 	{
-		Clock::getInstance().setRunning(false);
+		if (Clock::getInstance().isRunning())
+			Interface::getInstance().togglePlayPause();
+
 		Interface::getInstance().getGrid().stopSequence();
-		Interface::getInstance().getGrid().bypassGenerators(true);
 	}
 
 	ImGui::End();

@@ -25,6 +25,7 @@ private:
 	void handleLoseFocus();
 
 	void handleUndoRedo(SDL_Event *);
+	void handleShortcuts(SDL_Event *);
 
 	bool isKeyDown(SDL_Keycode);
 	void updateKeys(SDL_Event *);

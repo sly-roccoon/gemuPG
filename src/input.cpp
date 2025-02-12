@@ -146,6 +146,7 @@ void Input::handleMouse(SDL_Event *event)
 void Input::handleKeys(SDL_Event *event)
 {
 	updateKeys(event);
+	handleShortcuts(event);
 	// handleUndoRedo(event); //buggy, no time to fix :)
 }
 
@@ -163,4 +164,22 @@ void Input::handleUndoRedo(SDL_Event *event)
 			cmd_mgr.undo();
 		else if (key.key == SDLK_Y && key.type == SDL_EVENT_KEY_DOWN)
 			cmd_mgr.redo();
+}
+
+void Input::handleShortcuts(SDL_Event *event)
+{
+	SDL_KeyboardEvent key = event->key;
+
+	if (key.key == SDLK_F11 && key.type == SDL_EVENT_KEY_DOWN)
+		Interface::getInstance().toggleFullscreen();
+
+	if (key.key == SDLK_1 && key.type == SDL_EVENT_KEY_DOWN)
+		Interface::getInstance().setSelection(BLOCK_GENERATOR);
+	if (key.key == SDLK_2 && key.type == SDL_EVENT_KEY_DOWN)
+		Interface::getInstance().setSelection(AREA);
+	if (key.key == SDLK_3 && key.type == SDL_EVENT_KEY_DOWN)
+		Interface::getInstance().setSelection(BLOCK_SEQUENCER);
+
+	if (key.key == SDLK_SPACE && key.type == SDL_EVENT_KEY_DOWN)
+		Interface::getInstance().togglePlayPause();
 }

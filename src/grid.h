@@ -15,14 +15,16 @@ public:
 	void drawBlocks(SDL_Renderer *);
 	void drawAreas(SDL_Renderer *);
 
-	void addBlock(Block *);
+	void clear();
+
+	Block *addBlock(Block *);
 	bool removeBlock(Vector2f);
 	void removeBlock(Block *);
 	Block *getBlock(Vector2f);
 	std::vector<Block *> &getGlobalBlocks() { return blocks_; };
 	std::vector<Block *> getBlocks();
 
-	bool addArea(Vector2f);
+	Area *addArea(Vector2f);
 	bool removeArea(Vector2f);
 	void removeArea(Area *);
 	Area *getArea(Vector2f);

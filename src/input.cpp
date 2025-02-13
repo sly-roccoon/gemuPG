@@ -147,7 +147,8 @@ void Input::handleKeys(SDL_Event *event)
 {
 	updateKeys(event);
 	handleShortcuts(event);
-	// handleUndoRedo(event); //buggy, no time to fix :)
+	handleSaveLoad(event);
+	// handleUndoRedo(event); //doesn't work for block parameter changes, no time to add :)
 }
 
 void Input::handleLoseFocus()
@@ -164,6 +165,22 @@ void Input::handleUndoRedo(SDL_Event *event)
 			cmd_mgr.undo();
 		else if (key.key == SDLK_Y && key.type == SDL_EVENT_KEY_DOWN)
 			cmd_mgr.redo();
+}
+
+void Input::handleSaveLoad(SDL_Event *event)
+{
+	SDL_KeyboardEvent key = event->key;
+
+	if (isKeyDown(SDLK_LCTRL) || isKeyDown(SDLK_RCTRL))
+	{
+		bool save_as = false;
+		if (isKeyDown(SDLK_LSHIFT) || isKeyDown(SDLK_RSHIFT))
+			save_as = true;
+		if (key.key == SDLK_S && key.type == SDL_EVENT_KEY_DOWN)
+			save(save_as);
+		else if (key.key == SDLK_O && key.type == SDL_EVENT_KEY_DOWN)
+			load();
+	}
 }
 
 void Input::handleShortcuts(SDL_Event *event)

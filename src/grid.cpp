@@ -85,15 +85,15 @@ void Grid::drawAreas(SDL_Renderer *renderer)
 	}
 }
 
-void Grid::addBlock(Block *block)
+Block *Grid::addBlock(Block *block)
 {
 	if (!block)
-		return;
+		nullptr;
 
 	for (auto &area : areas_)
 		if (area->getSequencer(block->getPos()))
 		{
-			return;
+			return nullptr;
 		}
 
 	if (block->getType() == BLOCK_GENERATOR)
@@ -102,21 +102,21 @@ void Grid::addBlock(Block *block)
 	Area *area = getArea(block->getPos());
 	if (area)
 	{
-		area->addBlock(block);
-		return;
+		return area->addBlock(block);
 	}
 
 	if (block->getType() == BLOCK_SEQUENCER)
 	{
 		for (auto area : getAdjacentAreas(block->getPos()))
 			if (area)
-				area->addSequencer((BlockSequencer *)block);
+				return area->addSequencer((BlockSequencer *)block);
 
-		return;
+		return nullptr;
 	}
 
 	blocks_.push_back(std::move(block));
 	block->setInArea(false);
+	return block;
 }
 
 bool Grid::removeGlobalBlock(Vector2f pos)
@@ -212,6 +212,15 @@ Block *Grid::getBlock(Vector2f pos)
 	return nullptr;
 }
 
+void Grid::clear()
+{
+	for (auto &area : areas_)
+		removeArea(area);
+
+	for (auto &block : blocks_)
+		removeBlock(block);
+}
+
 std::vector<Block *> Grid::getBlocks()
 {
 	std::vector<Block *> blocks = blocks_;
@@ -219,6 +228,22 @@ std::vector<Block *> Grid::getBlocks()
 	{
 		auto area_blocks = area->getBlocks();
 		blocks.insert(std::end(blocks), std::begin(area_blocks), std::end(area_blocks));
+
+		auto sequence = area->getSequence();
+		// remove nullptrs
+		sequence.erase(
+			std::remove_if(sequence.begin(), sequence.end(),
+						   [](BlockSequencer *sequencer)
+						   { return sequencer == nullptr; }),
+			sequence.end());
+
+		// remove duplicates
+		std::sort(sequence.begin(), sequence.end());
+		sequence.erase(
+			std::unique(sequence.begin(), sequence.end()),
+			sequence.end());
+
+		blocks.insert(std::end(blocks), std::begin(sequence), std::end(sequence));
 	}
 
 	return blocks;
@@ -313,14 +338,14 @@ Area *Grid::connectAreas(Vector2f pos)
 	return area;
 }
 
-bool Grid::addArea(Vector2f pos)
+Area *Grid::addArea(Vector2f pos)
 {
 	if (getArea(pos))
-		return false;
+		return nullptr;
 
 	for (auto area : areas_)
 		if (area->getSequencer(pos))
-			return false;
+			return nullptr;
 
 	Area *area = connectAreas(pos); // adds position already
 	if (!area)
@@ -338,7 +363,7 @@ bool Grid::addArea(Vector2f pos)
 	removeGlobalBlock(pos);
 
 	area->updateSequence();
-	return true;
+	return area;
 }
 
 void Grid::splitAreas(Area *area) // TODO: this is probably terrible

@@ -2,6 +2,7 @@
 #include "interface.h"
 #include "util.h"
 #include "command.h"
+#include "save.h"
 
 class Input
 {
@@ -25,6 +26,7 @@ private:
 	void handleLoseFocus();
 
 	void handleUndoRedo(SDL_Event *);
+	void handleSaveLoad(SDL_Event *);
 	void handleShortcuts(SDL_Event *);
 
 	bool isKeyDown(SDL_Keycode);

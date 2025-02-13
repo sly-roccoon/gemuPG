@@ -75,10 +75,20 @@ public:
 	}
 
 	void setFrequency(pitch_t freq);
+	float getFrequency() { return data_.freq; }
 
 	void incrPhase() { data_.phase++; }
 
 	void setWave(WAVE_FORMS waveform, float *wave = nullptr);
+	WAVE_FORMS getWave() { return data_.waveform; }
+
+	float getAmp() { return data_.amp; }
+	void setAmp(float amp) { data_.amp = amp; }
+
+	pitch_t getRelFreq() { return rel_freq_; }
+	void setRelFreq(pitch_t rel_freq) { rel_freq_ = rel_freq; }
+	float getFreqFactor() { return freq_factor_; }
+	void setFreqFactor(float freq_factor) { freq_factor_ = freq_factor; }
 
 	void setBypass(bool bypass) { bypass_ = bypass; }
 	bool getBypass() { return bypass_; }
@@ -123,6 +133,11 @@ public:
 	void removeArea(Area *area);
 
 	std::pair<float, float> getInterval() { return {interval_, octave_subdivision_}; }
+	void setInterval(float interval, float oct_sub)
+	{
+		interval_ = interval;
+		octave_subdivision_ = oct_sub;
+	}
 
 	bool hasNoAreas() { return areas_.empty(); }
 

@@ -14,13 +14,13 @@ public:
     void removePosition(Vector2f);
     bool isInside(Vector2f);
 
-    void addBlock(Block *);
+    Block *addBlock(Block *);
     void removeBlock(Block *);
     bool removeBlock(Vector2f);
     auto getBlocks() { return blocks_; }
     Block *getBlock(Vector2f);
 
-    void addSequencer(BlockSequencer *);
+    Block *addSequencer(BlockSequencer *);
     void removeSequencer(BlockSequencer *);
     bool removeSequencer(Vector2f);
     void updateSequence();

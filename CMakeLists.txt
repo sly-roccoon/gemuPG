@@ -14,6 +14,7 @@ add_library(IMGUI ${IMGUI_SOURCES})
 target_link_libraries(IMGUI PUBLIC SDL3::SDL3)
 target_include_directories(IMGUI PUBLIC "include/imgui")
 
+
 # GEMUPG
 add_compile_options(-Wno-pmf-conversions)
 
@@ -22,13 +23,14 @@ file (GLOB_RECURSE gemupg_HEADERS CONFIGURE_DEPENDS "src/*.h")
 
 set (gemupg_INCLUDE_DIRS "")
 foreach (_headerFile ${gemupg_HEADERS})
-    get_filename_component(_dir ${_headerFile} PATH)
-    list (APPEND geumpg_INCLUDE_DIRS ${_dir})
+get_filename_component(_dir ${_headerFile} PATH)
+list (APPEND geumpg_INCLUDE_DIRS ${_dir})
 endforeach()
 list (REMOVE_DUPLICATES gemupg_INCLUDE_DIRS)
 
 add_executable(${PROJECT_NAME} ${gemupg_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE "include")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 IMGUI)
 # add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

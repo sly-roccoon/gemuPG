@@ -130,7 +130,8 @@ void Interface::drawGUI()
 	ImGui::NewFrame();
 
 	for (auto &block : grid_.getBlocks())
-		block->drawGUI(); // TODO: crackling when changing values
+		if (block->getType() == BLOCK_GENERATOR)
+			block->drawGUI(); // TODO: crackling when changing values
 
 	for (auto &area : grid_.getAreas())
 		area->drawGUI();
@@ -151,3 +152,5 @@ void Interface::debug()
 																													   : cur_selection_ == BLOCK_SEQUENCER ? "Sequencer"
 																																						   : "Unknown");
 }
+
+//--------------------------------------------------------

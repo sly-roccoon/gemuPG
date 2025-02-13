@@ -39,13 +39,15 @@ void Area::removePosition(Vector2f pos)
 		positions_.end());
 }
 
-void Area::addBlock(Block *block)
+Block *Area::addBlock(Block *block)
 {
 	if (block)
 	{
 		blocks_.push_back(block);
 		block->setInArea(true);
+		return block;
 	}
+	return nullptr;
 }
 
 void Area::removeBlock(Block *block)
@@ -92,12 +94,13 @@ BlockSequencer *Area::getSequencer(Vector2f pos)
 	return nullptr;
 }
 
-void Area::addSequencer(BlockSequencer *sequencer)
+Block *Area::addSequencer(BlockSequencer *sequencer)
 {
 	sequence_.push_back(sequencer);
 	sequencer->addArea(this);
 
 	updateSequence();
+	return sequencer;
 }
 
 void Area::removeSequencer(BlockSequencer *sequencer)

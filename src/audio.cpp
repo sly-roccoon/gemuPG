@@ -18,8 +18,7 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 
 		Grid &grid = Interface::getInstance().getGrid();
 
-		auto blocks = grid.getBlocks();
-		for (auto block : blocks)
+		for (auto block : grid.getGlobalBlocks())
 		{
 			if (block->getType() != BLOCK_GENERATOR)
 				continue;
@@ -28,8 +27,21 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 			SDL_GetAudioStreamData(gen_block->getStream(), new_samples, n_samples * sizeof(float));
 
 			for (int i = 0; i < n_samples; i++)
-				samples[i] += new_samples[i] * audio->getVolume();
+				samples[i] += new_samples[i] * audio->getAmp();
 		}
+
+		for (auto area : grid.getAreas())
+			for (auto block : area->getBlocks())
+			{
+				if (block->getType() != BLOCK_GENERATOR)
+					continue;
+
+				BlockGenerator *gen_block = (BlockGenerator *)block;
+				SDL_GetAudioStreamData(gen_block->getStream(), new_samples, n_samples * sizeof(float));
+
+				for (int i = 0; i < n_samples; i++)
+					samples[i] += new_samples[i] * audio->getAmp() * area->getAmp();
+			}
 
 		SDL_PutAudioStreamData(stream, samples, n_samples * sizeof(float));
 		additional_amount -= n_samples;

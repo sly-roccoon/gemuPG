@@ -85,7 +85,7 @@ void GUI::drawToolbar()
 	ImGui::Begin("Bottom Right", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 
 	float bpm = Clock::getInstance().getBPM();
-	float vol = AudioEngine::getInstance().getVolume();
+	float vol = AudioEngine::getInstance().getAmp();
 
 	ImGui::InputFloat("BPM", &bpm, 1.0f, 5.0f, "%.1f");
 	ImGui::SliderFloat("Volume", &vol, 0.0f, 1.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);

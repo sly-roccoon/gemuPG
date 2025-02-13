@@ -32,6 +32,9 @@ public:
     int getBPMSubdivision() { return bpm_subdivision_; }
     void setBPMSubdivision(int bpm_subdivision) { bpm_subdivision_ = bpm_subdivision; }
 
+    float getAmp() { return amp_; }
+    void setAmp(float amp) { amp_ = amp; }
+
     void drawGUI();
     void toggleGUI() { viewGUI_ = !viewGUI_; }
     void setGUI(bool view) { viewGUI_ = view; }
@@ -50,6 +53,8 @@ private:
     int cur_note_idx_ = 0;
     int last_note_idx_ = 0;
     pitch_t last_freq_ = 0.0f;
+
+    float amp_ = 1.0f;
 
     bool viewGUI_ = false;
     int bpm_subdivision_ = 4;

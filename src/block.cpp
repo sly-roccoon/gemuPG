@@ -142,7 +142,7 @@ void BlockGenerator::drawGUI()
 
 	ImGui::Begin(std::format("generator block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
-	ImGui::SliderFloat("amplitude", &data_.amp, 0.0f, 1.0f, "% .2f");
+	ImGui::SliderFloat("amplitude", &data_.amp, 0.0f, 1.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
 	if (!is_in_area_)
 		ImGui::SliderFloat("frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
 	else

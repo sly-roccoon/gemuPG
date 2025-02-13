@@ -13,7 +13,7 @@ public:
 	void destroy();
 
 	void setVolume(float volume) { volume_ = volume; }
-	float getVolume() { return volume_; }
+	float getAmp() { return volume_; }
 
 private:
 	SDL_AudioStream *stream_;

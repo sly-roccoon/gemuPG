@@ -144,6 +144,15 @@ void Interface::drawGUI()
 	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer_);
 }
 
+void Interface::closeAllWindows()
+{
+	for (auto &area : grid_.getAreas())
+		area->setGUI(false);
+
+	for (auto block : grid_.getBlocks())
+		block->setGUI(false);
+}
+
 void Interface::debug()
 {
 	SDL_SetRenderDrawColor(renderer_, 0, 0, 0, SDL_ALPHA_OPAQUE);

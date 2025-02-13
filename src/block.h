@@ -25,6 +25,7 @@ public:
 
 	virtual void drawGUI() = 0;
 	void toggleGUI() { viewGUI_ = !viewGUI_; }
+	void setGUI(bool view) { viewGUI_ = view; }
 
 	void setInArea(bool in_area) { is_in_area_ = in_area; }
 

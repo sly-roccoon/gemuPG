@@ -21,6 +21,7 @@ public:
 	bool removeBlock(Vector2f);
 	void removeBlock(Block *);
 	void draw();
+	void closeAllWindows();
 	Grid &getGrid() { return grid_; }
 	Block *getBlock(Vector2f pos) { return grid_.getBlock(pos); }
 

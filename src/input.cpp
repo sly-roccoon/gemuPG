@@ -6,27 +6,30 @@ void Input::handleEvent(SDL_Event *event)
 {
 	ImGui_ImplSDL3_ProcessEvent(event);
 
-	if (ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard)
-		return;
+	if (!ImGui::GetIO().WantCaptureMouse)
+		switch (event->type)
+		{
+		case SDL_EVENT_MOUSE_WHEEL:
+			handleMouseWheel(event);
+			break;
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
+		case SDL_EVENT_MOUSE_MOTION:
+			handleMouse(event);
+			break;
+		}
 
-	switch (event->type)
-	{
-	case SDL_EVENT_MOUSE_WHEEL:
-		handleMouseWheel(event);
-		break;
-	case SDL_EVENT_MOUSE_BUTTON_DOWN:
-	case SDL_EVENT_MOUSE_BUTTON_UP:
-	case SDL_EVENT_MOUSE_MOTION:
-		handleMouse(event);
-		break;
-	case SDL_EVENT_KEY_DOWN:
-	case SDL_EVENT_KEY_UP:
-		handleKeys(event);
-		break;
-	case SDL_EVENT_WINDOW_FOCUS_LOST:
-		handleLoseFocus();
-		break;
-	}
+	if (!ImGui::GetIO().WantTextInput)
+		switch (event->type)
+		{
+		case SDL_EVENT_KEY_DOWN:
+		case SDL_EVENT_KEY_UP:
+			handleKeys(event);
+			break;
+		case SDL_EVENT_WINDOW_FOCUS_LOST:
+			handleLoseFocus();
+			break;
+		}
 }
 
 void Input::updateKeys(SDL_Event *event)
@@ -199,4 +202,7 @@ void Input::handleShortcuts(SDL_Event *event)
 
 	if (key.key == SDLK_SPACE && key.type == SDL_EVENT_KEY_DOWN)
 		Interface::getInstance().togglePlayPause();
+
+	if (key.key == SDLK_Q && key.type == SDL_EVENT_KEY_DOWN)
+		Interface::getInstance().closeAllWindows();
 }

@@ -33,7 +33,8 @@ public:
     void setBPMSubdivision(int bpm_subdivision) { bpm_subdivision_ = bpm_subdivision; }
 
     void drawGUI();
-    void toggleGUI() { viewGUI_ = !viewGUI_; };
+    void toggleGUI() { viewGUI_ = !viewGUI_; }
+    void setGUI(bool view) { viewGUI_ = view; }
 
 private:
     Vector2f getTopLeft();

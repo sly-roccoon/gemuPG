@@ -88,7 +88,7 @@ void Grid::drawAreas(SDL_Renderer *renderer)
 Block *Grid::addBlock(Block *block)
 {
 	if (!block)
-		nullptr;
+		return nullptr;
 
 	for (auto &area : areas_)
 		if (area->getSequencer(block->getPos()))

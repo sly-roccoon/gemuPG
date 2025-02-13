@@ -1,5 +1,7 @@
 #include "clock.h"
 
+unsigned int Clock::counter_ = 0;
+
 bool Clock::isTime()
 {
     if (!running_)
@@ -11,6 +13,7 @@ bool Clock::isTime()
     if (delta_ >= 60.0f / bpm_ / MAX_SUBDIVISION)
     {
         last_time_ = now;
+        counter_++;
         return true;
     }
 

@@ -16,6 +16,8 @@ public:
     float getDelta() { return delta_; };
     bool isTime();
 
+    static unsigned int getCounter() { return counter_; };
+
     float getBPM() { return bpm_; };
     void setBPM(float bpm) { bpm_ = bpm; };
 
@@ -32,4 +34,6 @@ private:
     SDL_Time last_time_;
     float delta_;
     float bpm_ = DEFAULT_BPM;
+
+    static unsigned int counter_;
 };

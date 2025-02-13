@@ -238,7 +238,8 @@ void Area::setNotes(pitch_t freq)
 
 void Area::stepSequence()
 {
-	if (++subdivision_counter_ % (MAX_SUBDIVISION / bpm_subdivision_) != 0)
+	unsigned int counter = Clock::getCounter();
+	if (counter % (MAX_SUBDIVISION / bpm_subdivision_) != 0)
 		return;
 
 	last_note_idx_ = cur_note_idx_;

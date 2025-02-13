@@ -1,7 +1,8 @@
 #pragma once
 #include "block.h"
-#include <SDL3/SDL.h>
 #include "util.h"
+#include "clock.h"
+#include <SDL3/SDL.h>
 #include <vector>
 
 class Area
@@ -28,6 +29,9 @@ public:
     void stepSequence();
     void stopSequence();
 
+    int getBPMSubdivision() { return bpm_subdivision_; }
+    void setBPMSubdivision(int bpm_subdivision) { bpm_subdivision_ = bpm_subdivision; }
+
     void drawGUI();
     void toggleGUI() { viewGUI_ = !viewGUI_; };
 
@@ -48,5 +52,4 @@ private:
 
     bool viewGUI_ = false;
     int bpm_subdivision_ = 4;
-    int subdivision_counter_ = 0;
 };

@@ -25,13 +25,13 @@ public:
     void setRunning(bool running) { running_ = running; };
 
 private:
-    Clock() { SDL_GetCurrentTime(&last_time_); };
+    Clock() { last_time_ = SDL_GetTicksNS(); }
     Clock(const Clock &) = delete;
     Clock &operator=(const Clock &) = delete;
 
     bool running_ = true;
 
-    SDL_Time last_time_;
+    Uint64 last_time_;
     float delta_;
     float bpm_ = DEFAULT_BPM;
 

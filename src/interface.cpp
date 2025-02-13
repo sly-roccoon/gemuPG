@@ -1,6 +1,7 @@
 #include "interface.h"
 #include "blockfactory.h"
 #include "gui.h"
+#include "text.h"
 #include <format>
 
 Interface::Interface() : camera_{Camera::getInstance()}
@@ -10,6 +11,11 @@ Interface::Interface() : camera_{Camera::getInstance()}
 
 	if (!SDL_CreateWindowAndRenderer("GemuPG", width_, height_, 0, &window_, &renderer_))
 		exit(SDL_APP_FAILURE);
+
+	if (!TTF_Init())
+		exit(SDL_APP_FAILURE);
+
+	Text::init(renderer_);
 
 	SDL_SetWindowResizable(window_, true);
 }

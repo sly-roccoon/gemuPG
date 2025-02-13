@@ -1,6 +1,9 @@
 #include "grid.h"
+#include "text.h"
 #include <array>
+#include <format>
 #include <queue>
+#include "util.h"
 
 void Grid::update() // will def need optimization
 {
@@ -11,7 +14,6 @@ void Grid::update() // will def need optimization
 	// 		else
 	// 			area->removeBlock(block);
 }
-
 void Grid::draw(SDL_Renderer *renderer)
 {
 	SDL_SetRenderDrawColor(renderer, GRID_COLOR.r, GRID_COLOR.g, GRID_COLOR.b, GRID_COLOR.a);
@@ -39,48 +41,106 @@ void Grid::draw(SDL_Renderer *renderer)
 	}
 }
 
+void drawBlockText(SDL_FRect *rect, std::string type, std::string value, SDL_Color color)
+{
+	float size = rect->w / 16;
+	Vector2f value_size = Text::getTextSize(value, size * 2);
+	Text::draw(type, {rect->x, rect->y}, color, size);
+	Text::draw(value,
+			   {rect->x + rect->w / 2 - value_size.x / 2,
+				rect->y + rect->h / 2 - value_size.y / 2},
+			   color, size * 2);
+}
+
+void drawGenerator(SDL_Renderer *renderer, BlockGenerator *block)
+{
+	SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
+	SDL_RenderFillRect(renderer, block->getFRect());
+}
+
+void drawSequencer(SDL_Renderer *renderer, BlockSequencer *block)
+{
+	if (!block)
+		return;
+
+	SDL_SetRenderDrawColor(renderer, SEQUENCER_COLOR.r, SEQUENCER_COLOR.g, SEQUENCER_COLOR.b, SEQUENCER_COLOR.a);
+	SDL_RenderFillRect(renderer, block->getFRect());
+
+	std::string type_text = "";
+	std::string value_text = "";
+
+	switch (block->getPitchType())
+	{
+	case PITCH_ABS_FREQUENCY:
+	{
+		type_text = "absolute";
+		value_text = std::format("{:.2f} Hz", block->getPitch());
+		break;
+	}
+	case PITCH_REL_FREQUENCY:
+	{
+		type_text = "relative";
+		value_text = std::format("{:.2f} Hz", block->getPitch());
+		break;
+	}
+	case PITCH_INTERVAL:
+	{
+		type_text = "interval";
+		auto interval = block->getInterval();
+		value_text = std::format("{:.1f} / {:.1f}", interval.first, interval.second);
+		break;
+	}
+	case PITCH_NOTE:
+	{
+		type_text = "note";
+		auto note = freqToNote(block->getPitch());
+		value_text = std::format("{}{}", note.first, note.second);
+		break;
+	}
+	}
+
+	drawBlockText(block->getFRect(), type_text, value_text, invertColor(SEQUENCER_COLOR));
+}
+
 void Grid::drawBlocks(SDL_Renderer *renderer)
 {
-	for (auto block : blocks_)
-	{
-		switch (block->getType())
-		{
-		case BLOCK_GENERATOR:
-			SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
-			break;
-		default:
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-			break;
-		}
+	SDL_Rect render_rect;
+	SDL_FRect render_frect;
+	SDL_GetRenderViewport(renderer, &render_rect);
+	SDL_RectToFRect(&render_rect, &render_frect);
 
-		SDL_RenderFillRect(renderer, block->getFRect());
-	}
+	for (auto block : blocks_)
+		if (block->getType() == BLOCK_GENERATOR)
+			if (SDL_HasRectIntersectionFloat(block->getFRect(), &render_frect))
+				drawGenerator(renderer, (BlockGenerator *)block);
 
 	for (auto &area : areas_)
 	{
 		for (auto &block : area->getBlocks())
-		{
-			SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
-			SDL_RenderFillRect(renderer, block->getFRect());
-		}
+			if (SDL_HasRectIntersectionFloat(block->getFRect(), &render_frect))
+				drawGenerator(renderer, (BlockGenerator *)block);
+
 		for (auto &sequencer : area->getSequence())
-		{
-			SDL_SetRenderDrawColor(renderer, SEQUENCER_COLOR.r, SEQUENCER_COLOR.g, SEQUENCER_COLOR.b, SEQUENCER_COLOR.a);
 			if (sequencer)
-				SDL_RenderFillRect(renderer, sequencer->getFRect());
-		}
+				if (SDL_HasRectIntersectionFloat(sequencer->getFRect(), &render_frect))
+					drawSequencer(renderer, sequencer);
 	}
 }
 
 void Grid::drawAreas(SDL_Renderer *renderer)
 {
 	SDL_SetRenderDrawColor(renderer, AREA_COLOR.r, AREA_COLOR.g, AREA_COLOR.b, AREA_COLOR.a);
+	SDL_Rect render_rect;
+	SDL_FRect render_frect;
+	SDL_GetRenderViewport(renderer, &render_rect);
+	SDL_RectToFRect(&render_rect, &render_frect);
 	for (auto &area : areas_)
 	{
 		for (auto &pos : area->getPositions())
 		{
 			SDL_FRect rect = {Camera::worldToScreen(pos).x, Camera::worldToScreen(pos).y, Camera::getZoom(), Camera::getZoom()};
-			SDL_RenderFillRect(renderer, &rect);
+			if (SDL_HasRectIntersectionFloat(&rect, &render_frect))
+				SDL_RenderFillRect(renderer, &rect);
 		}
 	}
 }

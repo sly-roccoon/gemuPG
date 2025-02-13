@@ -85,3 +85,8 @@ pitch_t intervalToRatio(float interval, float octave_subdivision)
 {
   return pow(2, interval / octave_subdivision);
 }
+
+SDL_Color invertColor(SDL_Color color)
+{
+  return {(Uint8)(255 - color.r), (Uint8)(255 - color.g), (Uint8)(255 - color.b), color.a};
+}

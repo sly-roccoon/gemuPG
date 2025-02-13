@@ -7,8 +7,7 @@ bool Clock::isTime()
     if (!running_)
         return false;
 
-    SDL_Time now;
-    SDL_GetCurrentTime(&now);
+    Uint64 now = SDL_GetTicksNS();
     delta_ = SDL_NS_TO_MS(now - last_time_) / 1000.0f;
     if (delta_ >= 60.0f / bpm_ / MAX_SUBDIVISION)
     {

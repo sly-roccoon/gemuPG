@@ -1,8 +1,10 @@
 #pragma once
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <imgui.h>
+
 #include <cmath>
 #include <numbers>
-#include <SDL3/SDL.h>
-#include <imgui.h>
 #include <array>
 #include <string>
 
@@ -94,3 +96,5 @@ std::array<Vector2f, 4> getAdjacentPositions(Vector2f pos);
 std::pair<std::string, int> freqToNote(pitch_t);
 pitch_t noteToFreq(std::string, int);
 pitch_t intervalToRatio(float interval, float octave_subdivision);
+
+SDL_Color invertColor(SDL_Color);

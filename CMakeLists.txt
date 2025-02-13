@@ -8,12 +8,17 @@ project(gemupg VERSION 0.1)
 # SDL
 find_package(SDL3 CONFIG REQUIRED)
 
+# SDL_ttf
+# ! needs to run script under include/SDL_ttf/external first!
+set(SDLTTF_VENDORED ON)
+set(SDLTTF_HARFBUZZ OFF)
+add_subdirectory(include/SDL_ttf EXCLUDE_FROM_ALL)
+
 # IMGUI
 file (GLOB IMGUI_SOURCES CONFIGURE_DEPENDS "include/imgui/*.cpp")
 add_library(IMGUI ${IMGUI_SOURCES})
 target_link_libraries(IMGUI PUBLIC SDL3::SDL3)
 target_include_directories(IMGUI PUBLIC "include/imgui")
-
 
 # GEMUPG
 add_compile_options(-Wno-pmf-conversions)
@@ -32,8 +37,12 @@ add_executable(${PROJECT_NAME} ${gemupg_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE "include")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 IMGUI)
-# add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-# 	COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
-# 	COMMAND_EXPAND_LISTS
-# )
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 IMGUI SDL3_ttf::SDL3_ttf)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+	COMMAND_EXPAND_LISTS
+	)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> ${CMAKE_SOURCE_DIR}/assets/terminal_f4.ttf
+	COMMAND_EXPAND_LISTS
+	)

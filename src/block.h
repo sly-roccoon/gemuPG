@@ -27,7 +27,7 @@ public:
 	void toggleGUI() { viewGUI_ = !viewGUI_; }
 	void setGUI(bool view) { viewGUI_ = view; }
 
-	bool getInArea() { return is_in_area_; }
+	bool isInArea() { return is_in_area_; }
 	void setInArea(bool in_area) { is_in_area_ = in_area; }
 
 	std::string getText(int i) { return text_.at(i); }

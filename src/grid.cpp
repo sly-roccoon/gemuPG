@@ -44,8 +44,8 @@ void Grid::draw(SDL_Renderer *renderer)
 void drawBlockText(Block *block, std::string type, std::string value, SDL_Color color)
 {
 	SDL_FRect *rect = block->getFRect();
-	float value_size = rect->w / TEXT_VALUE_SIZE_DIV;
-	float type_size = rect->w / TEXT_TYPE_SIZE_DIV;
+	Vector2f value_size = {rect->w, rect->h / TEXT_VALUE_SIZE_DIV};
+	Vector2f type_size = {rect->w, rect->h / TEXT_TYPE_SIZE_DIV};
 
 	if (type != block->getText(0))
 	{
@@ -70,6 +70,34 @@ void drawGenerator(SDL_Renderer *renderer, BlockGenerator *block)
 {
 	SDL_SetRenderDrawColor(renderer, GENERATOR_COLOR.r, GENERATOR_COLOR.g, GENERATOR_COLOR.b, GENERATOR_COLOR.a);
 	SDL_RenderFillRect(renderer, block->getFRect());
+
+	std::string type_text = "";
+	std::string value_text = "";
+
+	if (block->isInArea())
+		type_text = std::format("{:.2f} * (x + {:.2f}) Hz", block->getFreqFactor(), block->getRelFreq());
+	else
+		type_text = std::format("{:.2f} Hz", block->getFrequency());
+
+	switch (block->getWave())
+	{
+	case WAVE_SINE:
+		value_text = "SINE";
+		break;
+	case WAVE_SQUARE:
+		value_text = "SQUARE";
+		break;
+	case WAVE_SAW:
+		value_text = "SAW";
+		break;
+	case WAVE_TRIANGLE:
+		value_text = "TRIANG";
+		break;
+	default:
+		break;
+	}
+
+	drawBlockText(block, type_text, value_text, invertColor(GENERATOR_COLOR));
 }
 
 void drawSequencer(SDL_Renderer *renderer, BlockSequencer *block)

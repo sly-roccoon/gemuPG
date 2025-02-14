@@ -9,6 +9,7 @@
 #include <string>
 
 #define ADJUST_AMP_BY_CREST true
+#define DEFAULT_FONT "Sono-SemiBold.ttf"
 
 constexpr unsigned int DEFAULT_WIDTH = 1280;
 constexpr unsigned int DEFAULT_HEIGHT = 960;

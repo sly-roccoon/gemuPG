@@ -20,7 +20,7 @@ public:
     static SDL_Texture *getTexture(std::string text, SDL_Color col);
     static Vector2f getTextSize(std::string text);
 
-    static void drawTexture(SDL_Texture *, Vector2f, float, bool centered = false);
+    static void drawTexture(SDL_Texture *, Vector2f, Vector2f, bool centered = false);
 
 private:
     Text() {};

@@ -8,8 +8,9 @@ void Text::init(SDL_Renderer *renderer)
 {
     renderer_ = renderer;
     std::string font_path = SDL_GetBasePath();
-    font_path.append("/terminal_f4.ttf");
-    default_font_ = TTF_OpenFont(font_path.c_str(), 32);
+    font_path.append("/");
+    font_path.append(DEFAULT_FONT);
+    default_font_ = TTF_OpenFont(font_path.c_str(), 128);
     text_engine_ = TTF_CreateRendererTextEngine(renderer_);
 }
 
@@ -22,19 +23,19 @@ SDL_Texture *Text::getTexture(std::string text, SDL_Color col)
     return texture;
 }
 
-void Text::drawTexture(SDL_Texture *texture, Vector2f pos, float size, bool centered)
+void Text::drawTexture(SDL_Texture *texture, Vector2f pos, Vector2f constraints, bool centered)
 {
     Vector2f texture_size;
     SDL_GetTextureSize(texture, &texture_size.x, &texture_size.y);
-    if (texture_size.x > texture_size.y)
+    if (texture_size.y > constraints.y)
     {
-        texture_size.y = size * texture_size.y / texture_size.x;
-        texture_size.x = size;
+        texture_size.x = constraints.y * texture_size.x / texture_size.y;
+        texture_size.y = constraints.y;
     }
-    else
+    if (texture_size.x > constraints.x)
     {
-        texture_size.x = size * texture_size.x / texture_size.y;
-        texture_size.y = size;
+        texture_size.y = constraints.x * texture_size.y / texture_size.x;
+        texture_size.x = constraints.x;
     }
 
     if (centered)

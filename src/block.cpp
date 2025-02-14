@@ -39,6 +39,9 @@ BlockGenerator::BlockGenerator(Vector2f pos, float phase) : Block(pos)
 	data_.phase = phase;
 	setWave(WAVE_SINE);
 
+	data_.freq = SDL_pow(10, SDL_randf() - 1) * 500.0f;
+	setWave((WAVE_FORMS)(SDL_rand(4) + 1));
+
 	stream_ = SDL_CreateAudioStream(&DEFAULT_SPEC, &DEFAULT_SPEC);
 	SDL_SetAudioStreamGetCallback(stream_, this->audioCallback, this);
 }

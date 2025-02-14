@@ -35,6 +35,14 @@ void Interface::togglePlayPause()
 	Interface::getInstance().getGrid().bypassGenerators(!is_playing_);
 }
 
+void Interface::stop()
+{
+	if (Clock::getInstance().isRunning())
+		togglePlayPause();
+
+	grid_.stopSequence();
+}
+
 void Interface::destroy()
 {
 	SDL_DestroyRenderer(renderer_);

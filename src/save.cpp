@@ -109,6 +109,7 @@ void loadJSON(std::string path, Grid *grid)
     file.close();
 
     grid->clear();
+    Interface::getInstance().stop();
 
     for (auto &area_json : j["areas"])
     {

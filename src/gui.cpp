@@ -79,12 +79,7 @@ void GUI::drawToolbar()
 
 	ImGui::SameLine();
 	if (ImGui::Button("Stop", {ICON_SIZE, ICON_SIZE}))
-	{
-		if (Clock::getInstance().isRunning())
-			Interface::getInstance().togglePlayPause();
-
-		Interface::getInstance().getGrid().stopSequence();
-	}
+		Interface::getInstance().stop();
 
 	ImGui::End();
 	ImGui::PopStyleVar(2);

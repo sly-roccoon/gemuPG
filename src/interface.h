@@ -30,6 +30,7 @@ public:
 
 	void toggleFullscreen();
 	void togglePlayPause();
+	void stop();
 
 private:
 	Interface();

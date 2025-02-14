@@ -145,8 +145,8 @@ void BlockGenerator::drawGUI()
 		ImGui::SliderFloat("frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
 	else
 	{
-		ImGui::SliderFloat("relative frequency", &rel_freq_, -10.0f, 10.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
-		ImGui::SliderFloat("frequency multiplicator", &freq_factor_, 0.01f, 10.0f, "%.2f");
+		ImGui::SliderFloat("relative frequency", &rel_freq_, -20.0f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("frequency multiplicator", &freq_factor_, 1.0f / 16.0f, 16.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	}
 
 	// ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");

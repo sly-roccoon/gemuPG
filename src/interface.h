@@ -53,6 +53,7 @@ private:
 	void drawAreas();
 	void drawBlocks();
 	void drawSequencerGUI();
+	void drawBlockSelection();
 	void drawGUI();
 	void debug();
 };

@@ -84,7 +84,7 @@ void Interface::draw()
 	drawBlocks();
 	drawGUI();
 
-	debug();
+	// debug();
 
 	SDL_RenderPresent(renderer_);
 }
@@ -129,6 +129,27 @@ void Interface::drawSequencerGUI()
 			sequencer->drawGUI();
 }
 
+void Interface::drawBlockSelection()
+{
+	SDL_FRect rect = {ICON_SIZE / 8, ICON_SIZE / 8, ICON_SIZE, ICON_SIZE};
+	SDL_Color col = {};
+
+	switch (cur_selection_)
+	{
+	case AREA:
+		col = AREA_COLOR;
+		break;
+	case BLOCK_GENERATOR:
+		col = GENERATOR_COLOR;
+		break;
+	case BLOCK_SEQUENCER:
+		col = SEQUENCER_COLOR;
+		break;
+	}
+	SDL_SetRenderDrawColor(renderer_, col.r, col.g, col.b, col.a);
+	SDL_RenderFillRect(renderer_, &rect);
+}
+
 void Interface::drawGUI()
 {
 	ImGui_ImplSDLRenderer3_NewFrame();
@@ -143,6 +164,8 @@ void Interface::drawGUI()
 		area->drawGUI();
 
 	drawSequencerGUI();
+
+	drawBlockSelection();
 
 	GUI::drawToolbar();
 

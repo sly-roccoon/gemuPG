@@ -298,7 +298,7 @@ void Area::drawGUI()
 	ImGui::Begin(std::format("Area @ [{}, {}]", getTopLeft().x, getTopLeft().y).c_str(), &viewGUI_, flags);
 
 	ImGui::DragInt("bpm subdivision", &bpm_subdivision_, 1, 1, 32, "1/%d", ImGuiSliderFlags_Logarithmic);
-	ImGui::SliderFloat("amplitude", &amp_, 0.0f, 1.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
+	ImGui::DragFloat("amplitude", &amp_, 0.001f, 0.0f, 1.0f, "% .3f", ImGuiSliderFlags_Logarithmic);
 
 	ImGui::End();
 }

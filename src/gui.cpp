@@ -34,8 +34,10 @@ void GUI::destroy()
 
 void GUI::drawToolbar()
 {
-	ImGui::SetNextWindowPos({0, ImGui::GetMainViewport()->GetCenter().y - (ICON_SIZE + 4) * 2});
-	ImGui::SetNextWindowSize({ICON_SIZE + ICON_SIZE / 4, (ICON_SIZE + 4) * 4}); // TODO: find better way to adjust margins of button border
+	ImGui::SetNextWindowPos({0, ImGui::GetMainViewport()->GetCenter().y - (ICON_SIZE / 2)});
+	ImGui::SetNextWindowSize({ICON_SIZE + ICON_SIZE / 4, ICON_SIZE / 2 + ICON_SIZE * 3}); // TODO: find better way to adjust margins of button border
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(ICON_SIZE / 8, ICON_SIZE / 8));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ICON_SIZE / 8, ICON_SIZE / 8));
 	ImGui::Begin("Side", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 
 	if (ImGui::ColorButton("Generator Block", toImVec4(GENERATOR_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
@@ -46,6 +48,7 @@ void GUI::drawToolbar()
 		Interface::getInstance().setSelection(BLOCK_SEQUENCER);
 
 	ImGui::End();
+	ImGui::PopStyleVar(2);
 
 	//------------------------------
 	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->GetCenter().x - ICON_SIZE * 2, ImGui::GetMainViewport()->Size.y - ICON_SIZE});
@@ -88,7 +91,7 @@ void GUI::drawToolbar()
 	float vol = AudioEngine::getInstance().getAmp();
 
 	ImGui::InputFloat("BPM", &bpm, 1.0f, 5.0f, "%.1f");
-	ImGui::SliderFloat("Volume", &vol, 0.0f, 1.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_Logarithmic);
+	ImGui::DragFloat("Volume", &vol, 0.001f, 0.0f, 1.0f, "%.4f", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_Logarithmic);
 
 	Clock::getInstance().setBPM(bpm);
 	AudioEngine::getInstance().setVolume(vol);

@@ -16,7 +16,7 @@ void Text::init(SDL_Renderer *renderer)
 
 SDL_Texture *Text::getTexture(std::string text, SDL_Color col)
 {
-    SDL_Surface *surface = TTF_RenderText_Solid(default_font_, text.c_str(), 0, col);
+    SDL_Surface *surface = TTF_RenderText_Blended(default_font_, text.c_str(), 0, col);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer_, surface);
     SDL_DestroySurface(surface);
 

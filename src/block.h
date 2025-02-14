@@ -68,7 +68,7 @@ typedef struct generator_data_t
 	float amp;
 	float pan;
 	float freq;
-	float phase;
+	int phase;
 } generator_data_t;
 
 class BlockGenerator : public Block
@@ -118,7 +118,7 @@ private:
 		.amp = 1.0f,
 		.pan = 0.0f,
 		.freq = 440.0f,
-		.phase = 0.0f};
+		.phase = 0};
 
 	pitch_t rel_freq_ = 0.0f;
 	float freq_factor_ = 1.0f;

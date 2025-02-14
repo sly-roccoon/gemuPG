@@ -40,7 +40,7 @@ BlockGenerator::BlockGenerator(Vector2f pos, float phase) : Block(pos)
 	setWave(WAVE_SINE);
 
 	stream_ = SDL_CreateAudioStream(&DEFAULT_SPEC, &DEFAULT_SPEC);
-	SDL_SetAudioStreamGetCallback(stream_, audioCallback, this);
+	SDL_SetAudioStreamGetCallback(stream_, this->audioCallback, this);
 }
 
 BlockGenerator::~BlockGenerator()
@@ -60,19 +60,17 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 		const int total = SDL_min(additional_amount, SDL_arraysize(samples));
 		int i;
 
-		generator_data_t data = block->getData();
-
 		for (i = 0; i < total; i++)
 		{
-			unsigned int idx = (int)(std::floorf(block->getData().phase * data.freq * WAVE_SIZE / SAMPLE_RATE)) % WAVE_SIZE;
+			unsigned int idx = (unsigned int)(std::floorf(block->getData().phase * block->getFrequency() * WAVE_SIZE / SAMPLE_RATE)) % WAVE_SIZE;
 
 			if (block->getBypass())
 				samples[i] = 0.0f;
 			else
 			{
-				samples[i] = data.amp * data.wave[idx];
+				samples[i] = block->getAmp() * block->getData().wave[idx];
 				if (ADJUST_AMP_BY_CREST)
-					samples[i] *= data.crest; // TODO: find better way as to not go over +-1.0f
+					samples[i] *= block->getData().crest; // TODO: find better way as to not go over +-1.0f
 			}
 
 			block->incrPhase();
@@ -142,7 +140,7 @@ void BlockGenerator::drawGUI()
 
 	ImGui::Begin(std::format("generator block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
-	ImGui::SliderFloat("amplitude", &data_.amp, 0.0f, 1.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
+	ImGui::DragFloat("amplitude", &data_.amp, 0.001f, 0.0f, 1.0f, "% .3f", ImGuiSliderFlags_Logarithmic);
 	if (!is_in_area_)
 		ImGui::SliderFloat("frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
 	else

@@ -41,15 +41,29 @@ void Grid::draw(SDL_Renderer *renderer)
 	}
 }
 
-void drawBlockText(SDL_FRect *rect, std::string type, std::string value, SDL_Color color)
+void drawBlockText(Block *block, std::string type, std::string value, SDL_Color color)
 {
-	float size = rect->w / 16;
-	Vector2f value_size = Text::getTextSize(value, size * 2);
-	Text::draw(type, {rect->x, rect->y}, color, size);
-	Text::draw(value,
-			   {rect->x + rect->w / 2 - value_size.x / 2,
-				rect->y + rect->h / 2 - value_size.y / 2},
-			   color, size * 2);
+	SDL_FRect *rect = block->getFRect();
+	float value_size = rect->w / TEXT_VALUE_SIZE_DIV;
+	float type_size = rect->w / TEXT_TYPE_SIZE_DIV;
+
+	if (type != block->getText(0))
+	{
+		block->setTextTexture(Text::getTexture(type, color), 0);
+		block->setText(type, 0);
+	}
+
+	if (value != block->getText(1))
+	{
+		block->setTextTexture(Text::getTexture(value, color), 1);
+		block->setValueTextSize(Text::getTextSize(value));
+		block->setText(value, 1);
+	}
+
+	Vector2f value_pos = {rect->x + rect->w / 2,
+						  rect->y + rect->h / 2};
+	Text::drawTexture(block->getTextTexture(0), {rect->x, rect->y}, type_size);
+	Text::drawTexture(block->getTextTexture(1), value_pos, value_size, true);
 }
 
 void drawGenerator(SDL_Renderer *renderer, BlockGenerator *block)
@@ -99,7 +113,7 @@ void drawSequencer(SDL_Renderer *renderer, BlockSequencer *block)
 	}
 	}
 
-	drawBlockText(block->getFRect(), type_text, value_text, invertColor(SEQUENCER_COLOR));
+	drawBlockText(block, type_text, value_text, invertColor(SEQUENCER_COLOR));
 }
 
 void Grid::drawBlocks(SDL_Renderer *renderer)

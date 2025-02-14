@@ -17,8 +17,10 @@ public:
     }
     static void init(SDL_Renderer *);
 
-    static void draw(std::string text, Vector2f pos, SDL_Color col, float size);
-    static Vector2f getTextSize(std::string text, float size);
+    static SDL_Texture *getTexture(std::string text, SDL_Color col);
+    static Vector2f getTextSize(std::string text);
+
+    static void drawTexture(SDL_Texture *, Vector2f, float, bool centered = false);
 
 private:
     Text() {};

@@ -14,6 +14,8 @@ constexpr unsigned int DEFAULT_WIDTH = 1280;
 constexpr unsigned int DEFAULT_HEIGHT = 960;
 
 constexpr unsigned int ICON_SIZE = 64;
+constexpr float TEXT_TYPE_SIZE_DIV = 4;
+constexpr float TEXT_VALUE_SIZE_DIV = 2;
 
 constexpr float DEFAULT_BPM = 60.0f;
 constexpr unsigned int MAX_SUBDIVISION = 64;

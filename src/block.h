@@ -27,7 +27,17 @@ public:
 	void toggleGUI() { viewGUI_ = !viewGUI_; }
 	void setGUI(bool view) { viewGUI_ = view; }
 
+	bool getInArea() { return is_in_area_; }
 	void setInArea(bool in_area) { is_in_area_ = in_area; }
+
+	std::string getText(int i) { return text_.at(i); }
+	void setText(std::string text, int i) { text_.at(i) = text; }
+
+	SDL_Texture *getTextTexture(int i) { return text_texture_.at(i); }
+	void setTextTexture(SDL_Texture *text_texture, int i) { text_texture_.at(i) = text_texture; }
+
+	Vector2f getValueTextSize() { return value_text_size_; }
+	void setValueTextSize(Vector2f size) { value_text_size_ = size; }
 
 protected:
 	bool viewGUI_ = false;
@@ -35,6 +45,10 @@ protected:
 	bool is_in_area_ = false;
 	SDL_FRect rect_{0, 0, 1.0f, 1.0f};
 	SDL_FRect render_rect_;
+
+	std::array<std::string, 2> text_ = {"", ""};
+	std::array<SDL_Texture *, 2> text_texture_ = {nullptr, nullptr};
+	Vector2f value_text_size_ = {0.0f, 0.0f};
 };
 
 typedef enum

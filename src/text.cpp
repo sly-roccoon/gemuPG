@@ -9,27 +9,52 @@ void Text::init(SDL_Renderer *renderer)
     renderer_ = renderer;
     std::string font_path = SDL_GetBasePath();
     font_path.append("/terminal_f4.ttf");
-    default_font_ = TTF_OpenFont(font_path.c_str(), 16);
+    default_font_ = TTF_OpenFont(font_path.c_str(), 32);
     text_engine_ = TTF_CreateRendererTextEngine(renderer_);
 }
 
-void Text::draw(std::string text, Vector2f pos, SDL_Color col, float size)
+SDL_Texture *Text::getTexture(std::string text, SDL_Color col)
 {
-    TTF_SetFontSize(default_font_, size);
-    TTF_Text *ttf_text = TTF_CreateText(text_engine_, default_font_, text.c_str(), 0);
-    TTF_SetTextColor(ttf_text, col.r, col.g, col.b, col.a);
-    TTF_DrawRendererText(ttf_text, pos.x, pos.y);
+    SDL_Surface *surface = TTF_RenderText_Solid(default_font_, text.c_str(), 0, col);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer_, surface);
+    SDL_DestroySurface(surface);
 
-    TTF_DestroyText(ttf_text);
+    return texture;
 }
 
-Vector2f Text::getTextSize(std::string text, float size)
+void Text::drawTexture(SDL_Texture *texture, Vector2f pos, float size, bool centered)
+{
+    Vector2f texture_size;
+    SDL_GetTextureSize(texture, &texture_size.x, &texture_size.y);
+    if (texture_size.x > texture_size.y)
+    {
+        texture_size.y = size * texture_size.y / texture_size.x;
+        texture_size.x = size;
+    }
+    else
+    {
+        texture_size.x = size * texture_size.x / texture_size.y;
+        texture_size.y = size;
+    }
+
+    if (centered)
+    {
+        pos = {pos.x - texture_size.x / 2, pos.y - texture_size.y / 2};
+    }
+
+    SDL_FRect dest = {pos.x, pos.y, texture_size.x, texture_size.y};
+
+    SDL_RenderTexture(renderer_, texture, NULL, &dest);
+}
+
+Vector2f Text::getTextSize(std::string text)
 {
     int width, height;
-    TTF_SetFontSize(default_font_, size);
     TTF_Text *ttf_text = TTF_CreateText(text_engine_, default_font_, text.c_str(), 0);
     TTF_GetTextSize(ttf_text, &width, &height);
     TTF_DestroyText(ttf_text);
 
-    return {(float)width, (float)height};
+    float font_size = TTF_GetFontSize(default_font_);
+
+    return {(float)width / font_size, (float)height / font_size};
 }

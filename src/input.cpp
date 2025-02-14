@@ -194,9 +194,9 @@ void Input::handleShortcuts(SDL_Event *event)
 		Interface::getInstance().toggleFullscreen();
 
 	if (key.key == SDLK_1 && key.type == SDL_EVENT_KEY_DOWN)
-		Interface::getInstance().setSelection(BLOCK_GENERATOR);
-	if (key.key == SDLK_2 && key.type == SDL_EVENT_KEY_DOWN)
 		Interface::getInstance().setSelection(AREA);
+	if (key.key == SDLK_2 && key.type == SDL_EVENT_KEY_DOWN)
+		Interface::getInstance().setSelection(BLOCK_GENERATOR);
 	if (key.key == SDLK_3 && key.type == SDL_EVENT_KEY_DOWN)
 		Interface::getInstance().setSelection(BLOCK_SEQUENCER);
 

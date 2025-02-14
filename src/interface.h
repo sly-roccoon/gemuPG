@@ -40,7 +40,7 @@ private:
 	unsigned int height_ = DEFAULT_HEIGHT;
 	bool is_fullscreen_ = false;
 
-	block_type_t cur_selection_ = BLOCK_GENERATOR;
+	block_type_t cur_selection_ = AREA;
 	bool is_playing_ = true;
 
 	Camera &camera_;

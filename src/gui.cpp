@@ -112,12 +112,12 @@ void GUI::drawToolbar()
 
 	if (ImGui::InputFloat("BPM", &bpm, 1.0f, 5.0f, "%.1f"))
 	{
+		Clock::getInstance().setBPM(bpm);
 		Interface::getInstance().updateBlockTimes();
 	}
-	ImGui::DragFloat("volume", &vol, 0.001f, 0.0f, 1.0f, "%.4f", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_Logarithmic);
 
-	Clock::getInstance().setBPM(bpm);
-	AudioEngine::getInstance().setVolume(vol);
+	if (ImGui::DragFloat("volume", &vol, 0.001f, 0.0f, 1.0f, "%.4f", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_Logarithmic))
+		AudioEngine::getInstance().setVolume(vol);
 
 	ImGui::End();
 }

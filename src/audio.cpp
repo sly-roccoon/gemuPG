@@ -4,20 +4,42 @@
 void LowPassFilter::init(int sample_rate)
 {
 	fs_ = sample_rate;
-	fc_ = sample_rate / 8.0f;
-	calculateCoefficient();
+	fc_ = 10'000.0;
+	d_ = 1.0;
+
+	calculateCoefficients();
 }
 
-void LowPassFilter::calculateCoefficient()
+void LowPassFilter::calculateCoefficients()
 {
-	alpha_ = (2.0f * fc_) / (2.0f * fc_ + fs_);
+	double F = 1.0 / std::tan(std::numbers::pi * fc_ / fs_);
+
+	b_.at(0) = 1.0f / (1 + 2 * d_ * F + F * F);
+	b_.at(1) = 2 * b_.at(0);
+	b_.at(2) = b_.at(0);
+
+	a_.at(0) = 0;
+	a_.at(1) = 2 * b_.at(0) * (1.0 - F * F);
+	a_.at(2) = b_.at(0) * (1.0 - 2.0 * d_ * F + F * F);
 }
 
-float LowPassFilter::process(float sample)
+void LowPassFilter::process(float *samples, int n_samples)
 {
-	float out = alpha_ * sample + (1.0f - alpha_) * prev_;
-	prev_ = out;
-	return out;
+	for (int sample = 0; sample < n_samples; sample++)
+	{
+		prev_x_.at(2) = prev_x_.at(1);
+		prev_x_.at(1) = prev_x_.at(0);
+		prev_x_.at(0) = samples[sample];
+
+		samples[sample] = 0.0f;
+		for (int i = 0; i < b_.size(); i++)
+		{
+			samples[sample] += b_.at(i) * prev_x_.at(i) - a_.at(i) * prev_y_.at(i);
+		}
+
+		prev_y_.at(2) = prev_y_.at(1);
+		prev_y_.at(1) = samples[sample];
+	}
 }
 
 void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
@@ -57,8 +79,7 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 					samples[i] += new_samples[i] * audio->getAmp() * area->getAmp();
 			}
 
-		for (int i = 0; i < n_samples; i++)
-			samples[i] = audio->lowPass(samples[i]);
+		audio->lowPass(samples, n_samples);
 
 		audio->setOutput(samples, n_samples);
 		SDL_PutAudioStreamData(stream, samples, n_samples * sizeof(float));
@@ -68,12 +89,15 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 
 void AudioEngine::setOutput(const float *output, const int n_samples)
 {
-	// static int written;
-	// int remainder = BUFFER_SIZE - n_samples;
-	// SDL_memcpy(output_ + written, output_ + written - remainder, remainder * sizeof(float));
-	SDL_memset(output_, (int)0.0f, BUFFER_SIZE * sizeof(float));
-	SDL_memcpy(output_, output, n_samples * sizeof(float));
-	// written = n_samples;
+	static int written = 0;
+	int remainder = BUFFER_SIZE - n_samples;
+
+	// Shift the previous entries
+	SDL_memmove(output_, output_ + n_samples, remainder * sizeof(float));
+
+	// Copy the new output
+	SDL_memcpy(output_ + remainder, output, n_samples * sizeof(float));
+	written = n_samples;
 }
 
 AudioEngine::AudioEngine()
@@ -88,7 +112,8 @@ AudioEngine::AudioEngine()
 	spec_.channels = 1;
 	spec_.format = SDL_AUDIO_F32;
 	printf("SAMPLE RATE: %d\n", spec_.freq);
-	filter_.init(spec_.freq);
+	for (auto &filter : filters_)
+		filter.init(spec_.freq);
 
 	stream_ = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec_, audioCallback, this);
 

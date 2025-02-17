@@ -90,3 +90,22 @@ SDL_Color invertColor(SDL_Color color)
 {
   return {(Uint8)(255 - color.r), (Uint8)(255 - color.g), (Uint8)(255 - color.b), color.a};
 }
+
+float interpTable(float *array, float idx)
+{
+  int lower = std::floor(idx);
+  int upper = std::ceil(idx);
+
+  float lower_factor = idx - lower;
+  float upper_factor = upper - idx;
+
+  if (upper > WAVE_SIZE)
+    upper = WAVE_SIZE;
+
+  if (lower < 0)
+    lower = 0;
+
+  float value = (array[upper] * upper_factor + array[lower] * lower_factor);
+
+  return value;
+}

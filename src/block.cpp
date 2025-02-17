@@ -35,10 +35,11 @@ BlockGenerator *BlockGenerator::clone()
 	return copy;
 }
 
-BlockGenerator::BlockGenerator(Vector2f pos, float phase) : Block(pos)
+BlockGenerator::BlockGenerator(Vector2f pos, double phase) : Block(pos)
 {
 	type_ = BLOCK_GENERATOR;
 	data_.phase = phase;
+	fs_ = AudioEngine::getInstance().getSpec()->freq;
 	setWave(WAVE_SINE);
 
 	data_.freq = SDL_pow(10, SDL_randf() - 1) * 500.0f;
@@ -51,6 +52,7 @@ BlockGenerator::BlockGenerator(Vector2f pos, float phase) : Block(pos)
 
 BlockGenerator::~BlockGenerator()
 {
+	SDL_free(data_.wave);
 	SDL_DestroyAudioStream(stream_);
 }
 
@@ -66,21 +68,20 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 		float samples[BUFFER_SIZE] = {};
 		const int total = SDL_min(additional_amount, BUFFER_SIZE);
 		int i;
-		float *wave = block->getData().wave;
+		float *wave = block->getData()->wave;
 
-		double freq = block->getFrequency();
 		for (i = 0; i < total; i++)
 		{
 			double amp = block->getAmp();
-			unsigned int idx = (unsigned int)(std::floorf(block->getData().phase * freq * WAVE_SIZE / fs)) % WAVE_SIZE;
+			float idx = block->getData()->phase * WAVE_SIZE;
 
 			if (block->getBypass())
 				samples[i] = 0.0f;
 			else
 			{
-				samples[i] = amp * wave[idx];
+				samples[i] = amp * interpTable(wave, idx);
 				if (ADJUST_AMP_BY_CREST)
-					samples[i] *= block->getData().crest * ONE_DIV_SQRT_THREE; // TODO: find better way as to not go over +-1.0f
+					samples[i] *= block->getData()->crest * ONE_DIV_SQRT_THREE; // TODO: find better way as to not go over +-1.0f
 			}
 
 			block->incrPhase();
@@ -152,9 +153,8 @@ double BlockGenerator::getAmp()
 		return data_.amp;
 
 	Uint64 now = SDL_GetPerformanceCounter();
-	Uint64 dt = now - last_note_change_;
-
-	double factor = double(1.0f * dt / attack_time_);
+	double dt = static_cast<double>(now - last_note_change_) / static_cast<double>(SDL_GetPerformanceFrequency());
+	double factor = static_cast<double>(dt) / static_cast<double>(attack_time_);
 	attack_amp_ = data_.amp * factor;
 
 	return attack_amp_;

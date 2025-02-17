@@ -96,3 +96,5 @@ pitch_t noteToFreq(std::string, int);
 pitch_t intervalToRatio(float interval, float octave_subdivision);
 
 SDL_Color invertColor(SDL_Color);
+
+float interpTable(float *, float);

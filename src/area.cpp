@@ -295,32 +295,32 @@ void Area::stopSequence()
 
 void Area::updateGlissando(BlockGenerator *block)
 {
-	double time = (gliss_percent_ / 100.0f) * Clock::getInstance().getBPM() / (60.0f * bpm_subdivision_);
+	double time = (gliss_percent_ / 100.0f) * (60.0f / (bpm_subdivision_ * Clock::getInstance().getBPM()));
 
 	if (block)
 	{
-		((BlockGenerator *)block)->setGlissTimeNS(time);
+		((BlockGenerator *)block)->setGlissTime(time);
 		return;
 	}
 
 	for (auto block : blocks_)
 		if (block->getType() == BLOCK_GENERATOR)
-			((BlockGenerator *)block)->setGlissTimeNS(time);
+			((BlockGenerator *)block)->setGlissTime(time);
 }
 
 void Area::updateAttack(BlockGenerator *block)
 {
-	double time = (attack_percent_ / 100.0f) * Clock::getInstance().getBPM() / (60.0f * bpm_subdivision_);
+	double time = (attack_percent_ / 100.0f) * (60.0f / (bpm_subdivision_ * Clock::getInstance().getBPM()));
 
 	if (block)
 	{
-		((BlockGenerator *)block)->setAttackTimeNS(time);
+		((BlockGenerator *)block)->setAttackTime(time);
 		return;
 	}
 
 	for (auto block : blocks_)
 		if (block->getType() == BLOCK_GENERATOR)
-			((BlockGenerator *)block)->setAttackTimeNS(time);
+			((BlockGenerator *)block)->setAttackTime(time);
 }
 
 void Area::drawGUI()

@@ -21,7 +21,7 @@ public:
             {
                 if (block->getType() == BLOCK_GENERATOR)
                 {
-                    float phase = ((BlockGenerator *)block)->getData().phase;
+                    float phase = ((BlockGenerator *)block)->getData()->phase;
                     return new BlockGenerator(pos, phase);
                 }
             }

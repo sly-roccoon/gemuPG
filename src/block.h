@@ -68,20 +68,20 @@ typedef struct generator_data_t
 	float amp;
 	float pan;
 	float freq;
-	int phase;
+	double phase;
 } generator_data_t;
 
 class BlockGenerator : public Block
 {
 public:
-	BlockGenerator(Vector2f, float phase = 0.0f);
+	BlockGenerator(Vector2f, double phase = 0.0f);
 	~BlockGenerator();
 	BlockGenerator *clone() override;
 
 	SDL_AudioStream *getStream() { return stream_; }
 	void drawGUI() override;
 
-	generator_data_t getData() { return data_; }
+	generator_data_t *getData() { return &data_; }
 	void setData(generator_data_t data)
 	{
 		float tmp_phase = data_.phase;
@@ -92,7 +92,10 @@ public:
 	void setFrequency(pitch_t freq);
 	double getFrequency();
 
-	void incrPhase() { data_.phase++; }
+	void incrPhase()
+	{
+		data_.phase = fmod(data_.phase + (getFrequency() / fs_), 1.0f);
+	}
 
 	void setWave(WAVE_FORMS waveform, float *wave = nullptr);
 	WAVE_FORMS getWave() { return data_.waveform; }
@@ -108,8 +111,8 @@ public:
 	void setBypass(bool bypass) { bypass_ = bypass; }
 	bool getBypass() { return bypass_; }
 
-	void setGlissTimeNS(double s) { gliss_time_ = s; }
-	void setAttackTimeNS(double s) { attack_time_ = s; }
+	void setGlissTime(double s) { gliss_time_ = s; }
+	void setAttackTime(double s) { attack_time_ = s; }
 
 private:
 	bool bypass_ = false;
@@ -123,6 +126,7 @@ private:
 		.freq = 440.0f,
 		.phase = 0};
 
+	int fs_;
 	Uint64 last_note_change_ = 0;
 	double gliss_freq_ = -1.0f;
 	double last_freq_ = -1.0f;

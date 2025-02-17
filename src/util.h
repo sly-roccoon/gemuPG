@@ -11,7 +11,7 @@
 #define ADJUST_AMP_BY_CREST true
 #define DEFAULT_FONT "Sono-SemiBold.ttf"
 
-constexpr float ONE_DIV_SQRT_TWO = 0.7071067811865475f;
+constexpr float ONE_DIV_SQRT_THREE = 0.5773502691896258;
 
 constexpr unsigned int DEFAULT_WIDTH = 1280;
 constexpr unsigned int DEFAULT_HEIGHT = 960;

@@ -60,25 +60,27 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 
 	int fs = AudioEngine::getInstance().getSpec()->freq;
 
-	float delta = block->getData().freq / fs;
 	additional_amount /= sizeof(float);
 	while (additional_amount > 0)
 	{
 		float samples[BUFFER_SIZE] = {};
 		const int total = SDL_min(additional_amount, BUFFER_SIZE);
 		int i;
+		float *wave = block->getData().wave;
 
+		double freq = block->getFrequency();
 		for (i = 0; i < total; i++)
 		{
-			unsigned int idx = (unsigned int)(std::floorf(block->getData().phase * block->getFrequency() * WAVE_SIZE / fs)) % WAVE_SIZE;
+			double amp = block->getAmp();
+			unsigned int idx = (unsigned int)(std::floorf(block->getData().phase * freq * WAVE_SIZE / fs)) % WAVE_SIZE;
 
 			if (block->getBypass())
 				samples[i] = 0.0f;
 			else
 			{
-				samples[i] = block->getAmp() * block->getData().wave[idx];
+				samples[i] = amp * wave[idx];
 				if (ADJUST_AMP_BY_CREST)
-					samples[i] *= block->getData().crest * ONE_DIV_SQRT_TWO; // TODO: find better way as to not go over +-1.0f
+					samples[i] *= block->getData().crest * ONE_DIV_SQRT_THREE; // TODO: find better way as to not go over +-1.0f
 			}
 
 			block->incrPhase();
@@ -134,7 +136,45 @@ void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
 
 void BlockGenerator::setFrequency(pitch_t freq)
 {
+	if (freq == last_freq_)
+		return;
+
+	last_freq_ = data_.freq;
+	gliss_freq_ = last_freq_;
+	attack_amp_ = 0.0f;
+	last_note_change_ = SDL_GetPerformanceCounter();
 	data_.freq = (freq + rel_freq_) * freq_factor_;
+}
+
+double BlockGenerator::getAmp()
+{
+	if (!is_in_area_ || attack_time_ == 0 || attack_amp_ >= data_.amp)
+		return data_.amp;
+
+	Uint64 now = SDL_GetPerformanceCounter();
+	Uint64 dt = now - last_note_change_;
+
+	double factor = double(1.0f * dt / attack_time_);
+	attack_amp_ = data_.amp * factor;
+
+	return attack_amp_;
+}
+
+double BlockGenerator::getFrequency()
+{
+	constexpr float e = 10e-6;
+	if (!is_in_area_ || last_freq_ == 0.0f || gliss_time_ == 0 || std::abs(data_.freq - gliss_freq_) < e)
+		return data_.freq;
+
+	Uint64 now = SDL_GetPerformanceCounter();
+	double dt = static_cast<double>(now - last_note_change_) / static_cast<double>(SDL_GetPerformanceFrequency());
+
+	double factor = static_cast<double>(dt) / static_cast<double>(gliss_time_);
+	factor = SDL_clamp(factor, 0.0, 1.0);
+	double ratio = data_.freq / last_freq_;
+	gliss_freq_ = last_freq_ * pow(ratio, factor);
+
+	return gliss_freq_;
 }
 
 void BlockGenerator::drawGUI()
@@ -159,27 +199,27 @@ void BlockGenerator::drawGUI()
 
 	// ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
 
-	const char *preview = data_.waveform == WAVE_SAW ? "Saw" : data_.waveform == WAVE_SINE	 ? "Sine"
-														   : data_.waveform == WAVE_SQUARE	 ? "Square"
-														   : data_.waveform == WAVE_TRIANGLE ? "Triangle"
-																							 : "Sample";
+	const char *preview = data_.waveform == WAVE_SAW ? "saw" : data_.waveform == WAVE_SINE	 ? "sine"
+														   : data_.waveform == WAVE_SQUARE	 ? "square"
+														   : data_.waveform == WAVE_TRIANGLE ? "triangle"
+																							 : "sample";
 
-	if (ImGui::BeginCombo("Waveform", preview))
+	if (ImGui::BeginCombo("waveform", preview))
 	{
 		// if (ImGui::Selectable("Sample"))
 		// 	setWave(WAVE_SAMPLE); //TODO: implement sample loading
-		if (ImGui::Selectable("Saw"))
+		if (ImGui::Selectable("saw"))
 			setWave(WAVE_SAW);
-		if (ImGui::Selectable("Sine"))
+		if (ImGui::Selectable("sine"))
 			setWave(WAVE_SINE);
-		if (ImGui::Selectable("Square"))
+		if (ImGui::Selectable("square"))
 			setWave(WAVE_SQUARE);
-		if (ImGui::Selectable("Triangle"))
+		if (ImGui::Selectable("triangle"))
 			setWave(WAVE_TRIANGLE);
 		ImGui::EndCombo();
 	}
 
-	ImGui::PlotLines("##Waveform", data_.wave, WAVE_SIZE, 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));
+	ImGui::PlotLines("##waveform", data_.wave, WAVE_SIZE, 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));
 
 	ImGui::End();
 }
@@ -232,7 +272,7 @@ void BlockSequencer::drawGUI()
 	ImGui::SetNextWindowSize({512, 256});
 	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
 
-	ImGui::Begin(std::format("Sequencer Block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
+	ImGui::Begin(std::format("sequencer block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
 	const char *preview = pitch_type_ == PITCH_REL_FREQUENCY   ? "relative frequency"
 						  : pitch_type_ == PITCH_ABS_FREQUENCY ? "absolute frequency"
@@ -261,7 +301,7 @@ void BlockSequencer::drawGUI()
 
 	if (pitch_type_ == PITCH_INTERVAL)
 	{
-		ImGui::SliderFloat("Interval", &interval_, -octave_subdivision_ * 2, octave_subdivision_ * 2, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
+		ImGui::SliderFloat("interval", &interval_, -octave_subdivision_ * 2, octave_subdivision_ * 2, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
 		ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
 	}
 

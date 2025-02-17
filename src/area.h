@@ -39,6 +39,9 @@ public:
     void toggleGUI() { viewGUI_ = !viewGUI_; }
     void setGUI(bool view) { viewGUI_ = view; }
 
+    void updateGlissando(BlockGenerator *block = nullptr);
+    void updateAttack(BlockGenerator *block = nullptr);
+
 private:
     Vector2f getTopLeft();
     void removeDanglingSequencers();
@@ -55,6 +58,9 @@ private:
     pitch_t last_freq_ = 0.0f;
 
     float amp_ = 1.0f;
+
+    float gliss_percent_ = 0.0f;
+    float attack_percent_ = 25.0f;
 
     bool viewGUI_ = false;
     int bpm_subdivision_ = 4;

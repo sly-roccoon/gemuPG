@@ -79,6 +79,15 @@ void Interface::removeBlock(Block *block)
 	grid_.removeBlock(block);
 }
 
+void Interface::updateBlockTimes()
+{
+	for (auto area : grid_.getAreas())
+	{
+		area->updateAttack();
+		area->updateGlissando();
+	}
+}
+
 //--------------------------------------------------------
 
 void Interface::draw()

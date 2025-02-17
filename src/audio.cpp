@@ -87,7 +87,6 @@ AudioEngine::AudioEngine()
 	SDL_GetAudioDeviceFormat(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec_, nullptr);
 	spec_.channels = 1;
 	spec_.format = SDL_AUDIO_F32;
-	spec_.freq = spec_.freq * 2;
 	printf("SAMPLE RATE: %d\n", spec_.freq);
 	filter_.init(spec_.freq);
 

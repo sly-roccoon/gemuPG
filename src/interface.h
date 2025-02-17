@@ -26,6 +26,8 @@ public:
 	Grid &getGrid() { return grid_; }
 	Block *getBlock(Vector2f pos) { return grid_.getBlock(pos); }
 
+	void updateBlockTimes();
+
 	void setSelection(block_type_t selection) { cur_selection_ = selection; }
 	block_type_t getSelection() { return cur_selection_; }
 

@@ -45,6 +45,12 @@ Block *Area::addBlock(Block *block)
 	{
 		blocks_.push_back(block);
 		block->setInArea(true);
+		if (block->getType() == BLOCK_GENERATOR)
+		{
+			updateGlissando((BlockGenerator *)block);
+			updateAttack((BlockGenerator *)block);
+			((BlockGenerator *)block)->setFrequency(0.0f);
+		}
 		return block;
 	}
 	return nullptr;
@@ -287,6 +293,36 @@ void Area::stopSequence()
 	last_note_idx_ = sequence_.size() - 1;
 }
 
+void Area::updateGlissando(BlockGenerator *block)
+{
+	double time = (gliss_percent_ / 100.0f) * Clock::getInstance().getBPM() / (60.0f * bpm_subdivision_);
+
+	if (block)
+	{
+		((BlockGenerator *)block)->setGlissTimeNS(time);
+		return;
+	}
+
+	for (auto block : blocks_)
+		if (block->getType() == BLOCK_GENERATOR)
+			((BlockGenerator *)block)->setGlissTimeNS(time);
+}
+
+void Area::updateAttack(BlockGenerator *block)
+{
+	double time = (attack_percent_ / 100.0f) * Clock::getInstance().getBPM() / (60.0f * bpm_subdivision_);
+
+	if (block)
+	{
+		((BlockGenerator *)block)->setAttackTimeNS(time);
+		return;
+	}
+
+	for (auto block : blocks_)
+		if (block->getType() == BLOCK_GENERATOR)
+			((BlockGenerator *)block)->setAttackTimeNS(time);
+}
+
 void Area::drawGUI()
 {
 	if (!viewGUI_)
@@ -297,8 +333,18 @@ void Area::drawGUI()
 	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
 	ImGui::Begin(std::format("Area @ [{}, {}]", getTopLeft().x, getTopLeft().y).c_str(), &viewGUI_, flags);
 
-	ImGui::DragInt("bpm subdivision", &bpm_subdivision_, 1, 1, 32, "1/%d", ImGuiSliderFlags_Logarithmic);
+	if (ImGui::DragInt("bpm subdivision", &bpm_subdivision_, 1, 1, 32, "1/%d", ImGuiSliderFlags_Logarithmic))
+	{
+		updateGlissando();
+		updateAttack();
+	}
+
 	ImGui::DragFloat("amplitude", &amp_, 0.001f, 0.0f, 1.0f, "% .3f", ImGuiSliderFlags_Logarithmic);
+
+	if (ImGui::SliderFloat("glissando", &gliss_percent_, 0.0f, 100.0f, "%.1f\%", ImGuiSliderFlags_AlwaysClamp))
+		updateGlissando();
+	if (ImGui::SliderFloat("attack", &attack_percent_, 0.0f, 100.0f, "%.1f\%", ImGuiSliderFlags_AlwaysClamp))
+		updateAttack();
 
 	ImGui::End();
 }

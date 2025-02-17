@@ -90,15 +90,15 @@ public:
 	}
 
 	void setFrequency(pitch_t freq);
-	float getFrequency() { return data_.freq; }
+	double getFrequency();
 
 	void incrPhase() { data_.phase++; }
 
 	void setWave(WAVE_FORMS waveform, float *wave = nullptr);
 	WAVE_FORMS getWave() { return data_.waveform; }
 
-	float getAmp() { return data_.amp; }
-	void setAmp(float amp) { data_.amp = amp; }
+	double getAmp();
+	void setAmp(double amp) { data_.amp = amp; }
 
 	pitch_t getRelFreq() { return rel_freq_; }
 	void setRelFreq(pitch_t rel_freq) { rel_freq_ = rel_freq; }
@@ -107,6 +107,9 @@ public:
 
 	void setBypass(bool bypass) { bypass_ = bypass; }
 	bool getBypass() { return bypass_; }
+
+	void setGlissTimeNS(double s) { gliss_time_ = s; }
+	void setAttackTimeNS(double s) { attack_time_ = s; }
 
 private:
 	bool bypass_ = false;
@@ -119,6 +122,13 @@ private:
 		.pan = 0.0f,
 		.freq = 440.0f,
 		.phase = 0};
+
+	Uint64 last_note_change_ = 0;
+	double gliss_freq_ = -1.0f;
+	double last_freq_ = -1.0f;
+	double gliss_time_ = 0.0f;
+	double attack_amp_ = 0.0f;
+	double attack_time_ = 0.0f;
 
 	pitch_t rel_freq_ = 0.0f;
 	float freq_factor_ = 1.0f;

@@ -60,17 +60,17 @@ void GUI::drawToolbar()
 	if (ImGui::ColorButton("Area", toImVec4(AREA_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
 		Interface::getInstance().setSelection(AREA);
 	if (ImGui::IsItemHovered())
-		ImGui::SetTooltip("Area");
+		ImGui::SetTooltip("area");
 
 	if (ImGui::ColorButton("Generator Block", toImVec4(GENERATOR_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
 		Interface::getInstance().setSelection(BLOCK_GENERATOR);
 	if (ImGui::IsItemHovered())
-		ImGui::SetTooltip("Generator");
+		ImGui::SetTooltip("generator");
 
 	if (ImGui::ColorButton("Sequencer", toImVec4(SEQUENCER_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
 		Interface::getInstance().setSelection(BLOCK_SEQUENCER);
 	if (ImGui::IsItemHovered())
-		ImGui::SetTooltip("Sequencer");
+		ImGui::SetTooltip("sequencer");
 
 	ImGui::End();
 	ImGui::PopStyleVar(2);
@@ -85,17 +85,17 @@ void GUI::drawToolbar()
 
 	if (Clock::getInstance().isRunning())
 	{
-		if (ImGui::Button("Pause", {ICON_SIZE, ICON_SIZE}))
+		if (ImGui::Button("pause", {ICON_SIZE, ICON_SIZE}))
 			Interface::getInstance().togglePlayPause();
 	}
 	else
 	{
-		if (ImGui::Button("Play", {ICON_SIZE, ICON_SIZE}))
+		if (ImGui::Button("play", {ICON_SIZE, ICON_SIZE}))
 			Interface::getInstance().togglePlayPause();
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button("Stop", {ICON_SIZE, ICON_SIZE}))
+	if (ImGui::Button("stop", {ICON_SIZE, ICON_SIZE}))
 		Interface::getInstance().stop();
 
 	ImGui::End();
@@ -110,8 +110,11 @@ void GUI::drawToolbar()
 	float bpm = Clock::getInstance().getBPM();
 	float vol = AudioEngine::getInstance().getAmp();
 
-	ImGui::InputFloat("BPM", &bpm, 1.0f, 5.0f, "%.1f");
-	ImGui::DragFloat("Volume", &vol, 0.001f, 0.0f, 1.0f, "%.4f", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_Logarithmic);
+	if (ImGui::InputFloat("BPM", &bpm, 1.0f, 5.0f, "%.1f"))
+	{
+		Interface::getInstance().updateBlockTimes();
+	}
+	ImGui::DragFloat("volume", &vol, 0.001f, 0.0f, 1.0f, "%.4f", ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_Logarithmic);
 
 	Clock::getInstance().setBPM(bpm);
 	AudioEngine::getInstance().setVolume(vol);

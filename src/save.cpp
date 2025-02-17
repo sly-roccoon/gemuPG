@@ -154,7 +154,8 @@ void save_dialog_callback(void *userdata, const char *const *filelist, int filte
     Grid *grid = (Grid *)userdata;
     std::string path = filelist[0];
 
-    saveJSON(path, grid);
+    if (!path.empty())
+        saveJSON(path, grid);
 }
 
 void load_dialog_callback(void *userdata, const char *const *filelist, int filter)

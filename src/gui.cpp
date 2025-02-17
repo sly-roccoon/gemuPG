@@ -5,6 +5,7 @@
 ImGuiContext *GUI::context_ = nullptr;
 SDL_Window *GUI::window_ = nullptr;
 SDL_Renderer *GUI::renderer_ = nullptr;
+bool GUI::show_output_ = true;
 
 bool GUI::init(SDL_Window *window, SDL_Renderer *renderer)
 {
@@ -30,6 +31,22 @@ void GUI::destroy()
 	ImGui_ImplSDLRenderer3_Shutdown();
 	ImGui_ImplSDL3_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void GUI::drawOutput(float *output)
+{
+	if (!show_output_)
+		return;
+
+	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->Size.x - (ICON_SIZE * 4), ImGui::GetMainViewport()->Size.y - (ICON_SIZE * 2)});
+	ImGui::SetNextWindowSize({ICON_SIZE * 4, ICON_SIZE * 2});
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
+	ImGui::Begin("Output", &show_output_, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
+
+	ImGui::PlotLines("##", output, BUFFER_SIZE, 0, nullptr, -1.0f, 1.0f, {ICON_SIZE * 4, ICON_SIZE * 2});
+
+	ImGui::End();
+	ImGui::PopStyleVar();
 }
 
 void GUI::drawToolbar()

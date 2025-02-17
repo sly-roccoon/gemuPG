@@ -1,5 +1,7 @@
 #include "block.h"
 #include "gui.h"
+#include "audio.h"
+
 #include <SDL3/SDL.h>
 
 Block::Block(Vector2f pos)
@@ -42,7 +44,8 @@ BlockGenerator::BlockGenerator(Vector2f pos, float phase) : Block(pos)
 	data_.freq = SDL_pow(10, SDL_randf() - 1) * 500.0f;
 	setWave((WAVE_FORMS)(SDL_rand(4) + 1));
 
-	stream_ = SDL_CreateAudioStream(&DEFAULT_SPEC, &DEFAULT_SPEC);
+	SDL_AudioSpec *spec = AudioEngine::getInstance().getSpec();
+	stream_ = SDL_CreateAudioStream(spec, spec);
 	SDL_SetAudioStreamGetCallback(stream_, this->audioCallback, this);
 }
 
@@ -55,17 +58,19 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 {
 	BlockGenerator *block = (BlockGenerator *)userdata;
 
-	float delta = block->getData().freq / SAMPLE_RATE;
+	int fs = AudioEngine::getInstance().getSpec()->freq;
+
+	float delta = block->getData().freq / fs;
 	additional_amount /= sizeof(float);
 	while (additional_amount > 0)
 	{
 		float samples[BUFFER_SIZE] = {};
-		const int total = SDL_min(additional_amount, SDL_arraysize(samples));
+		const int total = SDL_min(additional_amount, BUFFER_SIZE);
 		int i;
 
 		for (i = 0; i < total; i++)
 		{
-			unsigned int idx = (unsigned int)(std::floorf(block->getData().phase * block->getFrequency() * WAVE_SIZE / SAMPLE_RATE)) % WAVE_SIZE;
+			unsigned int idx = (unsigned int)(std::floorf(block->getData().phase * block->getFrequency() * WAVE_SIZE / fs)) % WAVE_SIZE;
 
 			if (block->getBypass())
 				samples[i] = 0.0f;
@@ -73,7 +78,7 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 			{
 				samples[i] = block->getAmp() * block->getData().wave[idx];
 				if (ADJUST_AMP_BY_CREST)
-					samples[i] *= block->getData().crest; // TODO: find better way as to not go over +-1.0f
+					samples[i] *= block->getData().crest * ONE_DIV_SQRT_TWO; // TODO: find better way as to not go over +-1.0f
 			}
 
 			block->incrPhase();
@@ -203,7 +208,7 @@ void BlockSequencer::randomize()
 		while (pitch_ < 50.0f || pitch_ > 880.0f);
 
 	if (pitch_type_ == PITCH_REL_FREQUENCY)
-		pitch_ = SDL_randf() * 1000.0f;
+		pitch_ = SDL_randf() * 2000.0f - 1000.0f;
 
 	if (pitch_type_ == PITCH_INTERVAL)
 	{

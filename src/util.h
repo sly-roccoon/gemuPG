@@ -11,6 +11,8 @@
 #define ADJUST_AMP_BY_CREST true
 #define DEFAULT_FONT "Sono-SemiBold.ttf"
 
+constexpr float ONE_DIV_SQRT_TWO = 0.7071067811865475f;
+
 constexpr unsigned int DEFAULT_WIDTH = 1280;
 constexpr unsigned int DEFAULT_HEIGHT = 960;
 
@@ -56,17 +58,10 @@ constexpr float MAX_CAMERA_ZOOM = 255.0f;
 const float DEFAULT_CAMERA_ZOOM = std::sqrt(std::pow(MIN_CAMERA_ZOOM, 2) + std::pow(MAX_CAMERA_ZOOM, 2));
 
 constexpr unsigned int BUFFER_SIZE = 512;
-constexpr unsigned int SAMPLE_RATE = 96000;
-constexpr unsigned int BIT_DEPTH = 16;
 constexpr unsigned int CHANNELS = 1;
 
-constexpr unsigned int WAVE_SIZE = 512;
+constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 4;
 constexpr double TWOPI = 2.0f * std::numbers::pi;
-
-constexpr SDL_AudioSpec DEFAULT_SPEC = {
-	.format = SDL_AUDIO_F32,
-	.channels = CHANNELS,
-	.freq = SAMPLE_RATE};
 
 template <typename T>
 struct Vector2

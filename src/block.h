@@ -115,7 +115,7 @@ private:
 		.waveform = WAVE_SINE,
 		.wave = new float[WAVE_SIZE],
 		.crest = 1.0f,
-		.amp = 1.0f,
+		.amp = 0.5f,
 		.pan = 0.0f,
 		.freq = 440.0f,
 		.phase = 0};

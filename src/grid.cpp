@@ -546,7 +546,7 @@ void Grid::removeArea(Area *area)
 					   { return a == area; }),
 		areas_.end());
 
-	delete area;
+	// delete area; TODO: why
 }
 
 void Grid::stepSequence()

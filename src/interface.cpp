@@ -177,6 +177,8 @@ void Interface::drawGUI()
 
 	GUI::drawToolbar();
 
+	GUI::drawOutput(AudioEngine::getInstance().getOutput());
+
 	ImGui::Render();
 	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer_);
 }

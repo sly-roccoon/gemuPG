@@ -19,6 +19,7 @@ void Input::handleEvent(SDL_Event *event)
 			break;
 		}
 
+	updateKeys(event);
 	if (!ImGui::GetIO().WantTextInput)
 		switch (event->type)
 		{
@@ -148,7 +149,6 @@ void Input::handleMouse(SDL_Event *event)
 
 void Input::handleKeys(SDL_Event *event)
 {
-	updateKeys(event);
 	handleShortcuts(event);
 	handleSaveLoad(event);
 	// handleUndoRedo(event); //doesn't work for block parameter changes, no time to add :)
@@ -180,9 +180,15 @@ void Input::handleSaveLoad(SDL_Event *event)
 		if (isKeyDown(SDLK_LSHIFT) || isKeyDown(SDLK_RSHIFT))
 			save_as = true;
 		if (key.key == SDLK_S && key.type == SDL_EVENT_KEY_DOWN)
+		{
+			Interface::getInstance().stop();
 			save(save_as);
+		}
 		else if (key.key == SDLK_O && key.type == SDL_EVENT_KEY_DOWN)
+		{
+			Interface::getInstance().stop();
 			load();
+		}
 	}
 }
 
@@ -205,4 +211,7 @@ void Input::handleShortcuts(SDL_Event *event)
 
 	if (key.key == SDLK_Q && key.type == SDL_EVENT_KEY_DOWN)
 		Interface::getInstance().closeAllWindows();
+
+	if (key.key == SDLK_D && key.type == SDL_EVENT_KEY_DOWN)
+		GUI::toggleShowOutput();
 }

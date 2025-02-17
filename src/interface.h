@@ -2,6 +2,7 @@
 #include <SDL3/SDL.h>
 #include "grid.h"
 #include "camera.h"
+#include "audio.h"
 
 class Interface
 {

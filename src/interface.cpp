@@ -52,13 +52,13 @@ void Interface::destroy()
 
 bool Interface::addBlock(Vector2f pos)
 {
+	pos = floorVec(pos);
 	BlockFactory &block_factory = BlockFactory::getInstance();
 
 	if (grid_.getBlock(pos) != nullptr)
 		return false;
 
 	Block *block = block_factory.createBlock(cur_selection_, pos);
-	// grid_.removeBlock(pos); //? shouldn't be necessary, but causes area drawing over blocks if removed??
 	grid_.addBlock(block);
 
 	return true;

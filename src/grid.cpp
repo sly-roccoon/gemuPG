@@ -209,11 +209,12 @@ Block *Grid::addBlock(Block *block)
 
 	if (block->getType() == BLOCK_SEQUENCER)
 	{
+		Block *placed = nullptr;
 		for (auto area : getAdjacentAreas(block->getPos()))
 			if (area)
-				return area->addSequencer((BlockSequencer *)block);
+				placed = area->addSequencer((BlockSequencer *)block);
 
-		return nullptr;
+		return placed;
 	}
 
 	blocks_.push_back(std::move(block));
@@ -316,11 +317,11 @@ Block *Grid::getBlock(Vector2f pos)
 
 void Grid::clear()
 {
-	for (auto &area : areas_)
-		removeArea(area);
+	for (int a = areas_.size() - 1; a >= 0; a--) // cannot use ranged for because area vector gets reallocated
+		removeArea(areas_.at(a));
 
-	for (auto &block : blocks_)
-		removeBlock(block);
+	for (int b = blocks_.size() - 1; b >= 0; b--)
+		removeBlock(blocks_.at(b));
 }
 
 std::vector<Block *> Grid::getBlocks()
@@ -430,12 +431,14 @@ Area *Grid::connectAreas(Vector2f pos)
 
 	// adds new position to first found neighbour, if exists
 	if (area)
+	{
 		area->addPosition(pos);
 
-	// merges all consecutive neighbours with the first previously found neighbour
-	for (int i = first_neighbour + 1; i < 4; i++)
-		if (adjacent.at(i))
-			mergeAreas(area, adjacent.at(i));
+		// merges all consecutive neighbours with the first previously found neighbour
+		for (int i = first_neighbour + 1; i < 4; i++)
+			if (adjacent.at(i))
+				mergeAreas(area, adjacent.at(i));
+	}
 
 	return area;
 }
@@ -546,7 +549,8 @@ void Grid::removeArea(Area *area)
 					   { return a == area; }),
 		areas_.end());
 
-	// delete area; TODO: why
+	for (auto block : area->getBlocks())
+		addBlock(block);
 }
 
 void Grid::stepSequence()

@@ -5,7 +5,7 @@ void LowPassFilter::init(int sample_rate)
 {
 	fs_ = sample_rate;
 	fc_ = 10'000.0;
-	d_ = 1.0;
+	d_ = 1.0 / std::sqrt(2.0);
 
 	calculateCoefficients();
 }
@@ -54,8 +54,9 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 
 		Grid &grid = Interface::getInstance().getGrid();
 
-		for (auto block : grid.getGlobalBlocks())
+		for (int b = 0; b < grid.getGlobalBlocks().size(); b++) // cannot use ranged for loop because of possible vector reallocation
 		{
+			Block *block = grid.getGlobalBlocks().at(b);
 			if (block->getType() != BLOCK_GENERATOR)
 				continue;
 
@@ -66,9 +67,12 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 				samples[i] += new_samples[i] * audio->getAmp();
 		}
 
-		for (auto area : grid.getAreas())
-			for (auto block : area->getBlocks())
+		for (int a = 0; a < grid.getAreas().size(); a++)
+		{
+			Area *area = grid.getAreas().at(a);
+			for (int b = 0; b < area->getBlocks().size(); b++)
 			{
+				Block *block = area->getBlocks().at(b);
 				if (block->getType() != BLOCK_GENERATOR)
 					continue;
 
@@ -78,6 +82,7 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 				for (int i = 0; i < n_samples; i++)
 					samples[i] += new_samples[i] * audio->getAmp() * area->getAmp();
 			}
+		}
 
 		audio->lowPass(samples, n_samples);
 

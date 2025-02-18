@@ -137,7 +137,9 @@ void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
 
 void BlockGenerator::setFrequency(pitch_t freq)
 {
-	if (freq == last_freq_)
+	if (freq == 0.0f)
+		data_.freq = 0.0f;
+	else if (freq == last_freq_)
 		return;
 
 	last_freq_ = data_.freq;

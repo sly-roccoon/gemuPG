@@ -3,11 +3,12 @@
 
 using json = nlohmann::json;
 
+std::string SaveLoad::save_path = "";
+
 void save_dialog_callback(void *userdata, const char *const *filelist, int filter);
 void load_dialog_callback(void *userdata, const char *const *filelist, int filter);
-void saveJSON(std::string path, Grid *grid);
 
-void save(bool save_as)
+void SaveLoad::save(bool save_as)
 {
     Grid *grid = &Interface::getInstance().getGrid();
     if (save_as || save_path.empty())
@@ -21,14 +22,14 @@ void save(bool save_as)
     }
 }
 
-void load()
+void SaveLoad::load()
 {
     Grid *grid = &Interface::getInstance().getGrid();
     SDL_Window *window = Interface::getInstance().getWindow();
     SDL_ShowOpenFileDialog(load_dialog_callback, (void *)grid, window, &save_filter, 1, NULL, false);
 }
 
-void saveJSON(std::string path, Grid *grid)
+void SaveLoad::saveJSON(std::string path, Grid *grid)
 {
     std::string file_ext = save_filter.pattern;
     if (path.length() < file_ext.length() || path.substr(path.length() - file_ext.length()) != file_ext)
@@ -86,6 +87,8 @@ void saveJSON(std::string path, Grid *grid)
         json area_json;
         area_json["positions"] = json::array();
         area_json["bpm_subdivision"] = area->getBPMSubdivision();
+        area_json["gliss_percent"] = area->getGlissPercent();
+        area_json["attack_percent"] = area->getAttackPercent();
         for (auto &pos : area->getPositions())
             area_json["positions"].push_back({pos.x, pos.y});
 
@@ -96,7 +99,7 @@ void saveJSON(std::string path, Grid *grid)
     file.close();
 }
 
-void loadJSON(std::string path, Grid *grid)
+void SaveLoad::loadJSON(std::string path, Grid *grid)
 {
     std::ifstream file(path, std::ios::in);
     if (!file.is_open())
@@ -113,11 +116,15 @@ void loadJSON(std::string path, Grid *grid)
 
     for (auto &area_json : j["areas"])
     {
+        Area *area;
         for (auto &pos_json : area_json["positions"])
         {
             Vector2f pos = {pos_json[0], pos_json[1]};
-            grid->addArea(pos)->setBPMSubdivision(area_json["bpm_subdivision"]);
+            area = grid->addArea(pos);
         }
+        area->setBPMSubdivision(area_json["bpm_subdivision"]);
+        area->setGlissPercent(area_json["gliss_percent"]);
+        area->setAttackPercent(area_json["attack_percent"]);
     }
 
     for (auto &sequencer_json : j["sequencers"])
@@ -155,7 +162,7 @@ void save_dialog_callback(void *userdata, const char *const *filelist, int filte
     std::string path = filelist[0];
 
     if (!path.empty())
-        saveJSON(path, grid);
+        SaveLoad::saveJSON(path, grid);
 }
 
 void load_dialog_callback(void *userdata, const char *const *filelist, int filter)
@@ -166,5 +173,5 @@ void load_dialog_callback(void *userdata, const char *const *filelist, int filte
     Grid *grid = (Grid *)userdata;
     std::string path = filelist[0];
 
-    loadJSON(path, grid);
+    SaveLoad::loadJSON(path, grid);
 }

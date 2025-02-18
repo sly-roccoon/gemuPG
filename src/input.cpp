@@ -19,12 +19,12 @@ void Input::handleEvent(SDL_Event *event)
 			break;
 		}
 
-	updateKeys(event);
 	if (!ImGui::GetIO().WantTextInput)
 		switch (event->type)
 		{
 		case SDL_EVENT_KEY_DOWN:
 		case SDL_EVENT_KEY_UP:
+			updateKeys(event);
 			handleKeys(event);
 			break;
 		case SDL_EVENT_WINDOW_FOCUS_LOST:
@@ -95,9 +95,11 @@ void Input::handleCamPan(SDL_Event *event)
 void Input::handlePlacement(SDL_Event *event)
 {
 	SDL_MouseButtonEvent button = event->button;
-	Vector2f mouse_pos = {button.x, button.y};
+	static Vector2f mouse_pos;
+	static Vector2f world_pos;
+	mouse_pos = {button.x, button.y};
+	world_pos = Camera::screenToWorld(mouse_pos);
 	Grid &grid = Interface::getInstance().getGrid();
-	Vector2f world_pos = Camera::screenToWorld(mouse_pos);
 	std::unique_ptr<Command> cmd;
 	block_type_t cur_selection = Interface::getInstance().getSelection();
 
@@ -182,12 +184,17 @@ void Input::handleSaveLoad(SDL_Event *event)
 		if (key.key == SDLK_S && key.type == SDL_EVENT_KEY_DOWN)
 		{
 			Interface::getInstance().stop();
-			save(save_as);
+			SaveLoad::save(save_as);
 		}
 		else if (key.key == SDLK_O && key.type == SDL_EVENT_KEY_DOWN)
 		{
 			Interface::getInstance().stop();
-			load();
+			SaveLoad::load();
+		}
+		else if (key.key == SDLK_N && key.type == SDL_EVENT_KEY_DOWN)
+		{
+			Interface::getInstance().getGrid().clear();
+			SaveLoad::clearPath();
 		}
 	}
 }

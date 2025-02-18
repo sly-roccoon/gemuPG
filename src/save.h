@@ -6,8 +6,17 @@
 
 #include "interface.h"
 
-static std::string save_path;
-constexpr SDL_DialogFileFilter save_filter = {"gemuPG grid file (*.gemupg)", "gemupg"};
+class SaveLoad
+{
+public:
+    static void clearPath() { save_path = ""; }
+    static void save(bool save_as);
+    static void load();
 
-void save(bool save_as);
-void load();
+    static void saveJSON(std::string path, Grid *grid);
+    static void loadJSON(std::string path, Grid *grid);
+
+private:
+    static std::string save_path;
+    static const inline SDL_DialogFileFilter save_filter = {"gemuPG grid file (*.gemupg)", "gemupg"};
+};

@@ -12,8 +12,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
 	SDL_SetAppMetadata("GemuPG", "0.1.0", "Poly* Audio Software");
 
-	printf("SDL_PerformanceCounter Frequency: %d\n", SDL_GetPerformanceFrequency());
-
 	Interface &interface = Interface::getInstance();
 	Input &input = Input::getInstance();
 	AudioEngine &audio = AudioEngine::getInstance();

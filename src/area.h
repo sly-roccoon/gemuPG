@@ -42,6 +42,20 @@ public:
     void updateGlissando(BlockGenerator *block = nullptr);
     void updateAttack(BlockGenerator *block = nullptr);
 
+    float getGlissPercent() { return gliss_percent_; }
+    void setGlissPercent(float gliss_percent)
+    {
+        gliss_percent_ = gliss_percent;
+        updateGlissando();
+    }
+
+    float getAttackPercent() { return attack_percent_; }
+    void setAttackPercent(float attack_percent)
+    {
+        attack_percent_ = attack_percent;
+        updateAttack();
+    }
+
 private:
     Vector2f getTopLeft();
     void removeDanglingSequencers();

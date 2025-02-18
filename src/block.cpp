@@ -78,7 +78,7 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 			}
 
 			double amp = block->getAmp();
-			float idx = block->getPhase() * WAVE_SIZE;
+			double idx = block->getPhase() * WAVE_SIZE;
 
 			if (block->getBypass())
 				samples[i] = 0.0f;

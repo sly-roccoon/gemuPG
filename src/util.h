@@ -97,4 +97,4 @@ pitch_t intervalToRatio(float interval, float octave_subdivision);
 
 SDL_Color invertColor(SDL_Color);
 
-float interpTable(std::array<float, WAVE_SIZE> array, float idx);
+double interpTable(std::array<float, WAVE_SIZE> array, double idx);

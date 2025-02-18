@@ -155,23 +155,20 @@ void SaveLoad::loadJSON(std::string path, Grid *grid)
 
 void save_dialog_callback(void *userdata, const char *const *filelist, int filter)
 {
-    if (filelist == NULL)
+    if (filelist == NULL || !filelist[0])
         return;
 
     Grid *grid = (Grid *)userdata;
     std::string path = filelist[0];
-
-    if (!path.empty())
-        SaveLoad::saveJSON(path, grid);
+    SaveLoad::saveJSON(path, grid);
 }
 
 void load_dialog_callback(void *userdata, const char *const *filelist, int filter)
 {
-    if (filelist == NULL)
+    if (filelist == NULL || !filelist[0])
         return;
 
     Grid *grid = (Grid *)userdata;
     std::string path = filelist[0];
-
     SaveLoad::loadJSON(path, grid);
 }

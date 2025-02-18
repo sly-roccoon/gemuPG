@@ -396,8 +396,8 @@ void Grid::mergeAreas(Area *into, Area *from)
 	into->addPositions(from->getPositions());
 	for (auto &block : from->getBlocks())
 	{
-		into->addBlock(block);
 		from->removeBlock(block);
+		into->addBlock(block);
 	}
 
 	for (auto &sequencer : from->getSequence())

@@ -6,7 +6,7 @@ Vector2f floorVec(Vector2f vec)
   return {floorf(vec.x), floorf(vec.y)};
 }
 
-float calcCrest(float *wave)
+float calcCrest(std::array<float, WAVE_SIZE> wave)
 {
   float crest = 0.0f;
   float peak = 0.0f;
@@ -91,7 +91,7 @@ SDL_Color invertColor(SDL_Color color)
   return {(Uint8)(255 - color.r), (Uint8)(255 - color.g), (Uint8)(255 - color.b), color.a};
 }
 
-float interpTable(float *array, float idx)
+float interpTable(std::array<float, WAVE_SIZE> array, float idx)
 {
   int lower = std::floor(idx);
   int upper = std::ceil(idx);

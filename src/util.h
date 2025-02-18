@@ -60,7 +60,7 @@ const float DEFAULT_CAMERA_ZOOM = std::sqrt(std::pow(MIN_CAMERA_ZOOM, 2) + std::
 constexpr unsigned int BUFFER_SIZE = 512;
 constexpr unsigned int CHANNELS = 1;
 
-constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 4;
+constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 32;
 constexpr double TWOPI = 2.0f * std::numbers::pi;
 
 template <typename T>
@@ -85,7 +85,7 @@ using Vector2i = Vector2<int>;
 
 Vector2f floorVec(Vector2f vec);
 
-float calcCrest(float *wave);
+float calcCrest(std::array<float, WAVE_SIZE> wave);
 
 ImVec4 toImVec4(SDL_Color color);
 
@@ -97,4 +97,4 @@ pitch_t intervalToRatio(float interval, float octave_subdivision);
 
 SDL_Color invertColor(SDL_Color);
 
-float interpTable(float *, float);
+float interpTable(std::array<float, WAVE_SIZE> array, float idx);

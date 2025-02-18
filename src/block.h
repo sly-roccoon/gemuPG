@@ -63,7 +63,7 @@ typedef enum
 typedef struct generator_data_t
 {
 	WAVE_FORMS waveform;
-	float *wave;
+	std::array<float, WAVE_SIZE> wave;
 	float crest;
 	float amp;
 	float pan;
@@ -92,9 +92,10 @@ public:
 	void setFrequency(pitch_t freq);
 	double getFrequency();
 
-	void incrPhase()
+	double getPhase()
 	{
 		data_.phase = fmod(data_.phase + (getFrequency() / fs_), 1.0f);
+		return data_.phase;
 	}
 
 	void setWave(WAVE_FORMS waveform, float *wave = nullptr);
@@ -119,7 +120,7 @@ private:
 	SDL_AudioStream *stream_;
 	generator_data_t data_ = {
 		.waveform = WAVE_SINE,
-		.wave = new float[WAVE_SIZE],
+		.wave = {},
 		.crest = 1.0f,
 		.amp = 0.5f,
 		.pan = 0.0f,
@@ -158,7 +159,7 @@ public:
 	void setPitchType(pitch_type_t pitch_type) { pitch_type_ = pitch_type; }
 	pitch_type_t getPitchType() { return pitch_type_; }
 
-	void addArea(Area *area) { areas_.push_back(area); }
+	void addArea(Area *area);
 	void removeArea(Area *area);
 
 	std::pair<float, float> getInterval() { return {interval_, octave_subdivision_}; }

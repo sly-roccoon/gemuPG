@@ -52,7 +52,6 @@ BlockGenerator::BlockGenerator(Vector2f pos, double phase) : Block(pos)
 
 BlockGenerator::~BlockGenerator()
 {
-	SDL_free(data_.wave);
 	SDL_DestroyAudioStream(stream_);
 }
 
@@ -68,12 +67,18 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 		float samples[BUFFER_SIZE] = {};
 		const int total = SDL_min(additional_amount, BUFFER_SIZE);
 		int i;
-		float *wave = block->getData()->wave;
+		std::array<float, WAVE_SIZE> &wave = block->getData()->wave;
 
 		for (i = 0; i < total; i++)
 		{
+			if (block->getFrequency() == 0.0f)
+			{
+				block->getPhase();
+				continue;
+			}
+
 			double amp = block->getAmp();
-			float idx = block->getData()->phase * WAVE_SIZE;
+			float idx = block->getPhase() * WAVE_SIZE;
 
 			if (block->getBypass())
 				samples[i] = 0.0f;
@@ -83,8 +88,6 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 				if (ADJUST_AMP_BY_CREST)
 					samples[i] *= block->getData()->crest * ONE_DIV_SQRT_THREE; // TODO: find better way as to not go over +-1.0f
 			}
-
-			block->incrPhase();
 		}
 
 		SDL_PutAudioStreamData(stream, samples, total * sizeof(float));
@@ -98,8 +101,8 @@ void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
 
 	if (waveform == WAVE_SAMPLE)
 	{
-		if (wave)
-			data_.wave = wave;
+		// if (wave)
+		// 	data_.wave = wave;
 	}
 	else if (waveform == WAVE_SAW)
 	{
@@ -221,7 +224,7 @@ void BlockGenerator::drawGUI()
 		ImGui::EndCombo();
 	}
 
-	ImGui::PlotLines("##waveform", data_.wave, WAVE_SIZE, 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));
+	ImGui::PlotLines("##waveform", data_.wave.data(), data_.wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));
 
 	ImGui::End();
 }
@@ -347,6 +350,12 @@ void BlockSequencer::drawGUI()
 	}
 
 	ImGui::End();
+}
+
+void BlockSequencer::addArea(Area *area)
+{
+	if (std::find(areas_.begin(), areas_.end(), area) == areas_.end())
+		areas_.push_back(area);
 }
 
 void BlockSequencer::removeArea(Area *area)

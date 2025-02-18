@@ -4,6 +4,7 @@
 
 void Input::handleEvent(SDL_Event *event)
 {
+	updateKeys(event);
 	ImGui_ImplSDL3_ProcessEvent(event);
 
 	if (!ImGui::GetIO().WantCaptureMouse)
@@ -24,7 +25,6 @@ void Input::handleEvent(SDL_Event *event)
 		{
 		case SDL_EVENT_KEY_DOWN:
 		case SDL_EVENT_KEY_UP:
-			updateKeys(event);
 			handleKeys(event);
 			break;
 		case SDL_EVENT_WINDOW_FOCUS_LOST:

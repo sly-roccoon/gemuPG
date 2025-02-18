@@ -511,8 +511,6 @@ void Grid::splitAreas(Area *area) // TODO: this is probably terrible
 			Block *block = area->getBlock(pos);
 			area->removePosition(pos);
 			new_area->addPosition(pos);
-			if (block)
-				new_area->addBlock(block);
 		}
 		for (auto sequencer : area->getSequence())
 		{

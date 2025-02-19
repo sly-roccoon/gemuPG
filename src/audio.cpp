@@ -4,7 +4,7 @@
 void LowPassFilter::init(int sample_rate)
 {
 	fs_ = sample_rate;
-	fc_ = 10'000.0;
+	fc_ = 20'000.0;
 	d_ = 1.0 / std::sqrt(2.0);
 
 	calculateCoefficients();
@@ -128,6 +128,8 @@ AudioEngine::AudioEngine()
 		exit(SDL_APP_FAILURE);
 	}
 
+	initWaveTables();
+
 	SDL_ResumeAudioStreamDevice(stream_);
 }
 
@@ -136,3 +138,55 @@ void AudioEngine::destroy()
 	SDL_DestroyAudioStream(stream_);
 	SDL_CloseAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK);
 }
+
+void AudioEngine::initWaveTables()
+{
+	for (int harmonic = 0; harmonic <= MAX_HARMONIC; harmonic++)
+	{
+		wavetables_[{WAVE_SINE, harmonic}] = {0.0f};
+		wavetables_[{WAVE_SAW, harmonic}] = {0.0f};
+		wavetables_[{WAVE_TRIANGLE, harmonic}] = {0.0f};
+		wavetables_[{WAVE_SQUARE, harmonic}] = {0.0f};
+	}
+
+	constexpr double PI = std::numbers::pi;
+	constexpr double TWO_PI = 2.0 * PI;
+	constexpr double INV_PI = 1.0 / PI;
+	constexpr double INV_PI_SQ = 1.0 / (PI * PI);
+
+	for (int i = 0; i < WAVE_SIZE; i++)
+	{
+		long double phase = TWO_PI * i / WAVE_SIZE;
+
+		for (int harmonic = 1; harmonic <= MAX_HARMONIC; harmonic++)
+		{
+			// SINE
+			wavetables_.at({WAVE_SINE, harmonic}).at(i) = sinf(phase);
+
+			// SAW
+			float prev = wavetables_.at({WAVE_SAW, harmonic - 1}).at(i);
+			wavetables_.at({WAVE_SAW, harmonic}).at(i) = prev - (2.0 * INV_PI) * ((-1) + 2 * (harmonic % 2)) * sin(harmonic * phase) / harmonic;
+
+			// TRIANGLE
+			prev = wavetables_.at({WAVE_TRIANGLE, harmonic - 1}).at(i);
+			wavetables_.at({WAVE_TRIANGLE, harmonic}).at(i) = prev + -8.0 * INV_PI_SQ * ((-1) + 2 * (harmonic % 2)) * sin((2 * harmonic - 1) * phase) / std::pow(2 * harmonic - 1, 2);
+		}
+
+		for (int harmonic = 1; harmonic <= MAX_HARMONIC; harmonic++)
+		{
+			float prev = wavetables_.at({WAVE_SQUARE, harmonic - 1}).at(i);
+			wavetables_.at({WAVE_SQUARE, harmonic}).at(i) = prev + 4.0 * INV_PI * sin((2 * harmonic - 1) * phase) / (2 * harmonic - 1);
+		}
+	}
+}
+
+std::array<float, WAVE_SIZE> *AudioEngine::getWaveTable(WAVE_FORMS form, pitch_t freq)
+{
+	int n_harmonics = floor(spec_.freq / (2.0 * freq));
+	n_harmonics = std::clamp(n_harmonics, 1, MAX_HARMONIC);
+
+	return &wavetables_.at({form, n_harmonics});
+}
+
+SDL_AudioSpec AudioEngine::spec_ = {};
+std::map<std::pair<WAVE_FORMS, int>, std::array<float, WAVE_SIZE>> AudioEngine::wavetables_ = {};

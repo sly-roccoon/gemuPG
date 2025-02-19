@@ -79,7 +79,7 @@ void drawGenerator(SDL_Renderer *renderer, BlockGenerator *block)
 	else
 		type_text = std::format("{:.2f} Hz", block->getFrequency());
 
-	switch (block->getWave())
+	switch (block->getWaveForm())
 	{
 	case WAVE_SINE:
 		value_text = "SINE";

@@ -1,8 +1,10 @@
 #pragma once
 #include <SDL3/SDL.h>
 #include <cmath>
+#include <map>
 #include <numbers>
 #include "interface.h"
+#include "util.h"
 
 constexpr int n_filters = 4;
 
@@ -48,18 +50,22 @@ public:
 	void setOutput(const float *, const int n);
 
 	SDL_AudioSpec *getSpec() { return &spec_; }
+	static std::array<float, WAVE_SIZE> *getWaveTable(WAVE_FORMS wave, pitch_t freq);
+	static void initWaveTables();
 
 private:
 	SDL_AudioStream *stream_;
-	SDL_AudioSpec spec_;
+	static SDL_AudioSpec spec_;
 
 	AudioEngine();
 	AudioEngine(const AudioEngine &) = delete;
 	AudioEngine &operator=(const AudioEngine &) = delete;
+
 	float volume_ = 0.5f;
 	std::array<LowPassFilter, n_filters> filters_;
 
 	float output_[BUFFER_SIZE] = {};
+	static std::map<std::pair<WAVE_FORMS, int>, std::array<float, WAVE_SIZE>> wavetables_; // waveforms_[{WAVE_FORM,n_harmonics}][idx]
 };
 
 void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);

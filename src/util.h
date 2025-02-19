@@ -29,6 +29,15 @@ using pitch_t = float;
 
 typedef enum
 {
+	WAVE_SAMPLE,
+	WAVE_SAW,
+	WAVE_SINE,
+	WAVE_SQUARE,
+	WAVE_TRIANGLE
+} WAVE_FORMS;
+
+typedef enum
+{
 	PITCH_REL_FREQUENCY,
 	PITCH_ABS_FREQUENCY,
 	PITCH_INTERVAL,
@@ -60,8 +69,8 @@ const float DEFAULT_CAMERA_ZOOM = std::sqrt(std::pow(MIN_CAMERA_ZOOM, 2) + std::
 constexpr unsigned int BUFFER_SIZE = 512;
 constexpr unsigned int CHANNELS = 1;
 
-constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 32;
-constexpr double TWOPI = 2.0f * std::numbers::pi;
+constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 4;
+constexpr int MAX_HARMONIC = 32;
 
 template <typename T>
 struct Vector2
@@ -97,4 +106,4 @@ pitch_t intervalToRatio(float interval, float octave_subdivision);
 
 SDL_Color invertColor(SDL_Color);
 
-double interpTable(std::array<float, WAVE_SIZE> array, double idx);
+double interpTable(std::array<float, WAVE_SIZE> *array, double idx);

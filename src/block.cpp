@@ -67,11 +67,12 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 		float samples[BUFFER_SIZE] = {};
 		const int total = SDL_min(additional_amount, BUFFER_SIZE);
 		int i;
-		std::array<float, WAVE_SIZE> &wave = block->getData()->wave;
+		double freq = block->getFrequency();
+		std::array<float, WAVE_SIZE> *wave = AudioEngine::getWaveTable(block->getWaveForm(), freq);
 
 		for (i = 0; i < total; i++)
 		{
-			if (block->getFrequency() == 0.0f)
+			if (freq == 0.0f)
 			{
 				block->getPhase();
 				continue;
@@ -99,27 +100,32 @@ void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
 {
 	data_.waveform = waveform;
 
+	constexpr double PI = std::numbers::pi;
+	constexpr double TWOPI = 2 * PI;
+
 	if (waveform == WAVE_SAMPLE)
 	{
 		// if (wave)
 		// 	data_.wave = wave;
 	}
-	else if (waveform == WAVE_SAW)
-	{
-		for (int i = 0; i < WAVE_SIZE; i++)
-			data_.wave[i] = 1.0f - (2.0f * i / WAVE_SIZE);
-	}
 
 	else if (waveform == WAVE_SINE)
 	{
+		data_.disp_wave = {};
 		for (int i = 0; i < WAVE_SIZE; i++)
-			data_.wave[i] = sinf(TWOPI * i / WAVE_SIZE);
+			data_.disp_wave.at(i) = sinf(TWOPI * i / WAVE_SIZE);
+	}
+
+	else if (waveform == WAVE_SAW)
+	{
+		for (int i = 0; i < WAVE_SIZE; i++)
+			data_.disp_wave[i] = 1.0f - (2.0f * i / WAVE_SIZE);
 	}
 
 	else if (waveform == WAVE_SQUARE)
 	{
 		for (int i = 0; i < WAVE_SIZE; i++)
-			data_.wave[i] = (i < WAVE_SIZE / 2) ? 1.0f : -1.0f;
+			data_.disp_wave[i] = (i < WAVE_SIZE / 2) ? 1.0f : -1.0f;
 	}
 
 	else if (waveform == WAVE_TRIANGLE)
@@ -127,15 +133,15 @@ void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
 		for (int i = 0; i < WAVE_SIZE; i++)
 		{
 			if (i < WAVE_SIZE / 4)
-				data_.wave[i] = 4.0f * i / WAVE_SIZE;
+				data_.disp_wave[i] = 4.0f * i / WAVE_SIZE;
 			else if (i < 3 * WAVE_SIZE / 4)
-				data_.wave[i] = 2.0f - 4.0f * i / WAVE_SIZE;
+				data_.disp_wave[i] = 2.0f - 4.0f * i / WAVE_SIZE;
 			else
-				data_.wave[i] = -4.0f + 4.0f * i / WAVE_SIZE;
+				data_.disp_wave[i] = -4.0f + 4.0f * i / WAVE_SIZE;
 		}
 	}
 
-	data_.crest = calcCrest(data_.wave);
+	data_.crest = calcCrest(data_.disp_wave);
 }
 
 void BlockGenerator::setFrequency(pitch_t freq)
@@ -224,7 +230,7 @@ void BlockGenerator::drawGUI()
 		ImGui::EndCombo();
 	}
 
-	ImGui::PlotLines("##waveform", data_.wave.data(), data_.wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));
+	ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));
 
 	ImGui::End();
 }

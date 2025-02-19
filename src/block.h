@@ -51,19 +51,10 @@ protected:
 	Vector2f value_text_size_ = {0.0f, 0.0f};
 };
 
-typedef enum
-{
-	WAVE_SAMPLE,
-	WAVE_SAW,
-	WAVE_SINE,
-	WAVE_SQUARE,
-	WAVE_TRIANGLE
-} WAVE_FORMS;
-
 typedef struct generator_data_t
 {
 	WAVE_FORMS waveform;
-	std::array<float, WAVE_SIZE> wave;
+	std::array<float, WAVE_SIZE> disp_wave;
 	float crest;
 	float amp;
 	float pan;
@@ -94,12 +85,12 @@ public:
 
 	double getPhase()
 	{
-		data_.phase = fmod(data_.phase + (getFrequency() / fs_), 1.0f);
+		data_.phase = SDL_fmod(data_.phase + (getFrequency() / fs_), 1.0f);
 		return data_.phase;
 	}
 
 	void setWave(WAVE_FORMS waveform, float *wave = nullptr);
-	WAVE_FORMS getWave() { return data_.waveform; }
+	WAVE_FORMS getWaveForm() { return data_.waveform; }
 
 	double getAmp();
 	void setAmp(double amp) { data_.amp = amp; }
@@ -120,13 +111,12 @@ private:
 	SDL_AudioStream *stream_;
 	generator_data_t data_ = {
 		.waveform = WAVE_SINE,
-		.wave = {},
+		.disp_wave = {},
 		.crest = 1.0f,
 		.amp = 0.5f,
 		.pan = 0.0f,
 		.freq = 440.0f,
 		.phase = 0};
-
 	int fs_;
 	Uint64 last_note_change_ = 0;
 	double gliss_freq_ = -1.0f;

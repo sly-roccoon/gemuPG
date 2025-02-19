@@ -57,7 +57,7 @@ void SaveLoad::saveJSON(std::string path, Grid *grid)
         case BLOCK_GENERATOR:
         {
             BlockGenerator *generator = (BlockGenerator *)block;
-            block_json["waveform"] = generator->getWave();
+            block_json["waveform"] = generator->getWaveForm();
             block_json["amp"] = generator->getAmp();
             block_json["freq"] = generator->getFrequency();
             block_json["rel_freq"] = generator->getRelFreq();

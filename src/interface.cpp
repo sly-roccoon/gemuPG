@@ -17,6 +17,7 @@ Interface::Interface() : camera_{Camera::getInstance()}
 
 	Text::init(renderer_);
 
+	global_window = window_;
 	SDL_SetWindowResizable(window_, true);
 }
 

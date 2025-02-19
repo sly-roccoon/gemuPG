@@ -4,6 +4,7 @@
 #include <SDL3/SDL.h>
 #include "util.h"
 #include "camera.h"
+#include "sample.h"
 
 class Area;
 
@@ -89,8 +90,9 @@ public:
 		return data_.phase;
 	}
 
-	void setWave(WAVE_FORMS waveform, float *wave = nullptr);
+	void setWave(WAVE_FORMS waveform);
 	WAVE_FORMS getWaveForm() { return data_.waveform; }
+	std::vector<float> getSample() { return sample_.getWave(); }
 
 	double getAmp();
 	void setAmp(double amp) { data_.amp = amp; }
@@ -127,6 +129,8 @@ private:
 
 	pitch_t rel_freq_ = 0.0f;
 	float freq_factor_ = 1.0f;
+
+	Sample sample_ = {};
 
 	static void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
 };

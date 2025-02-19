@@ -68,7 +68,14 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 		const int total = SDL_min(additional_amount, BUFFER_SIZE);
 		int i;
 		double freq = block->getFrequency();
-		std::array<float, WAVE_SIZE> *wave = AudioEngine::getWaveTable(block->getWaveForm(), freq);
+
+		std::array<float, WAVE_SIZE> *simple_wave;
+		std::vector<float> sample;
+
+		if (block->getWaveForm() != WAVE_SAMPLE)
+			simple_wave = AudioEngine::getWaveTable(block->getWaveForm(), freq);
+		else
+			sample = block->getSample();
 
 		for (i = 0; i < total; i++)
 		{
@@ -77,17 +84,25 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 				block->getPhase();
 				continue;
 			}
-
 			double amp = block->getAmp();
-			double idx = block->getPhase() * WAVE_SIZE;
-
 			if (block->getBypass())
 				samples[i] = 0.0f;
-			else
+
+			if (block->getWaveForm() != WAVE_SAMPLE)
 			{
-				samples[i] = amp * interpTable(wave, idx);
+				double idx = block->getPhase() * WAVE_SIZE;
+
+				samples[i] = amp * interpTable(simple_wave, idx);
 				if (ADJUST_AMP_BY_CREST)
 					samples[i] *= block->getData()->crest * ONE_DIV_SQRT_THREE; // TODO: find better way as to not go over +-1.0f
+			}
+			else
+			{
+				double idx = block->getPhase() * sample.size();
+				if (!sample.empty())
+					samples[i] = amp * sample.at(idx);
+				else
+					samples[i] = 0.0f;
 			}
 		}
 
@@ -96,7 +111,7 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 	}
 }
 
-void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
+void BlockGenerator::setWave(WAVE_FORMS waveform)
 {
 	data_.waveform = waveform;
 
@@ -105,8 +120,7 @@ void BlockGenerator::setWave(WAVE_FORMS waveform, float *wave)
 
 	if (waveform == WAVE_SAMPLE)
 	{
-		// if (wave)
-		// 	data_.wave = wave;
+		data_.disp_wave = sample_.getDispWave();
 	}
 
 	else if (waveform == WAVE_SINE)
@@ -217,8 +231,8 @@ void BlockGenerator::drawGUI()
 
 	if (ImGui::BeginCombo("waveform", preview))
 	{
-		// if (ImGui::Selectable("Sample"))
-		// 	setWave(WAVE_SAMPLE); //TODO: implement sample loading
+		if (ImGui::Selectable("sample"))
+			setWave(WAVE_SAMPLE); // TODO: implement sample loading
 		if (ImGui::Selectable("saw"))
 			setWave(WAVE_SAW);
 		if (ImGui::Selectable("sine"))
@@ -228,6 +242,19 @@ void BlockGenerator::drawGUI()
 		if (ImGui::Selectable("triangle"))
 			setWave(WAVE_TRIANGLE);
 		ImGui::EndCombo();
+	}
+
+	if (data_.waveform == WAVE_SAMPLE)
+	{
+		if (ImGui::Button("load sample"))
+		{
+			sample_.open();
+			data_.disp_wave = sample_.getDispWave();
+		}
+
+		pitch_t root = sample_.getRoot();
+		if (ImGui::SliderFloat("sample root frequency", &root, 20.0f, 20'000.0f, "%.2f", ImGuiSliderFlags_Logarithmic))
+			sample_.setRoot(root);
 	}
 
 	ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));

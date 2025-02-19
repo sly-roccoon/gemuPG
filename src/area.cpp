@@ -341,9 +341,9 @@ void Area::drawGUI()
 
 	ImGui::DragFloat("amplitude", &amp_, 0.001f, 0.0f, 1.0f, "% .3f", ImGuiSliderFlags_Logarithmic);
 
-	if (ImGui::SliderFloat("glissando", &gliss_percent_, 0.0f, 100.0f, "%.1f%%", ImGuiSliderFlags_AlwaysClamp))
+	if (ImGui::SliderFloat("glissando", &gliss_percent_, 0.0f, 100.0f, "%.1f %%", ImGuiSliderFlags_AlwaysClamp))
 		updateGlissando();
-	if (ImGui::SliderFloat("attack", &attack_percent_, 0.0f, 100.0f, "%.1f%%", ImGuiSliderFlags_AlwaysClamp))
+	if (ImGui::SliderFloat("attack", &attack_percent_, 0.0f, 100.0f, "%.1f %%", ImGuiSliderFlags_AlwaysClamp))
 		updateAttack();
 
 	ImGui::End();

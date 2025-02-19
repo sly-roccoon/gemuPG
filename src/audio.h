@@ -46,6 +46,8 @@ public:
 			filter.process(samples, n_samples);
 	}
 
+	float getSampleRate() { return spec_.freq; }
+
 	float *getOutput() { return output_; }
 	void setOutput(const float *, const int n);
 

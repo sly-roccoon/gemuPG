@@ -81,6 +81,9 @@ void drawGenerator(SDL_Renderer *renderer, BlockGenerator *block)
 
 	switch (block->getWaveForm())
 	{
+	case WAVE_SAMPLE:
+		value_text = "SAMPLE";
+		break;
 	case WAVE_SINE:
 		value_text = "SINE";
 		break;

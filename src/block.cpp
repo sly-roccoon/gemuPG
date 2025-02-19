@@ -55,6 +55,16 @@ BlockGenerator::~BlockGenerator()
 	SDL_DestroyAudioStream(stream_);
 }
 
+double BlockGenerator::getPhase()
+{
+	if (getWaveForm() != WAVE_SAMPLE || sample_.getSize() == 0)
+		data_.phase = SDL_fmod(data_.phase + (getFrequency() / fs_), 1.0f);
+	else
+		data_.phase = SDL_fmod(data_.phase + (getFrequency() / sample_.getRoot() / (fs_)), 1.0);
+
+	return data_.phase;
+}
+
 void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
 {
 	BlockGenerator *block = (BlockGenerator *)userdata;
@@ -70,12 +80,10 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 		double freq = block->getFrequency();
 
 		std::array<float, WAVE_SIZE> *simple_wave;
-		std::vector<float> sample;
+		Sample *sample = block->getSample();
 
 		if (block->getWaveForm() != WAVE_SAMPLE)
 			simple_wave = AudioEngine::getWaveTable(block->getWaveForm(), freq);
-		else
-			sample = block->getSample();
 
 		for (i = 0; i < total; i++)
 		{
@@ -84,23 +92,30 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 				block->getPhase();
 				continue;
 			}
-			double amp = block->getAmp();
 			if (block->getBypass())
+			{
 				samples[i] = 0.0f;
+				continue;
+			}
+
+			double amp = block->getAmp();
 
 			if (block->getWaveForm() != WAVE_SAMPLE)
 			{
-				double idx = block->getPhase() * WAVE_SIZE;
+				double idx = block->getPhase() * (WAVE_SIZE - 1);
 
-				samples[i] = amp * interpTable(simple_wave, idx);
+				samples[i] = amp * interpTable(simple_wave->data(), WAVE_SIZE, idx);
 				if (ADJUST_AMP_BY_CREST)
 					samples[i] *= block->getData()->crest * ONE_DIV_SQRT_THREE; // TODO: find better way as to not go over +-1.0f
 			}
 			else
 			{
-				double idx = block->getPhase() * sample.size();
-				if (!sample.empty())
-					samples[i] = amp * sample.at(idx);
+				double idx = block->getPhase() * (sample->getSize() - 1);
+
+				if (sample->getSize() != 0)
+				{
+					samples[i] = amp * interpTable(sample->getWave(), sample->getSize(), idx);
+				}
 				else
 					samples[i] = 0.0f;
 			}
@@ -120,7 +135,7 @@ void BlockGenerator::setWave(WAVE_FORMS waveform)
 
 	if (waveform == WAVE_SAMPLE)
 	{
-		data_.disp_wave = sample_.getDispWave();
+		data_.disp_wave = *sample_.getDispWave();
 	}
 
 	else if (waveform == WAVE_SINE)
@@ -249,12 +264,13 @@ void BlockGenerator::drawGUI()
 		if (ImGui::Button("load sample"))
 		{
 			sample_.open();
-			data_.disp_wave = sample_.getDispWave();
+			data_.disp_wave = *sample_.getDispWave();
 		}
 
 		pitch_t root = sample_.getRoot();
 		if (ImGui::SliderFloat("sample root frequency", &root, 20.0f, 20'000.0f, "%.2f", ImGuiSliderFlags_Logarithmic))
-			sample_.setRoot(root);
+			if (root > 0)
+				sample_.setRoot(root);
 	}
 
 	ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));

@@ -84,15 +84,11 @@ public:
 	void setFrequency(pitch_t freq);
 	double getFrequency();
 
-	double getPhase()
-	{
-		data_.phase = SDL_fmod(data_.phase + (getFrequency() / fs_), 1.0f);
-		return data_.phase;
-	}
+	double getPhase();
 
 	void setWave(WAVE_FORMS waveform);
 	WAVE_FORMS getWaveForm() { return data_.waveform; }
-	std::vector<float> getSample() { return sample_.getWave(); }
+	Sample *getSample() { return &sample_; }
 
 	double getAmp();
 	void setAmp(double amp) { data_.amp = amp; }

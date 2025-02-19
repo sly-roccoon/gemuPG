@@ -536,7 +536,6 @@ bool Grid::removeArea(Vector2f pos)
 		return false;
 
 	area->removePosition(pos);
-	addBlock(area->getBlock(pos));
 	splitAreas(area);
 
 	return true;

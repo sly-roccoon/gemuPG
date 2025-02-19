@@ -43,8 +43,8 @@ constexpr unsigned int CHANNELS = 1;
 constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 4;
 constexpr int MAX_HARMONIC = 32;
 
-constexpr long long int AUDIO_S16_PEAK = 65536;
-constexpr long long int AUDIO_S32_PEAK = 4294967296;
+constexpr long long int AUDIO_S16_PEAK = 65536 / 2;
+constexpr long long int AUDIO_S32_PEAK = 4294967296 / 2;
 
 using pitch_t = float;
 
@@ -109,6 +109,6 @@ pitch_t intervalToRatio(float interval, float octave_subdivision);
 
 SDL_Color invertColor(SDL_Color);
 
-double interpTable(std::array<float, WAVE_SIZE> *array, double idx);
+double interpTable(float *array, size_t size, double idx);
 
 extern SDL_Window *global_window;

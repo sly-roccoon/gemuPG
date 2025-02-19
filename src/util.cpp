@@ -93,20 +93,20 @@ SDL_Color invertColor(SDL_Color color)
   return {(Uint8)(255 - color.r), (Uint8)(255 - color.g), (Uint8)(255 - color.b), color.a};
 }
 
-double interpTable(std::array<float, WAVE_SIZE> *array, double idx)
+double interpTable(float *array, size_t size, double idx)
 {
   int lower = std::floor(idx);
   int upper = std::ceil(idx);
 
   double factor = idx - lower;
 
-  if (upper >= WAVE_SIZE)
+  if (upper >= size)
     upper = 0;
 
   if (lower < 0)
-    lower = WAVE_SIZE;
+    lower = size;
 
-  double value = (array->at(upper) * factor + array->at(upper) * (1.0 - factor));
+  double value = (array[upper] * factor + array[upper] * (1.0 - factor));
 
   return value;
 }

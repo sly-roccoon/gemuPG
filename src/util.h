@@ -25,6 +25,24 @@ constexpr unsigned int MAX_SUBDIVISION = 64;
 
 constexpr bool SEQUENCER_RANDOMIZED = true;
 
+constexpr SDL_Color GENERATOR_COLOR = {0, 0, 255, SDL_ALPHA_OPAQUE};
+constexpr SDL_Color AREA_COLOR = {128, 128, 128, 128};
+constexpr SDL_Color SEQUENCER_COLOR = {255, 255, 0, SDL_ALPHA_OPAQUE};
+
+constexpr float BLOCK_SIZE_FACTOR = 0.8f;
+constexpr int GRID_SIZE = 512;
+constexpr SDL_Color GRID_COLOR = {128, 128, 128, SDL_ALPHA_OPAQUE};
+
+constexpr float MIN_CAMERA_ZOOM = 16.0f;
+constexpr float MAX_CAMERA_ZOOM = 255.0f;
+const float DEFAULT_CAMERA_ZOOM = std::sqrt(std::pow(MIN_CAMERA_ZOOM, 2) + std::pow(MAX_CAMERA_ZOOM, 2));
+
+constexpr unsigned int BUFFER_SIZE = 512;
+constexpr unsigned int CHANNELS = 1;
+
+constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 4;
+constexpr int MAX_HARMONIC = 32;
+
 using pitch_t = float;
 
 typedef enum
@@ -53,24 +71,6 @@ typedef enum
 	// BLOCK_EFFECT,
 	// BLOCK_MODULATOR
 } block_type_t;
-
-constexpr SDL_Color GENERATOR_COLOR = {0, 0, 255, SDL_ALPHA_OPAQUE};
-constexpr SDL_Color AREA_COLOR = {128, 128, 128, 128};
-constexpr SDL_Color SEQUENCER_COLOR = {255, 255, 0, SDL_ALPHA_OPAQUE};
-
-constexpr float BLOCK_SIZE_FACTOR = 0.8f;
-constexpr int GRID_SIZE = 512;
-constexpr SDL_Color GRID_COLOR = {128, 128, 128, SDL_ALPHA_OPAQUE};
-
-constexpr float MIN_CAMERA_ZOOM = 16.0f;
-constexpr float MAX_CAMERA_ZOOM = 255.0f;
-const float DEFAULT_CAMERA_ZOOM = std::sqrt(std::pow(MIN_CAMERA_ZOOM, 2) + std::pow(MAX_CAMERA_ZOOM, 2));
-
-constexpr unsigned int BUFFER_SIZE = 512;
-constexpr unsigned int CHANNELS = 1;
-
-constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 4;
-constexpr int MAX_HARMONIC = 32;
 
 template <typename T>
 struct Vector2

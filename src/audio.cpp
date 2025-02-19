@@ -92,19 +92,6 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 	}
 }
 
-void AudioEngine::setOutput(const float *output, const int n_samples)
-{
-	static int written = 0;
-	int remainder = BUFFER_SIZE - n_samples;
-
-	// Shift the previous entries
-	SDL_memmove(output_, output_ + n_samples, remainder * sizeof(float));
-
-	// Copy the new output
-	SDL_memcpy(output_ + remainder, output, n_samples * sizeof(float));
-	written = n_samples;
-}
-
 AudioEngine::AudioEngine()
 {
 	if (!SDL_Init(SDL_INIT_AUDIO))
@@ -137,6 +124,19 @@ void AudioEngine::destroy()
 {
 	SDL_DestroyAudioStream(stream_);
 	SDL_CloseAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK);
+}
+
+void AudioEngine::setOutput(const float *output, const int n_samples)
+{
+	static int written = 0;
+	int remainder = BUFFER_SIZE - n_samples;
+
+	// Shift the previous entries
+	SDL_memmove(output_, output_ + n_samples, remainder * sizeof(float));
+
+	// Copy the new output
+	SDL_memcpy(output_ + remainder, output, n_samples * sizeof(float));
+	written = n_samples;
 }
 
 void AudioEngine::initWaveTables()

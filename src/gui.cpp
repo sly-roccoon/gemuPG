@@ -112,6 +112,8 @@ void GUI::drawToolbar()
 
 	if (ImGui::InputFloat("BPM", &bpm, 1.0f, 5.0f, "%.1f"))
 	{
+		if (bpm < 0.0f)
+			bpm = 1.0f;
 		Clock::getInstance().setBPM(bpm);
 		Interface::getInstance().updateBlockTimes();
 	}

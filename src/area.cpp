@@ -331,7 +331,7 @@ void Area::drawGUI()
 		return;
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
-	ImGui::SetNextWindowSize({512, 256});
+	ImGui::SetNextWindowSize(IMGUI_WIN_SIZE);
 	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
 	ImGui::Begin(std::format("Area @ [{}, {}]", getTopLeft().x, getTopLeft().y).c_str(), &viewGUI_, flags);
 

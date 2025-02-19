@@ -115,10 +115,9 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 			}
 			else
 			{
-				double idx = block->getPhase() * (sample->getSize() - 1);
-
 				if (sample->getSize() != 0 && (!sample->isPlayed() || sample->getPlayType() == REPEAT))
 				{
+					double idx = block->getPhase() * (sample->getSize() - 1);
 					samples[i] = amp * interpTable(sample->getWave(), sample->getSize(), idx);
 				}
 				else
@@ -229,18 +228,20 @@ void BlockGenerator::drawGUI()
 		return;
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
-	ImGui::SetNextWindowSize({512, 256});
+	ImVec2 margins = ImGui::GetStyle().WindowPadding;
+
+	ImGui::SetNextWindowSize(IMGUI_WIN_SIZE);
 	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
 
 	ImGui::Begin(std::format("generator block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
 
 	ImGui::DragFloat("amplitude", &data_.amp, 0.001f, 0.0f, 1.0f, "% .3f", ImGuiSliderFlags_Logarithmic);
 	if (!is_in_area_)
-		ImGui::SliderFloat("frequency", &data_.freq, 20.0f, 20000.0f, "% .2f", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("frequency", &data_.freq, 20.0f, 20000.0f, "% .2f Hz", ImGuiSliderFlags_Logarithmic);
 	else
 	{
-		ImGui::SliderFloat("relative frequency", &rel_freq_, -20.0f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
-		ImGui::SliderFloat("frequency multiplicator", &freq_factor_, 1.0f / 16.0f, 16.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("relative frequency", &rel_freq_, -20.0f, 20.0f, "%.2f Hz", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("frequency multiplicator", &freq_factor_, 1.0f / 16.0f, 16.0f, "%.2f Hz", ImGuiSliderFlags_Logarithmic);
 	}
 
 	// ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
@@ -267,7 +268,7 @@ void BlockGenerator::drawGUI()
 
 	if (data_.waveform == WAVE_SAMPLE)
 	{
-		if (ImGui::Button("load sample"))
+		if (ImGui::Button("load sample", {ICON_SIZE * 2, 0}))
 		{
 			sample_.open();
 			data_.disp_wave = *sample_.getDispWave();
@@ -275,7 +276,6 @@ void BlockGenerator::drawGUI()
 
 		if (is_in_area_)
 		{
-			ImGui::SameLine();
 			const char *preview = sample_.getPlayType() == REPEAT ? "repeat" : "oneshot";
 			if (ImGui::BeginCombo("play type", preview))
 			{
@@ -288,12 +288,12 @@ void BlockGenerator::drawGUI()
 		}
 
 		pitch_t root = sample_.getRoot();
-		if (ImGui::SliderFloat("sample root frequency", &root, 20.0f, 20'000.0f, "%.2f", ImGuiSliderFlags_Logarithmic))
+		if (ImGui::SliderFloat("sample root frequency", &root, 20.0f, 20'000.0f, "%.2f Hz", ImGuiSliderFlags_Logarithmic))
 			if (root > 0)
 				sample_.setRoot(root);
 	}
 
-	ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, ImVec2(512, 128));
+	ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, {ICON_SIZE * 8 - margins.x * 2, ICON_SIZE * 2 - margins.y * 2});
 
 	ImGui::End();
 }
@@ -343,7 +343,7 @@ void BlockSequencer::drawGUI()
 		return;
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
-	ImGui::SetNextWindowSize({512, 256});
+	ImGui::SetNextWindowSize(IMGUI_WIN_SIZE);
 	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
 
 	ImGui::Begin(std::format("sequencer block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);

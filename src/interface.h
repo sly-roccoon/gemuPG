@@ -33,6 +33,8 @@ public:
 
 	void toggleFullscreen();
 	void togglePlayPause();
+	void updateTitle(std::string path);
+
 	void stop();
 
 private:

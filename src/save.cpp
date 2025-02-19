@@ -170,6 +170,7 @@ void save_dialog_callback(void *userdata, const char *const *filelist, int filte
     Grid *grid = (Grid *)userdata;
     std::string path = filelist[0];
     SaveLoad::saveJSON(path, grid);
+    Interface::getInstance().updateTitle(SaveLoad::getPath());
 }
 
 void load_dialog_callback(void *userdata, const char *const *filelist, int filter)
@@ -180,4 +181,5 @@ void load_dialog_callback(void *userdata, const char *const *filelist, int filte
     Grid *grid = (Grid *)userdata;
     std::string path = filelist[0];
     SaveLoad::loadJSON(path, grid);
+    Interface::getInstance().updateTitle(SaveLoad::getPath());
 }

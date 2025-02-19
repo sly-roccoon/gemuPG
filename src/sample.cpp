@@ -93,7 +93,13 @@ bool Sample::openPath(std::string path)
     if (path.empty())
         return false;
 
-    return SDL_LoadWAV(path.c_str(), &spec_, &audio_, &audio_len_);
+    if (SDL_LoadWAV(path.c_str(), &spec_, &audio_, &audio_len_))
+    {
+        updatePath();
+        updateWave();
+        return true;
+    }
+    return false;
 }
 
 bool Sample::open()
@@ -144,6 +150,8 @@ void callback(void *userdata, const char *const *filelist, int filter)
     sample->setSpec(spec);
     sample->setAudio(audio);
     sample->setAudioLen(audio_len);
+
+    sample->setPath(filelist[0]);
 
     SDL_SignalSemaphore(sample->sem);
 }

@@ -9,7 +9,13 @@
 class SaveLoad
 {
 public:
-    static void clearPath() { save_path = ""; }
+    static void clearPath()
+    {
+        save_path = "";
+        Interface::getInstance().updateTitle(SaveLoad::getPath());
+    }
+    static std::string getPath() { return save_path; }
+
     static void save(bool save_as);
     static void load();
 

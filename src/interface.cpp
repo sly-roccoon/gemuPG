@@ -36,6 +36,14 @@ void Interface::togglePlayPause()
 	Interface::getInstance().getGrid().bypassGenerators(!is_playing_);
 }
 
+void Interface::updateTitle(std::string path)
+{
+	if (path.empty())
+		SDL_SetWindowTitle(window_, "GemuPG");
+	else
+		SDL_SetWindowTitle(window_, std::format("GemuPG [{}]", path).c_str());
+}
+
 void Interface::stop()
 {
 	if (Clock::getInstance().isRunning())

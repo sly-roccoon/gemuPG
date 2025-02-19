@@ -17,6 +17,7 @@ constexpr unsigned int DEFAULT_WIDTH = 1280;
 constexpr unsigned int DEFAULT_HEIGHT = 960;
 
 constexpr unsigned int ICON_SIZE = 64;
+constexpr ImVec2 IMGUI_WIN_SIZE = {ICON_SIZE * 8, ICON_SIZE * 5};
 constexpr float TEXT_TYPE_SIZE_DIV = 4;
 constexpr float TEXT_VALUE_SIZE_DIV = 2;
 

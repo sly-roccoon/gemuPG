@@ -44,12 +44,13 @@ Block *Area::addBlock(Block *block)
 	if (block)
 	{
 		blocks_.push_back(block);
-		block->setInArea(true);
 		if (block->getType() == BLOCK_GENERATOR)
 		{
-			updateGlissando((BlockGenerator *)block);
-			updateAttack((BlockGenerator *)block);
-			((BlockGenerator *)block)->setFrequency(0.0f);
+			BlockGenerator *block_g = (BlockGenerator *)block;
+			block_g->setInArea(true);
+			updateGlissando(block_g);
+			updateAttack(block_g);
+			(block_g)->setFrequency(0.0f);
 		}
 		return block;
 	}
@@ -63,8 +64,9 @@ void Area::removeBlock(Block *block)
 					   [block](auto b)
 					   { return b == block; }),
 		blocks_.end());
-	if (block)
-		block->setInArea(false);
+
+	if (block && block->getType())
+		((BlockGenerator *)block)->setInArea(false);
 }
 
 bool Area::removeBlock(Vector2f pos)

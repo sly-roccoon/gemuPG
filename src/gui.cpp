@@ -12,6 +12,8 @@ bool GUI::init(SDL_Window *window, SDL_Renderer *renderer)
 	IMGUI_CHECKVERSION();
 	context_ = ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
+	io.IniFilename = "";
+	io.LogFilename = "";
 	ImGui::StyleColorsDark();
 
 	window_ = window;

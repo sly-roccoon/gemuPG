@@ -73,14 +73,38 @@ Sample::~Sample()
 
 void callback(void *userdata, const char *const *filelist, int filter);
 
+void Sample::updatePath()
+{
+    std::string currentDir(SDL_GetCurrentDirectory());
+    if (path_.find(currentDir) == 0)
+    {
+        std::string filePath(path_);
+        filePath = filePath.substr(currentDir.length());
+        if (!filePath.empty())
+            if (filePath[0] == '/' || filePath[0] == '\\')
+                filePath.erase(0, 1);
+
+        path_ = filePath;
+    }
+}
+
+bool Sample::openPath(std::string path)
+{
+    if (path.empty())
+        return false;
+
+    return SDL_LoadWAV(path.c_str(), &spec_, &audio_, &audio_len_);
+}
+
 bool Sample::open()
 {
-    SDL_ShowOpenFileDialog(callback, this, nullptr, &wav_filter, 1, NULL, false);
+    SDL_ShowOpenFileDialog(callback, this, nullptr, &wav_filter, 1, SDL_GetCurrentDirectory(), false);
 
     SDL_WaitSemaphore(sem);
     if (empty())
         return false;
 
+    updatePath();
     updateWave();
     return true;
 }
@@ -111,12 +135,11 @@ void callback(void *userdata, const char *const *filelist, int filter)
         return;
     }
 
-    sample->setPath(filelist[0]);
     SDL_AudioSpec spec;
     Uint8 *audio;
     Uint32 audio_len;
 
-    SDL_LoadWAV(sample->getPath().c_str(), &spec, &audio, &audio_len);
+    SDL_LoadWAV(filelist[0], &spec, &audio, &audio_len);
 
     sample->setSpec(spec);
     sample->setAudio(audio);

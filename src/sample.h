@@ -21,6 +21,8 @@ public:
     pitch_t getRoot() { return root_; };
     void setRoot(pitch_t root) { root_ = root; };
     bool open();
+    bool openPath(std::string path = "");
+    void updatePath();
 
     void setPath(std::string path) { path_ = path; }
     std::string getPath() { return path_; }
@@ -40,6 +42,12 @@ public:
 
     size_t getSize() { return sample_size_; }
 
+    void setPlayed(bool played) { played_ = played; }
+    bool isPlayed() { return played_; }
+
+    sample_play_type_t getPlayType() { return play_type_; };
+    void setPlayType(sample_play_type_t play_type) { play_type_ = play_type; }
+
     SDL_Semaphore *sem = SDL_CreateSemaphore(0);
 
 private:
@@ -53,10 +61,12 @@ private:
     float *sample_ = nullptr;
     size_t sample_size_ = 0;
 
+    bool played_ = false;
+
     std::array<float, WAVE_SIZE> disp_wave_ = {};
 
     pitch_t root_ = 440.0f;
-    sample_play_type_t play_type_ = ONE_SHOT;
+    sample_play_type_t play_type_ = REPEAT;
 
     void convertAudio(const SDL_AudioSpec *src_spec, Uint8 *data, Uint32 audio_len);
 

@@ -60,7 +60,12 @@ double BlockGenerator::getPhase()
 	if (getWaveForm() != WAVE_SAMPLE || sample_.getSize() == 0)
 		data_.phase = SDL_fmod(data_.phase + (getFrequency() / fs_), 1.0f);
 	else
-		data_.phase = SDL_fmod(data_.phase + (getFrequency() / sample_.getRoot() / (fs_)), 1.0);
+	{
+		data_.phase = data_.phase + getFrequency() / (sample_.getRoot() * fs_);
+		if (data_.phase > 1.0)
+			sample_.setPlayed(true);
+		data_.phase = SDL_fmod(data_.phase, 1.0);
+	}
 
 	return data_.phase;
 }
@@ -112,7 +117,7 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 			{
 				double idx = block->getPhase() * (sample->getSize() - 1);
 
-				if (sample->getSize() != 0)
+				if (sample->getSize() != 0 && (!sample->isPlayed() || sample->getPlayType() == REPEAT))
 				{
 					samples[i] = amp * interpTable(sample->getWave(), sample->getSize(), idx);
 				}
@@ -180,6 +185,7 @@ void BlockGenerator::setFrequency(pitch_t freq)
 	else if (freq == last_freq_)
 		return;
 
+	sample_.setPlayed(false);
 	last_freq_ = data_.freq;
 	gliss_freq_ = last_freq_;
 	attack_amp_ = 0.0f;
@@ -267,6 +273,20 @@ void BlockGenerator::drawGUI()
 			data_.disp_wave = *sample_.getDispWave();
 		}
 
+		if (is_in_area_)
+		{
+			ImGui::SameLine();
+			const char *preview = sample_.getPlayType() == REPEAT ? "repeat" : "oneshot";
+			if (ImGui::BeginCombo("play type", preview))
+			{
+				if (ImGui::Selectable("repeat"))
+					sample_.setPlayType(REPEAT);
+				if (ImGui::Selectable("oneshot"))
+					sample_.setPlayType(ONE_SHOT);
+				ImGui::EndCombo();
+			}
+		}
+
 		pitch_t root = sample_.getRoot();
 		if (ImGui::SliderFloat("sample root frequency", &root, 20.0f, 20'000.0f, "%.2f", ImGuiSliderFlags_Logarithmic))
 			if (root > 0)
@@ -302,7 +322,7 @@ void BlockSequencer::randomize()
 		while (pitch_ < 50.0f || pitch_ > 880.0f);
 
 	if (pitch_type_ == PITCH_REL_FREQUENCY)
-		pitch_ = SDL_randf() * 2000.0f - 1000.0f;
+		pitch_ = SDL_randf() * 500.0f - 250.0f;
 
 	if (pitch_type_ == PITCH_INTERVAL)
 	{

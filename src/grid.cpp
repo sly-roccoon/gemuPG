@@ -221,7 +221,8 @@ Block *Grid::addBlock(Block *block)
 	}
 
 	blocks_.push_back(std::move(block));
-	block->setInArea(false);
+	if (block->getType() == BLOCK_GENERATOR)
+		((BlockGenerator *)block)->setInArea(false);
 	return block;
 }
 

@@ -29,7 +29,7 @@ public:
 	void setGUI(bool view) { viewGUI_ = view; }
 
 	bool isInArea() { return is_in_area_; }
-	void setInArea(bool in_area) { is_in_area_ = in_area; }
+	// void setInArea(bool in_area) { is_in_area_ = in_area; }
 
 	std::string getText(int i) { return text_.at(i); }
 	void setText(std::string text, int i) { text_.at(i) = text; }
@@ -70,6 +70,16 @@ public:
 	~BlockGenerator();
 	BlockGenerator *clone() override;
 
+	void setInArea(bool in_area)
+	{
+		is_in_area_ = in_area;
+		if (in_area)
+			sample_.setPlayType(ONE_SHOT);
+		else
+			sample_.setPlayType(REPEAT);
+		sample_.setPlayed(false);
+	}
+
 	SDL_AudioStream *getStream() { return stream_; }
 	void drawGUI() override;
 
@@ -91,6 +101,7 @@ public:
 	Sample *getSample() { return &sample_; }
 
 	double getAmp();
+	double getDataAmp() { return data_.amp; }
 	void setAmp(double amp) { data_.amp = amp; }
 
 	pitch_t getRelFreq() { return rel_freq_; }

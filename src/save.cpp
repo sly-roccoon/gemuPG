@@ -47,6 +47,7 @@ void SaveLoad::saveJSON(std::string path, Grid *grid)
     j["areas"] = json::array();
     j["generators"] = json::array();
     j["sequencers"] = json::array();
+    j["bpm"] = Clock::getInstance().getBPM();
 
     for (auto &block : grid->getBlocks())
     {
@@ -58,10 +59,13 @@ void SaveLoad::saveJSON(std::string path, Grid *grid)
         {
             BlockGenerator *generator = (BlockGenerator *)block;
             block_json["waveform"] = generator->getWaveForm();
-            block_json["amp"] = generator->getAmp();
+            block_json["amp"] = generator->getDataAmp();
             block_json["freq"] = generator->getFrequency();
             block_json["rel_freq"] = generator->getRelFreq();
             block_json["freq_factor"] = generator->getFreqFactor();
+            block_json["sample_path"] = generator->getSample()->getPath();
+            block_json["sample_root"] = generator->getSample()->getRoot();
+            block_json["sample_play_type"] = generator->getSample()->getPlayType();
             block_json["pos"] = {block->getPos().x, block->getPos().y};
 
             j["generators"].push_back(block_json);
@@ -113,6 +117,7 @@ void SaveLoad::loadJSON(std::string path, Grid *grid)
 
     grid->clear();
     Interface::getInstance().stop();
+    Clock::getInstance().setBPM(j["bpm"]);
 
     for (auto &area_json : j["areas"])
     {
@@ -148,6 +153,10 @@ void SaveLoad::loadJSON(std::string path, Grid *grid)
         generator->setFrequency(generator_json["freq"]);
         generator->setRelFreq(generator_json["rel_freq"]);
         generator->setFreqFactor(generator_json["freq_factor"]);
+
+        generator->getSample()->openPath(generator_json["sample_path"]);
+        generator->getSample()->setRoot(generator_json["sample_root"]);
+        generator->getSample()->setPlayType(generator_json["sample_play_type"]);
 
         grid->addBlock(generator);
     }

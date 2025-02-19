@@ -63,7 +63,9 @@ double BlockGenerator::getPhase()
 	{
 		data_.phase = data_.phase + getFrequency() / (sample_.getRoot() * fs_);
 		if (data_.phase > 1.0)
+		{
 			sample_.setPlayed(true);
+		}
 		data_.phase = SDL_fmod(data_.phase, 1.0);
 	}
 
@@ -117,7 +119,15 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 			{
 				if (sample->getSize() != 0 && (!sample->isPlayed() || sample->getPlayType() == REPEAT))
 				{
-					double idx = block->getPhase() * (sample->getSize() - 1);
+					double idx = 0.0;
+					if (sample->getTrigger())
+					{
+						block->getData()->phase = 0.0; // first sample of retrigger should always be [0]
+						sample->setTrigger(false);
+					}
+					else
+						idx = block->getPhase() * (sample->getSize() - 1);
+
 					samples[i] = amp * interpTable(sample->getWave(), sample->getSize(), idx);
 				}
 				else
@@ -185,6 +195,7 @@ void BlockGenerator::setFrequency(pitch_t freq)
 		return;
 
 	sample_.setPlayed(false);
+	sample_.setTrigger(true);
 	last_freq_ = data_.freq;
 	gliss_freq_ = last_freq_;
 	attack_amp_ = 0.0f;

@@ -45,6 +45,9 @@ public:
     void setPlayed(bool played) { played_ = played; }
     bool isPlayed() { return played_; }
 
+    bool getTrigger() { return trigger_; }
+    void setTrigger(bool trigger) { trigger_ = trigger; }
+
     sample_play_type_t getPlayType() { return play_type_; };
     void setPlayType(sample_play_type_t play_type) { play_type_ = play_type; }
 
@@ -62,6 +65,7 @@ private:
     size_t sample_size_ = 0;
 
     bool played_ = false;
+    bool trigger_ = true;
 
     std::array<float, WAVE_SIZE> disp_wave_ = {};
 

@@ -1,7 +1,7 @@
 #include "util.h"
 #include <map>
 
-SDL_Window *global_window = nullptr;
+float RENDER_SCALE = 1.0f;
 
 Vector2f floorVec(Vector2f vec)
 {

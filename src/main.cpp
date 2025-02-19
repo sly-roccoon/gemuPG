@@ -7,6 +7,7 @@
 #include "audio.h"
 #include "gui.h"
 #include "clock.h"
+#include "util.h"
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
@@ -36,6 +37,11 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
 	if (event->type == SDL_EVENT_QUIT)
 		return SDL_APP_SUCCESS;
+
+	if (event->type == SDL_EVENT_WINDOW_DISPLAY_CHANGED || event->type == SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED)
+	{
+		Interface::updateScaling();
+	}
 
 	Input::getInstance().handleEvent(event);
 

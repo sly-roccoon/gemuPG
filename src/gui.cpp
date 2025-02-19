@@ -14,7 +14,11 @@ bool GUI::init(SDL_Window *window, SDL_Renderer *renderer)
 	ImGuiIO &io = ImGui::GetIO();
 	io.IniFilename = "";
 	io.LogFilename = "";
-	ImGui::StyleColorsDark();
+	ImGui::StyleColorsClassic();
+	ImGui::GetStyle().Colors[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.9f);
+	ImGui::GetStyle().WindowMenuButtonPosition = ImGuiDir_None;
+
+	Interface::updateScaling();
 
 	window_ = window;
 	renderer_ = renderer;
@@ -40,12 +44,12 @@ void GUI::drawOutput(float *output)
 	if (!show_output_)
 		return;
 
-	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->Size.x - (ICON_SIZE * 4), ImGui::GetMainViewport()->Size.y - (ICON_SIZE * 2)});
-	ImGui::SetNextWindowSize({ICON_SIZE * 4, ICON_SIZE * 2});
+	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->Size.x - (ICON_SIZE * RENDER_SCALE * 4), ImGui::GetMainViewport()->Size.y - (ICON_SIZE * RENDER_SCALE * 2)});
+	ImGui::SetNextWindowSize({ICON_SIZE * RENDER_SCALE * 4, ICON_SIZE * RENDER_SCALE * 2});
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0, 0});
 	ImGui::Begin("Output", &show_output_, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 
-	ImGui::PlotLines("##", output, BUFFER_SIZE, 0, nullptr, -1.0f, 1.0f, {ICON_SIZE * 4, ICON_SIZE * 2});
+	ImGui::PlotLines("##", output, BUFFER_SIZE, 0, nullptr, -1.0f, 1.0f, {ICON_SIZE * RENDER_SCALE * 4, ICON_SIZE * RENDER_SCALE * 2});
 
 	ImGui::End();
 	ImGui::PopStyleVar();
@@ -53,23 +57,23 @@ void GUI::drawOutput(float *output)
 
 void GUI::drawToolbar()
 {
-	ImGui::SetNextWindowPos({0, ImGui::GetMainViewport()->GetCenter().y - (ICON_SIZE / 2)});
-	ImGui::SetNextWindowSize({ICON_SIZE + ICON_SIZE / 4, ICON_SIZE / 2 + ICON_SIZE * 3}); // TODO: find better way to adjust margins of button border
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(ICON_SIZE / 8, ICON_SIZE / 8));
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ICON_SIZE / 8, ICON_SIZE / 8));
+	ImGui::SetNextWindowPos({0, ImGui::GetMainViewport()->GetCenter().y - (ICON_SIZE * RENDER_SCALE / 2)});
+	ImGui::SetNextWindowSize({ICON_SIZE * RENDER_SCALE + ICON_SIZE * RENDER_SCALE / 4, ICON_SIZE * RENDER_SCALE / 2 + ICON_SIZE * RENDER_SCALE * 3}); // TODO: find better way to adjust margins of button border
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(ICON_SIZE * RENDER_SCALE / 8, ICON_SIZE * RENDER_SCALE / 8));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ICON_SIZE * RENDER_SCALE / 8, ICON_SIZE * RENDER_SCALE / 8));
 	ImGui::Begin("Side", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 
-	if (ImGui::ColorButton("Area", toImVec4(AREA_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
+	if (ImGui::ColorButton("Area", toImVec4(AREA_COLOR), 0, {ICON_SIZE * RENDER_SCALE, ICON_SIZE * RENDER_SCALE}))
 		Interface::getInstance().setSelection(AREA);
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("area");
 
-	if (ImGui::ColorButton("Generator Block", toImVec4(GENERATOR_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
+	if (ImGui::ColorButton("Generator Block", toImVec4(GENERATOR_COLOR), 0, {ICON_SIZE * RENDER_SCALE, ICON_SIZE * RENDER_SCALE}))
 		Interface::getInstance().setSelection(BLOCK_GENERATOR);
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("generator");
 
-	if (ImGui::ColorButton("Sequencer", toImVec4(SEQUENCER_COLOR), 0, {ICON_SIZE, ICON_SIZE}))
+	if (ImGui::ColorButton("Sequencer", toImVec4(SEQUENCER_COLOR), 0, {ICON_SIZE * RENDER_SCALE, ICON_SIZE * RENDER_SCALE}))
 		Interface::getInstance().setSelection(BLOCK_SEQUENCER);
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("sequencer");
@@ -78,8 +82,8 @@ void GUI::drawToolbar()
 	ImGui::PopStyleVar(2);
 
 	//------------------------------
-	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->GetCenter().x - ICON_SIZE * 2, ImGui::GetMainViewport()->Size.y - ICON_SIZE});
-	ImGui::SetNextWindowSize({ICON_SIZE * 2, ICON_SIZE});
+	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->GetCenter().x - ICON_SIZE * RENDER_SCALE * 2, ImGui::GetMainViewport()->Size.y - ICON_SIZE * RENDER_SCALE});
+	ImGui::SetNextWindowSize({ICON_SIZE * RENDER_SCALE * 2, ICON_SIZE * RENDER_SCALE});
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
@@ -87,17 +91,17 @@ void GUI::drawToolbar()
 
 	if (Clock::getInstance().isRunning())
 	{
-		if (ImGui::Button("pause", {ICON_SIZE, ICON_SIZE}))
+		if (ImGui::Button("pause", {ICON_SIZE * RENDER_SCALE, ICON_SIZE * RENDER_SCALE}))
 			Interface::getInstance().togglePlayPause();
 	}
 	else
 	{
-		if (ImGui::Button("play", {ICON_SIZE, ICON_SIZE}))
+		if (ImGui::Button("play", {ICON_SIZE * RENDER_SCALE, ICON_SIZE * RENDER_SCALE}))
 			Interface::getInstance().togglePlayPause();
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button("stop", {ICON_SIZE, ICON_SIZE}))
+	if (ImGui::Button("stop", {ICON_SIZE * RENDER_SCALE, ICON_SIZE * RENDER_SCALE}))
 		Interface::getInstance().stop();
 
 	ImGui::End();
@@ -105,8 +109,8 @@ void GUI::drawToolbar()
 
 	//-----------------------------
 
-	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->GetCenter().x, ImGui::GetMainViewport()->Size.y - ICON_SIZE});
-	ImGui::SetNextWindowSize({ICON_SIZE * 4, ICON_SIZE});
+	ImGui::SetNextWindowPos({ImGui::GetMainViewport()->GetCenter().x, ImGui::GetMainViewport()->Size.y - ICON_SIZE * RENDER_SCALE});
+	ImGui::SetNextWindowSize({ICON_SIZE * RENDER_SCALE * 4, ICON_SIZE * RENDER_SCALE});
 	ImGui::Begin("Bottom Right", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar);
 
 	float bpm = Clock::getInstance().getBPM();

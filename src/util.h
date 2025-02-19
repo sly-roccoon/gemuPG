@@ -112,4 +112,4 @@ SDL_Color invertColor(SDL_Color);
 
 double interpTable(float *array, size_t size, double idx);
 
-extern SDL_Window *global_window;
+extern float RENDER_SCALE;

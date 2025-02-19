@@ -241,7 +241,7 @@ void BlockGenerator::drawGUI()
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
 	ImVec2 margins = ImGui::GetStyle().WindowPadding;
 
-	ImGui::SetNextWindowSize(IMGUI_WIN_SIZE);
+	ImGui::SetNextWindowSize({IMGUI_WIN_SIZE.x * RENDER_SCALE, IMGUI_WIN_SIZE.y * RENDER_SCALE});
 	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
 
 	ImGui::Begin(std::format("generator block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);
@@ -252,7 +252,7 @@ void BlockGenerator::drawGUI()
 	else
 	{
 		ImGui::SliderFloat("relative frequency", &rel_freq_, -20.0f, 20.0f, "%.2f Hz", ImGuiSliderFlags_Logarithmic);
-		ImGui::SliderFloat("frequency multiplicator", &freq_factor_, 1.0f / 16.0f, 16.0f, "%.2f Hz", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("frequency factor", &freq_factor_, 1.0f / 16.0f, 16.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	}
 
 	// ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
@@ -279,7 +279,7 @@ void BlockGenerator::drawGUI()
 
 	if (data_.waveform == WAVE_SAMPLE)
 	{
-		if (ImGui::Button("load sample", {ICON_SIZE * 2, 0}))
+		if (ImGui::Button("load sample", {ICON_SIZE * RENDER_SCALE * 2, 0}))
 		{
 			sample_.open();
 			data_.disp_wave = *sample_.getDispWave();
@@ -304,7 +304,7 @@ void BlockGenerator::drawGUI()
 				sample_.setRoot(root);
 	}
 
-	ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, {ICON_SIZE * 8 - margins.x * 2, ICON_SIZE * 2 - margins.y * 2});
+	ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, {ICON_SIZE * RENDER_SCALE * 8 - margins.x * 2, ICON_SIZE * RENDER_SCALE * 2 - margins.y * 2});
 
 	ImGui::End();
 }
@@ -354,7 +354,7 @@ void BlockSequencer::drawGUI()
 		return;
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
-	ImGui::SetNextWindowSize(IMGUI_WIN_SIZE);
+	ImGui::SetNextWindowSize({IMGUI_WIN_SIZE.x * RENDER_SCALE, IMGUI_WIN_SIZE.y * RENDER_SCALE});
 	ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
 
 	ImGui::Begin(std::format("sequencer block @ [{}, {}]", rect_.x, rect_.y).c_str(), &viewGUI_, flags);

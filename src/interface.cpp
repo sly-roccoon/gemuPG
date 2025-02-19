@@ -17,8 +17,13 @@ Interface::Interface() : camera_{Camera::getInstance()}
 
 	Text::init(renderer_);
 
-	global_window = window_;
 	SDL_SetWindowResizable(window_, true);
+}
+
+void Interface::updateScaling()
+{
+	RENDER_SCALE = SDL_GetWindowDisplayScale(window_);
+	ImGui::GetIO().FontGlobalScale = RENDER_SCALE;
 }
 
 void Interface::toggleFullscreen()
@@ -157,7 +162,7 @@ void Interface::drawSequencerGUI()
 
 void Interface::drawBlockSelection()
 {
-	SDL_FRect rect = {ICON_SIZE / 8, ICON_SIZE / 8, ICON_SIZE, ICON_SIZE};
+	SDL_FRect rect = {ICON_SIZE * RENDER_SCALE / 8, ICON_SIZE * RENDER_SCALE / 8, ICON_SIZE * RENDER_SCALE, ICON_SIZE * RENDER_SCALE};
 	SDL_Color col = {};
 
 	switch (cur_selection_)

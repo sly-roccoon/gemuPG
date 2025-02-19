@@ -34,6 +34,7 @@ public:
 	void toggleFullscreen();
 	void togglePlayPause();
 	void updateTitle(std::string path);
+	static void updateScaling();
 
 	void stop();
 
@@ -52,7 +53,7 @@ private:
 	Camera &camera_;
 	Grid grid_{};
 
-	SDL_Window *window_ = nullptr;
+	inline static SDL_Window *window_ = nullptr;
 	SDL_Renderer *renderer_ = nullptr;
 
 	void drawGrid();

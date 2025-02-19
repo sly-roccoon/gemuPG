@@ -28,7 +28,7 @@ void Sample::convertAudio(const SDL_AudioSpec *src_spec, Uint8 *data, Uint32 aud
         }
         return;
     }
-    case SDL_AUDIO_S32:
+    case SDL_AUDIO_S32: // FIXME: 24 bit audio is seen as 32 bit audio, causing glitches!
     {
         sample_size_ = audio_len / static_cast<uint32_t>(SDL_AUDIO_BYTESIZE(SDL_AUDIO_S32));
 

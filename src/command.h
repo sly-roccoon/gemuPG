@@ -16,22 +16,25 @@ protected:
 class AddBlockCommand : public Command
 {
 public:
-	AddBlockCommand(Vector2f pos) : pos_{pos} {}
+	AddBlockCommand(Vector2f pos) : pos_{floorVec(pos)} {}
 
 	bool execute() override
 	{
+		if (pos_.x >= GRID_SIZE / 2 || pos_.y >= GRID_SIZE / 2 || pos_.x < -GRID_SIZE / 2 || pos_.y < -GRID_SIZE / 2)
+			return false;
+
 		if (block_)
 		{
 			interface_.addBlock(std::move(block_));
 			return true;
 		}
-		return interface_.addBlock(floorVec(pos_));
+		return interface_.addBlock(pos_);
 	}
 
 	void undo() override
 	{
-		block_ = interface_.getBlock(floorVec(pos_));
-		interface_.removeBlock(floorVec(pos_));
+		block_ = interface_.getBlock(pos_);
+		interface_.removeBlock(pos_);
 	}
 
 private:
@@ -74,11 +77,13 @@ private:
 class AddAreaCommand : public Command
 {
 public:
-	AddAreaCommand(Vector2f pos) : pos_{pos} {}
+	AddAreaCommand(Vector2f pos) : pos_{floorVec(pos)} {}
 
 	bool execute() override
 	{
-		pos_ = floorVec(pos_);
+		if (pos_.x >= GRID_SIZE / 2 || pos_.y >= GRID_SIZE / 2 || pos_.x < -GRID_SIZE / 2 || pos_.y < -GRID_SIZE / 2)
+			return false;
+
 		return interface_.getGrid().addArea(pos_);
 	}
 

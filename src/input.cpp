@@ -2,6 +2,14 @@
 #include "gui.h"
 #include <cstdio>
 
+Vector2f getRendererSize()
+{
+	int w;
+	int h;
+	SDL_GetRenderOutputSize(Interface::getInstance().getRenderer(), &w, &h);
+	return {static_cast<float>(w), static_cast<float>(h)};
+}
+
 void Input::handleEvent(SDL_Event *event)
 {
 	updateKeys(event);
@@ -67,7 +75,7 @@ void Input::handleMouseWheel(SDL_Event *event)
 	if (wheel.y < 0)
 		scale_factor = 1.0f / scale_factor;
 
-	Camera::zoomAtPos(mouse_pos, scale_factor);
+	Camera::zoomAtPos(mouse_pos, scale_factor, getRendererSize());
 }
 
 void Input::handleCamPan(SDL_Event *event)
@@ -89,7 +97,10 @@ void Input::handleCamPan(SDL_Event *event)
 			isDragging = false;
 	}
 	if (isDragging)
-		Camera::setPos(Camera::getPos() + delta * -1.0f / Camera::getZoom());
+	{
+
+		Camera::setPos(Camera::getPos() + delta * -1.0f / Camera::getZoom(), getRendererSize());
+	}
 }
 
 void Input::handlePlacement(SDL_Event *event)

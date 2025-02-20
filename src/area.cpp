@@ -280,9 +280,9 @@ void Area::stepSequence()
 			break;
 		}
 
-		if (last_freq_ < 20.0f)
+		while (last_freq_ < 20.0f)
 			last_freq_ += 20000.0f - 20.0f;
-		else if (last_freq_ > 20000.0f)
+		while (last_freq_ > 20000.0f)
 			last_freq_ -= 20000.0 - 20.0f;
 
 		setNotes(last_freq_);

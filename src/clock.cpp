@@ -8,10 +8,10 @@ bool Clock::isTime()
         return false;
 
     Uint64 now = SDL_GetPerformanceCounter();
-    delta_ = static_cast<double>(now - last_time_) / static_cast<double>(SDL_GetPerformanceFrequency());
+    delta_ = static_cast<double>(now - last_time_) / static_cast<double>(PERFORMANCE_FREQUENCY);
     if (delta_ >= 60.0f / bpm_ / MAX_SUBDIVISION)
     {
-        last_time_ = now;
+        last_time_ += delta_ * PERFORMANCE_FREQUENCY;
         counter_++;
         return true;
     }

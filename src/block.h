@@ -135,6 +135,7 @@ private:
 	double last_freq_ = -1.0f;
 	double gliss_time_ = 0.0f;
 
+	Uint64 now = 0;
 	double env_amp_ = 0.0f;
 	double attack_time_ = 0.0f;
 	double release_time_ = 0.0f;

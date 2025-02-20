@@ -39,6 +39,7 @@ public:
     void updateWave();
     std::array<float, WAVE_SIZE> *getDispWave() { return &disp_wave_; };
     float *getWave() { return sample_; };
+    void copyWave(float *, size_t);
 
     size_t getSize() { return sample_size_; }
 
@@ -72,8 +73,8 @@ private:
     pitch_t root_ = 440.0f;
     sample_play_type_t play_type_ = REPEAT;
 
-    void convertAudio(const SDL_AudioSpec *src_spec, Uint8 *data, Uint32 audio_len);
-
     static const inline SDL_DialogFileFilter wav_filter = {"WAV (*.wav)", "wav"};
+
+    void convertAudio();
 };
 ;

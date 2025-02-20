@@ -22,7 +22,7 @@ public:
 		rect_.y = pos.y;
 	}
 	block_type_t getType() { return type_; }
-	virtual Block *clone() = 0; // TODO: implement properly with operator overloading
+	virtual Block *clone() = 0;
 
 	virtual void drawGUI() = 0;
 	void toggleGUI() { viewGUI_ = !viewGUI_; }
@@ -69,6 +69,7 @@ public:
 	BlockGenerator(Vector2f, double phase = 0.0f);
 	~BlockGenerator();
 	BlockGenerator *clone() override;
+	void createAudioStream();
 
 	void setInArea(bool in_area)
 	{
@@ -99,6 +100,7 @@ public:
 	void setWave(WAVE_FORMS waveform);
 	WAVE_FORMS getWaveForm() { return data_.waveform; }
 	Sample *getSample() { return &sample_; }
+	void copySample(Sample *sample);
 
 	double getAmp();
 	double getDataAmp() { return data_.amp; }
@@ -119,7 +121,7 @@ public:
 
 private:
 	bool bypass_ = false;
-	SDL_AudioStream *stream_;
+	SDL_AudioStream *stream_ = nullptr;
 	generator_data_t data_ = {
 		.waveform = WAVE_SINE,
 		.disp_wave = {},
@@ -169,6 +171,7 @@ public:
 
 	void addArea(Area *area);
 	void removeArea(Area *area);
+	auto getAreas() { return areas_; }
 
 	std::pair<float, float> getInterval() { return {interval_, octave_subdivision_}; }
 	void setInterval(float interval, float oct_sub)

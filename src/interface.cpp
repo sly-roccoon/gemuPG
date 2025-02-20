@@ -43,6 +43,14 @@ void Interface::togglePlayPause()
 	Interface::getInstance().getGrid().bypassGenerators(!is_playing_);
 }
 
+void Interface::setPlaying(bool playing)
+{
+	is_playing_ = playing;
+
+	Clock::getInstance().setRunning(is_playing_);
+	Interface::getInstance().getGrid().bypassGenerators(!is_playing_);
+}
+
 void Interface::updateTitle(std::string path)
 {
 	if (path.empty())
@@ -53,8 +61,7 @@ void Interface::updateTitle(std::string path)
 
 void Interface::stop()
 {
-	if (Clock::getInstance().isRunning())
-		togglePlayPause();
+	setPlaying(false);
 
 	grid_.stopSequence();
 }

@@ -2,23 +2,23 @@
 #include "audio.h"
 #include <semaphore>
 
-void Sample::convertAudio(const SDL_AudioSpec *src_spec, Uint8 *data, Uint32 audio_len)
+void Sample::convertAudio()
 {
     if (sample_)
         delete[] sample_;
 
     size_t sample_size = 1;
-    size_t channel_incr = src_spec->channels / AudioEngine::getInstance().getSpec()->channels;
-    double freq_factor = static_cast<double>(src_spec->freq) / AudioEngine::getInstance().getSpec()->freq;
+    size_t channel_incr = spec_.channels / AudioEngine::getInstance().getSpec()->channels;
+    double freq_factor = static_cast<double>(spec_.freq) / AudioEngine::getInstance().getSpec()->freq;
     double pos = 0;
 
-    switch (src_spec->format)
+    switch (spec_.format)
     {
     case SDL_AUDIO_S16:
     {
-        int16_t *buffer = reinterpret_cast<int16_t *>(data);
-        sample_ = new float[audio_len / static_cast<uint32_t>(SDL_AUDIO_BYTESIZE(SDL_AUDIO_S16))];
-        sample_size_ = audio_len / static_cast<uint32_t>(SDL_AUDIO_BYTESIZE(SDL_AUDIO_S16));
+        int16_t *buffer = reinterpret_cast<int16_t *>(audio_);
+        sample_ = new float[audio_len_ / static_cast<uint32_t>(SDL_AUDIO_BYTESIZE(SDL_AUDIO_S16))];
+        sample_size_ = audio_len_ / static_cast<uint32_t>(SDL_AUDIO_BYTESIZE(SDL_AUDIO_S16));
         for (size_t i = 0; i < sample_size_; i++)
         {
             pos += channel_incr * freq_factor;
@@ -30,9 +30,9 @@ void Sample::convertAudio(const SDL_AudioSpec *src_spec, Uint8 *data, Uint32 aud
     }
     case SDL_AUDIO_S32: // FIXME: 24 bit audio is seen as 32 bit audio, causing glitches!
     {
-        sample_size_ = audio_len / static_cast<uint32_t>(SDL_AUDIO_BYTESIZE(SDL_AUDIO_S32));
+        sample_size_ = audio_len_ / static_cast<uint32_t>(SDL_AUDIO_BYTESIZE(SDL_AUDIO_S32));
 
-        int32_t *buffer = reinterpret_cast<int32_t *>(data);
+        int32_t *buffer = reinterpret_cast<int32_t *>(audio_);
         sample_ = new float[sample_size_];
 
         for (size_t i = 0; i < sample_size_; i++)
@@ -46,8 +46,8 @@ void Sample::convertAudio(const SDL_AudioSpec *src_spec, Uint8 *data, Uint32 aud
     }
     case SDL_AUDIO_F32:
     {
-        sample_size_ = audio_len / static_cast<uint32_t>(SDL_AUDIO_BYTESIZE(SDL_AUDIO_F32));
-        float_t *buffer = reinterpret_cast<float_t *>(data);
+        sample_size_ = audio_len_ / static_cast<uint32_t>(SDL_AUDIO_BYTESIZE(SDL_AUDIO_F32));
+        float_t *buffer = reinterpret_cast<float_t *>(audio_);
         sample_ = new float[sample_size_];
 
         for (size_t i = 0; i < sample_size_; i++)
@@ -62,6 +62,12 @@ void Sample::convertAudio(const SDL_AudioSpec *src_spec, Uint8 *data, Uint32 aud
     }
 
     return;
+}
+
+void Sample::copyWave(float *src, size_t size)
+{
+    memcpy(sample_, src, sizeof(float) * size);
+    sample_size_ = size;
 }
 
 Sample::Sample() : spec_{*AudioEngine::getInstance().getSpec()} {}
@@ -105,9 +111,13 @@ bool Sample::openPath(std::string path)
 
 bool Sample::open()
 {
+    bool running = Clock::getInstance().isRunning();
+    Interface::getInstance().setPlaying(false);
     SDL_ShowOpenFileDialog(callback, this, nullptr, &wav_filter, 1, SDL_GetCurrentDirectory(), false);
 
     SDL_WaitSemaphore(sem);
+    Interface::getInstance().setPlaying(running);
+
     if (empty())
         return false;
 
@@ -119,11 +129,9 @@ bool Sample::open()
 void Sample::updateWave()
 {
     fs_ratio_ = AudioEngine::getInstance().getSpec()->freq / spec_.freq;
-    convertAudio(&spec_, audio_, audio_len_);
+    convertAudio();
 
     disp_wave_ = {};
-
-    convertAudio(&spec_, audio_, audio_len_);
 
     for (int i = 0; i < WAVE_SIZE; i++)
     {

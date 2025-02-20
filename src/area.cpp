@@ -316,7 +316,6 @@ void Area::updateEnvelope(BlockGenerator *block)
 
 	double attack_time = (attack_percent_ / 100.0f) * note_length;
 
-	release_percent_ = release_percent_ < 100.0f - attack_percent_ ? release_percent_ : 100.0f - attack_percent_;
 	double release_time = (1.0 - (release_percent_ / 100.0f)) * note_length;
 
 	if (block)
@@ -356,9 +355,15 @@ void Area::drawGUI()
 	if (ImGui::SliderFloat("glissando", &gliss_percent_, 0.0f, 100.0f, "%.1f %%", ImGuiSliderFlags_AlwaysClamp))
 		updateGlissando();
 	if (ImGui::SliderFloat("attack", &attack_percent_, 0.0f, 100.0f, "%.1f %%", ImGuiSliderFlags_AlwaysClamp))
+	{
+		release_percent_ = SDL_clamp(release_percent_, 0.0, 100.0f - attack_percent_);
 		updateEnvelope();
+	}
 	if (ImGui::SliderFloat("release", &release_percent_, 0.0f, 100.0f, "%.1f %%", ImGuiSliderFlags_AlwaysClamp))
+	{
+		attack_percent_ = SDL_clamp(attack_percent_, 0.0, 100.0f - release_percent_);
 		updateEnvelope();
+	}
 
 	ImGui::End();
 }

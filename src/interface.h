@@ -33,6 +33,7 @@ public:
 
 	void toggleFullscreen();
 	void togglePlayPause();
+	void setPlaying(bool playing);
 	void updateTitle(std::string path);
 	static void updateScaling();
 

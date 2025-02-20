@@ -156,13 +156,24 @@ void Input::handlePlacement(SDL_Event *event)
 
 void Input::handleMouse(SDL_Event *event)
 {
+	updateMousePos(event);
 	handleCamPan(event);
 	handlePlacement(event);
+}
+
+void Input::updateMousePos(SDL_Event *event)
+{
+	if (event->type != SDL_EVENT_MOUSE_MOTION)
+		return;
+
+	SDL_MouseMotionEvent motion = event->motion;
+	mouse_pos_ = {motion.x, motion.y};
 }
 
 void Input::handleKeys(SDL_Event *event)
 {
 	handleShortcuts(event);
+	handleCopyPaste(event);
 	handleSaveLoad(event);
 	// handleUndoRedo(event); //doesn't work for block parameter changes, no time to add :)
 }
@@ -208,6 +219,24 @@ void Input::handleSaveLoad(SDL_Event *event)
 			SaveLoad::clearPath();
 		}
 	}
+}
+
+void Input::handleCopyPaste(SDL_Event *event)
+{
+	SDL_KeyboardEvent key = event->key;
+
+	if (!isKeyDown(SDLK_LCTRL) && !isKeyDown(SDLK_RCTRL))
+		return;
+
+	if (key.type != SDL_EVENT_KEY_DOWN)
+		return;
+
+	Vector2f world_pos = floorVec(Camera::screenToWorld(mouse_pos_));
+
+	if (key.key == SDLK_C)
+		Interface::getInstance().getGrid().copyBlock(world_pos);
+	if (key.key == SDLK_V)
+		Interface::getInstance().getGrid().pasteBlock(world_pos);
 }
 
 void Input::handleShortcuts(SDL_Event *event)

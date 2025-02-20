@@ -26,11 +26,24 @@ SDL_FRect *Block::getFRect()
 	return &render_rect_;
 }
 
+void BlockGenerator::copySample(Sample *sample)
+{
+	sample_.openPath(sample->getPath());
+	sample_.setPlayType(sample->getPlayType());
+	sample_.setRoot(sample->getRoot());
+}
+
 BlockGenerator *BlockGenerator::clone()
 {
-	BlockGenerator *copy = new BlockGenerator({rect_.x, rect_.y});
+	// BlockGenerator *copy = new BlockGenerator(*this);
+	// copy->createAudioStream(); //audiocallback crashes?
+
+	BlockGenerator *copy = new BlockGenerator({getPos().x, getPos().y}, data_.phase);
 
 	copy->setData(data_);
+	copy->copySample(&sample_);
+	copy->setRelFreq(rel_freq_);
+	copy->setFreqFactor(freq_factor_);
 
 	return copy;
 }
@@ -44,6 +57,13 @@ BlockGenerator::BlockGenerator(Vector2f pos, double phase) : Block(pos)
 
 	data_.freq = SDL_pow(10, SDL_randf() - 1) * 500.0f;
 	setWave((WAVE_FORMS)(SDL_rand(4) + 1));
+
+	createAudioStream();
+}
+
+void BlockGenerator::createAudioStream()
+{
+	SDL_DestroyAudioStream(stream_);
 
 	SDL_AudioSpec *spec = AudioEngine::getInstance().getSpec();
 	stream_ = SDL_CreateAudioStream(spec, spec);
@@ -195,7 +215,10 @@ void BlockGenerator::setWave(WAVE_FORMS waveform)
 void BlockGenerator::setFrequency(pitch_t freq)
 {
 	if (freq == 0.0f)
+	{
 		data_.freq = 0.0f;
+		return;
+	}
 	else if (freq == last_freq_)
 		return;
 
@@ -375,7 +398,12 @@ void BlockSequencer::randomize()
 
 BlockSequencer *BlockSequencer::clone()
 {
-	BlockSequencer *copy = new BlockSequencer({rect_.x, rect_.y});
+	BlockSequencer *copy = new BlockSequencer(*this);
+
+	for (auto area : copy->getAreas())
+		removeArea(area);
+	copy->setActive(false);
+
 	return copy;
 }
 

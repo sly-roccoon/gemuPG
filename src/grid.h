@@ -34,6 +34,8 @@ public:
 	void bypassGenerators(bool);
 
 	bool isAreaAdjacent(Vector2f);
+	void copyBlock(Vector2f);
+	void pasteBlock(Vector2f);
 
 private:
 	bool sequencerExists(Vector2f);
@@ -50,6 +52,8 @@ private:
 
 	std::vector<Area *> areas_;
 	std::vector<Block *> blocks_;
+
+	std::shared_ptr<Block> copy_block_ = nullptr;
 
 	bool bypass_ = false;
 };

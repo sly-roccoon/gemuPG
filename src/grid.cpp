@@ -576,3 +576,38 @@ void Grid::bypassGenerators(bool bypass)
 			if (block->getType() == BLOCK_GENERATOR)
 				((BlockGenerator *)block)->setBypass(bypass);
 }
+
+void Grid::copyBlock(Vector2f pos)
+{
+	Block *block = getBlock(pos);
+	if (!block)
+		return;
+
+	copy_block_.reset(block->clone());
+}
+
+void Grid::pasteBlock(Vector2f pos)
+{
+	if (pos.x >= GRID_SIZE / 2 || pos.y >= GRID_SIZE / 2 || pos.x < -GRID_SIZE / 2 || pos.y < -GRID_SIZE / 2)
+		return;
+
+	if (!copy_block_)
+		return;
+
+	if (copy_block_->getType() == BLOCK_SEQUENCER)
+		if (!isAreaAdjacent(pos) || getArea(pos))
+			return;
+
+	Block *block = copy_block_->clone();
+	block->setPos(pos);
+
+	// override blocks of same type at pos
+	if (getBlock(pos) && getBlock(pos)->getType() == block->getType())
+		if (block->getType() == BLOCK_GENERATOR)
+			removeBlock(pos);
+		else if (block->getType() == BLOCK_SEQUENCER)
+			removeSequencer(pos);
+
+	if (!addBlock(block))
+		delete block;
+}

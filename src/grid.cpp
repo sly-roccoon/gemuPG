@@ -5,15 +5,6 @@
 #include <queue>
 #include "util.h"
 
-void Grid::update() // will def need optimization
-{
-	// for (auto &area : areas_)
-	// 	for (auto &block : blocks_)
-	// 		if (area->isInside(block->getPos()))
-	// 			area->addBlock(block);
-	// 		else
-	// 			area->removeBlock(block);
-}
 void Grid::draw(SDL_Renderer *renderer)
 {
 	SDL_SetRenderDrawColor(renderer, GRID_COLOR.r, GRID_COLOR.g, GRID_COLOR.b, GRID_COLOR.a);
@@ -75,9 +66,9 @@ void drawGenerator(SDL_Renderer *renderer, BlockGenerator *block)
 	std::string value_text = "";
 
 	if (block->isInArea())
-		type_text = std::format("{:.2f} * (x + {:.2f}) Hz", block->getFreqFactor(), block->getRelFreq());
+		type_text = std::format("{:.2f} * (x + {:.2f})Hz", block->getFreqFactor(), block->getRelFreq());
 	else
-		type_text = std::format("{:.2f} Hz", block->getFrequency());
+		type_text = std::format("{:.2f}Hz", block->getFrequency());
 
 	switch (block->getWaveForm())
 	{
@@ -119,13 +110,13 @@ void drawSequencer(SDL_Renderer *renderer, BlockSequencer *block)
 	case PITCH_ABS_FREQUENCY:
 	{
 		type_text = "absolute";
-		value_text = std::format("{:.2f} Hz", block->getPitch());
+		value_text = std::format("{:.2f}Hz", block->getPitch());
 		break;
 	}
 	case PITCH_REL_FREQUENCY:
 	{
 		type_text = "relative";
-		value_text = std::format("{:.2f} Hz", block->getPitch());
+		value_text = std::format("{:.2f}Hz", block->getPitch());
 		break;
 	}
 	case PITCH_INTERVAL:

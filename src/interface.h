@@ -56,6 +56,8 @@ private:
 	inline static SDL_Window *window_ = nullptr;
 	SDL_Renderer *renderer_ = nullptr;
 
+	SDL_Surface *icon_;
+
 	void drawGrid();
 	void drawAreas();
 	void drawBlocks();

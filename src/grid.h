@@ -10,7 +10,6 @@
 class Grid
 {
 public:
-	void update();
 	void draw(SDL_Renderer *);
 	void drawBlocks(SDL_Renderer *);
 	void drawAreas(SDL_Renderer *);

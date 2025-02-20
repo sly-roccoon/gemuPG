@@ -17,6 +17,8 @@ Interface::Interface() : camera_{Camera::getInstance()}
 
 	Text::init(renderer_);
 
+	icon_ = SDL_LoadBMP("icon.bmp");
+	SDL_SetWindowIcon(window_, icon_);
 	SDL_SetWindowResizable(window_, true);
 }
 
@@ -61,7 +63,7 @@ void Interface::destroy()
 {
 	SDL_DestroyRenderer(renderer_);
 	SDL_DestroyWindow(window_);
-	renderer_, window_ = nullptr;
+	SDL_DestroySurface(icon_);
 }
 
 bool Interface::addBlock(Vector2f pos)

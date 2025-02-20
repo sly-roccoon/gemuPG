@@ -266,10 +266,10 @@ void BlockGenerator::drawGUI()
 
 	ImGui::DragFloat("amplitude", &data_.amp, 0.001f, 0.0f, 1.0f, "% .3f", ImGuiSliderFlags_Logarithmic);
 	if (!is_in_area_)
-		ImGui::SliderFloat("frequency", &data_.freq, 20.0f, 20000.0f, "% .2f Hz", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("frequency", &data_.freq, 20.0f, 20000.0f, "% .2fHz", ImGuiSliderFlags_Logarithmic);
 	else
 	{
-		ImGui::SliderFloat("relative frequency", &rel_freq_, -20.0f, 20.0f, "%.2f Hz", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("relative frequency", &rel_freq_, -20.0f, 20.0f, "%.2fHz", ImGuiSliderFlags_Logarithmic);
 		ImGui::SliderFloat("frequency factor", &freq_factor_, 1.0f / 16.0f, 16.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 	}
 
@@ -319,7 +319,7 @@ void BlockGenerator::drawGUI()
 		}
 
 		pitch_t root = sample_.getRoot();
-		if (ImGui::SliderFloat("sample root frequency", &root, 20.0f, 20'000.0f, "%.2f Hz", ImGuiSliderFlags_Logarithmic))
+		if (ImGui::SliderFloat("sample root frequency", &root, 20.0f, 20'000.0f, "%.2fHz", ImGuiSliderFlags_Logarithmic))
 			if (root > 0)
 				sample_.setRoot(root);
 	}

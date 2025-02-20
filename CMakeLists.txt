@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.28)
 set(CMAKE_COLOR_DIAGNOSTICS OFF)
 set(CMAKE_CXX_STANDARD 20)
 
-project(gemupg VERSION 0.1)
+project(gemupg VERSION 0.9)
 
 # SDL
 find_package(SDL3 CONFIG REQUIRED)

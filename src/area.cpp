@@ -49,7 +49,7 @@ Block *Area::addBlock(Block *block)
 			BlockGenerator *block_g = (BlockGenerator *)block;
 			block_g->setInArea(true);
 			updateGlissando(block_g);
-			updateAttack(block_g);
+			updateEnvelope(block_g);
 			(block_g)->setFrequency(0.0f);
 		}
 		return block;
@@ -281,9 +281,9 @@ void Area::stepSequence()
 		}
 
 		if (last_freq_ < 20.0f)
-			last_freq_ += 20000.0f;
+			last_freq_ += 20000.0f - 20.0f;
 		else if (last_freq_ > 20000.0f)
-			last_freq_ -= 20000.0f;
+			last_freq_ -= 20000.0 - 20.0f;
 
 		setNotes(last_freq_);
 	}
@@ -310,19 +310,30 @@ void Area::updateGlissando(BlockGenerator *block)
 			((BlockGenerator *)block)->setGlissTime(time);
 }
 
-void Area::updateAttack(BlockGenerator *block)
+void Area::updateEnvelope(BlockGenerator *block)
 {
-	double time = (attack_percent_ / 100.0f) * (60.0f / (bpm_subdivision_ * Clock::getInstance().getBPM()));
+	double note_length = (60.0f / (bpm_subdivision_ * Clock::getInstance().getBPM()));
+
+	double attack_time = (attack_percent_ / 100.0f) * note_length;
+
+	release_percent_ = release_percent_ < 100.0f - attack_percent_ ? release_percent_ : 100.0f - attack_percent_;
+	double release_time = (1.0 - (release_percent_ / 100.0f)) * note_length;
 
 	if (block)
 	{
-		((BlockGenerator *)block)->setAttackTime(time);
+		((BlockGenerator *)block)->setAttackTime(attack_time);
+		((BlockGenerator *)block)->setReleaseTime(release_time);
+		((BlockGenerator *)block)->setNoteLength(note_length);
 		return;
 	}
 
 	for (auto block : blocks_)
 		if (block->getType() == BLOCK_GENERATOR)
-			((BlockGenerator *)block)->setAttackTime(time);
+		{
+			((BlockGenerator *)block)->setAttackTime(attack_time);
+			((BlockGenerator *)block)->setReleaseTime(release_time);
+			((BlockGenerator *)block)->setNoteLength(note_length);
+		}
 }
 
 void Area::drawGUI()
@@ -337,7 +348,7 @@ void Area::drawGUI()
 	if (ImGui::DragInt("bpm subdivision", &bpm_subdivision_, 1, 1, 32, "1/%d", ImGuiSliderFlags_Logarithmic))
 	{
 		updateGlissando();
-		updateAttack();
+		updateEnvelope();
 	}
 
 	ImGui::DragFloat("amplitude", &amp_, 0.001f, 0.0f, 1.0f, "% .3f", ImGuiSliderFlags_Logarithmic);
@@ -345,7 +356,9 @@ void Area::drawGUI()
 	if (ImGui::SliderFloat("glissando", &gliss_percent_, 0.0f, 100.0f, "%.1f %%", ImGuiSliderFlags_AlwaysClamp))
 		updateGlissando();
 	if (ImGui::SliderFloat("attack", &attack_percent_, 0.0f, 100.0f, "%.1f %%", ImGuiSliderFlags_AlwaysClamp))
-		updateAttack();
+		updateEnvelope();
+	if (ImGui::SliderFloat("release", &release_percent_, 0.0f, 100.0f, "%.1f %%", ImGuiSliderFlags_AlwaysClamp))
+		updateEnvelope();
 
 	ImGui::End();
 }

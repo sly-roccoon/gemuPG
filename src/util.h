@@ -113,3 +113,4 @@ SDL_Color invertColor(SDL_Color);
 double interpTable(float *array, size_t size, double idx);
 
 extern float RENDER_SCALE;
+extern Uint32 PERFORMANCE_FREQUENCY;

@@ -114,6 +114,8 @@ public:
 
 	void setGlissTime(double s) { gliss_time_ = s; }
 	void setAttackTime(double s) { attack_time_ = s; }
+	void setReleaseTime(double s) { release_time_ = s; }
+	void setNoteLength(double s) { note_length_ = s; }
 
 private:
 	bool bypass_ = false;
@@ -128,11 +130,15 @@ private:
 		.phase = 0};
 	int fs_;
 	Uint64 last_note_change_ = 0;
+
 	double gliss_freq_ = -1.0f;
 	double last_freq_ = -1.0f;
 	double gliss_time_ = 0.0f;
-	double attack_amp_ = 0.0f;
+
+	double env_amp_ = 0.0f;
 	double attack_time_ = 0.0f;
+	double release_time_ = 0.0f;
+	double note_length_ = 0.0f;
 
 	pitch_t rel_freq_ = 0.0f;
 	float freq_factor_ = 1.0f;

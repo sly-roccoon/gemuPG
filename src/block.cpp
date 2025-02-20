@@ -57,18 +57,24 @@ BlockGenerator::~BlockGenerator()
 
 double BlockGenerator::getPhase()
 {
-	if (getWaveForm() != WAVE_SAMPLE || sample_.getSize() == 0)
+	if (getWaveForm() != WAVE_SAMPLE)
 		data_.phase = SDL_fmod(data_.phase + (getFrequency() / fs_), 1.0f);
-	else
+	else if (sample_.getSize() > 0)
 	{
-		data_.phase = data_.phase + getFrequency() / (sample_.getRoot() * fs_);
+		double root = sample_.getRoot();
+		if (root <= 0.0)
+			root = 1.0;
+		data_.phase = data_.phase + getFrequency() / (root * fs_);
 		if (data_.phase > 1.0)
 		{
 			sample_.setPlayed(true);
 		}
 		data_.phase = SDL_fmod(data_.phase, 1.0);
 	}
+	else
+		data_.phase = 0;
 
+	data_.phase = SDL_clamp(data_.phase, 0.0, 1.0);
 	return data_.phase;
 }
 
@@ -106,7 +112,6 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 			}
 
 			double amp = block->getAmp();
-
 			if (block->getWaveForm() != WAVE_SAMPLE)
 			{
 				double idx = block->getPhase() * (WAVE_SIZE - 1);
@@ -198,22 +203,35 @@ void BlockGenerator::setFrequency(pitch_t freq)
 	sample_.setTrigger(true);
 	last_freq_ = data_.freq;
 	gliss_freq_ = last_freq_;
-	attack_amp_ = 0.0f;
+	env_amp_ = 0.0f;
 	last_note_change_ = SDL_GetPerformanceCounter();
 	data_.freq = (freq + rel_freq_) * freq_factor_;
 }
 
 double BlockGenerator::getAmp()
 {
-	if (!is_in_area_ || attack_time_ == 0 || attack_amp_ >= data_.amp)
+	if (!is_in_area_)
 		return data_.amp;
 
 	Uint64 now = SDL_GetPerformanceCounter();
-	double dt = static_cast<double>(now - last_note_change_) / static_cast<double>(SDL_GetPerformanceFrequency());
-	double factor = static_cast<double>(dt) / static_cast<double>(attack_time_);
-	attack_amp_ = data_.amp * factor;
 
-	return attack_amp_;
+	double dt = static_cast<double>(now - last_note_change_) / static_cast<double>(PERFORMANCE_FREQUENCY);
+	if (env_amp_ < data_.amp && attack_time_ != 0.0)
+	{
+		double factor = SDL_clamp(static_cast<double>(dt) / static_cast<double>(attack_time_), 0.0, 1.0);
+		env_amp_ = data_.amp * factor;
+	}
+	else if (now - last_note_change_ > release_time_ * PERFORMANCE_FREQUENCY && release_time_ != note_length_)
+	{
+		dt -= release_time_;
+		double factor = 1.0 - SDL_clamp(static_cast<double>(dt) / static_cast<double>(note_length_ - release_time_), 0.0, 1.0);
+		env_amp_ = data_.amp * factor;
+	}
+	else
+	{
+		env_amp_ = data_.amp;
+	}
+	return env_amp_;
 }
 
 double BlockGenerator::getFrequency()
@@ -284,6 +302,8 @@ void BlockGenerator::drawGUI()
 			sample_.open();
 			data_.disp_wave = *sample_.getDispWave();
 		}
+		ImGui::SameLine();
+		ImGui::Text(sample_.getPath().c_str());
 
 		if (is_in_area_)
 		{

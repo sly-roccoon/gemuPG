@@ -93,6 +93,7 @@ void SaveLoad::saveJSON(std::string path, Grid *grid)
         area_json["bpm_subdivision"] = area->getBPMSubdivision();
         area_json["gliss_percent"] = area->getGlissPercent();
         area_json["attack_percent"] = area->getAttackPercent();
+        area_json["release_percent"] = area->getReleasePercent();
         for (auto &pos : area->getPositions())
             area_json["positions"].push_back({pos.x, pos.y});
 
@@ -130,6 +131,7 @@ void SaveLoad::loadJSON(std::string path, Grid *grid)
         area->setBPMSubdivision(area_json["bpm_subdivision"]);
         area->setGlissPercent(area_json["gliss_percent"]);
         area->setAttackPercent(area_json["attack_percent"]);
+        area->setReleasePercent(area_json["release_percent"]);
     }
 
     for (auto &sequencer_json : j["sequencers"])

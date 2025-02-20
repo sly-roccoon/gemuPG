@@ -95,6 +95,7 @@ bool Sample::openPath(std::string path)
 
     if (SDL_LoadWAV(path.c_str(), &spec_, &audio_, &audio_len_))
     {
+        path_ = path;
         updatePath();
         updateWave();
         return true;

@@ -40,7 +40,7 @@ public:
     void setGUI(bool view) { viewGUI_ = view; }
 
     void updateGlissando(BlockGenerator *block = nullptr);
-    void updateAttack(BlockGenerator *block = nullptr);
+    void updateEnvelope(BlockGenerator *block = nullptr);
 
     float getGlissPercent() { return gliss_percent_; }
     void setGlissPercent(float gliss_percent)
@@ -53,7 +53,13 @@ public:
     void setAttackPercent(float attack_percent)
     {
         attack_percent_ = attack_percent;
-        updateAttack();
+        updateEnvelope();
+    }
+    float getReleasePercent() { return release_percent_; }
+    void setReleasePercent(float release_percent)
+    {
+        release_percent_ = release_percent;
+        updateEnvelope();
     }
 
 private:
@@ -75,6 +81,7 @@ private:
 
     float gliss_percent_ = 0.0f;
     float attack_percent_ = 25.0f;
+    float release_percent_ = 25.0f;
 
     bool viewGUI_ = false;
     int bpm_subdivision_ = 4;

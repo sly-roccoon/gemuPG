@@ -475,7 +475,7 @@ Area *Grid::addArea(Vector2f pos)
 	return area;
 }
 
-void Grid::splitAreas(Area *area) // TODO: this is probably terrible
+void Grid::splitAreas(Area *area)
 {
 	std::vector<Vector2f> remaining_pos = area->getPositions();
 
@@ -522,6 +522,12 @@ void Grid::splitAreas(Area *area) // TODO: this is probably terrible
 				continue;
 			new_area->addSequencer(sequencer);
 		}
+
+		new_area->setAmp(area->getAmp());
+		new_area->setGlissPercent(area->getGlissPercent());
+		new_area->setAttackPercent(area->getAttackPercent());
+		new_area->setReleasePercent(area->getReleasePercent());
+		new_area->setBPMSubdivision(area->getBPMSubdivision());
 
 		new_area->updateSequence();
 		areas_.push_back(new_area);

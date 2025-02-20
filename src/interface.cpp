@@ -97,7 +97,7 @@ void Interface::updateBlockTimes()
 {
 	for (auto area : grid_.getAreas())
 	{
-		area->updateAttack();
+		area->updateEnvelope();
 		area->updateGlissando();
 	}
 }

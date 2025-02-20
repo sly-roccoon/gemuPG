@@ -2,6 +2,7 @@
 #include <map>
 
 float RENDER_SCALE = 1.0f;
+Uint32 PERFORMANCE_FREQUENCY = SDL_GetPerformanceFrequency();
 
 Vector2f floorVec(Vector2f vec)
 {

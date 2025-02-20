@@ -9,7 +9,7 @@ void Text::init(SDL_Renderer *renderer)
     renderer_ = renderer;
     std::string font_path = SDL_GetBasePath();
     font_path.append("/");
-    font_path.append(DEFAULT_FONT);
+    font_path.append(FONT);
     default_font_ = TTF_OpenFont(font_path.c_str(), 128);
     text_engine_ = TTF_CreateRendererTextEngine(renderer_);
 }

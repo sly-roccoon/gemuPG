@@ -238,18 +238,13 @@ void Area::updateSequence()
 void Area::setNotes(pitch_t freq)
 {
 	for (auto block : blocks_)
-	{
 		if (block->getType() == BLOCK_GENERATOR)
-		{
-			auto generator = (BlockGenerator *)block;
-			generator->setFrequency(freq);
-		}
-	}
+			((BlockGenerator *)block)->setFrequency(freq);
 };
 
 void Area::stepSequence()
 {
-	unsigned int counter = Clock::getCounter();
+	unsigned int counter = Clock::getStepCounter();
 	if (counter % (MAX_SUBDIVISION / bpm_subdivision_) != 0)
 		return;
 

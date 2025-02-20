@@ -118,8 +118,7 @@ void GUI::drawToolbar()
 
 	if (ImGui::InputFloat("BPM", &bpm, 1.0f, 5.0f, "%.1f"))
 	{
-		if (bpm <= 0.0f)
-			bpm = 1.0f;
+		bpm = SDL_clamp(bpm, 1.0, 200.0);
 		Clock::getInstance().setBPM(bpm);
 		Interface::getInstance().updateBlockTimes();
 	}

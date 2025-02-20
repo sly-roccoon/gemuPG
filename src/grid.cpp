@@ -600,6 +600,7 @@ void Grid::pasteBlock(Vector2f pos)
 
 	Block *block = copy_block_->clone();
 	block->setPos(pos);
+	block->setGUI(false);
 
 	// override blocks of same type at pos
 	if (getBlock(pos) && getBlock(pos)->getType() == block->getType())

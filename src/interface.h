@@ -65,5 +65,5 @@ private:
 	void drawSequencerGUI();
 	void drawBlockSelection();
 	void drawGUI();
-	void debug();
+	void drawDebug();
 };

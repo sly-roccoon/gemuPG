@@ -219,8 +219,8 @@ void BlockGenerator::setFrequency(pitch_t freq)
 		data_.freq = 0.0f;
 		return;
 	}
-	else if (freq == last_freq_)
-		return;
+	// else if (freq == last_freq_)
+	// 	return;
 
 	sample_.setPlayed(false);
 	sample_.setTrigger(true);

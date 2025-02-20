@@ -124,7 +124,8 @@ void Interface::draw()
 	drawBlocks();
 	drawGUI();
 
-	// debug();
+	if (DRAW_DEBUG)
+		drawDebug();
 
 	SDL_RenderPresent(renderer_);
 }
@@ -224,13 +225,12 @@ void Interface::closeAllWindows()
 		block->setGUI(false);
 }
 
-void Interface::debug()
+void Interface::drawDebug()
 {
+	int w;
+	SDL_GetWindowSizeInPixels(window_, &w, NULL);
 	SDL_SetRenderDrawColor(renderer_, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderDebugTextFormat(renderer_, 0, 0, "CamPos: %.2f, %.2f", Camera::getPos().x, Camera::getPos().y);
-	SDL_RenderDebugTextFormat(renderer_, 0, 20, "Current Selection: %s", cur_selection_ == BLOCK_GENERATOR ? "Generator" : cur_selection_ == AREA		   ? "Area"
-																													   : cur_selection_ == BLOCK_SEQUENCER ? "Sequencer"
-																																						   : "Unknown");
+	SDL_RenderDebugTextFormat(renderer_, w - 2 * SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE, 0, "%d", Clock::getInstance().getFPS());
 }
 
 //--------------------------------------------------------

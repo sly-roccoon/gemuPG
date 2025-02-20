@@ -8,13 +8,17 @@
 #include <array>
 #include <string>
 
-#define ADJUST_AMP_BY_CREST true
-#define DEFAULT_FONT "Sono-SemiBold.ttf"
+#define DRAW_DEBUG false
+#define FONT "Sono-SemiBold.ttf"
 
+constexpr bool ADJUST_AMP_BY_CREST = true;
 constexpr float ONE_DIV_SQRT_THREE = 0.5773502691896258;
 
 constexpr unsigned int DEFAULT_WIDTH = 1280;
 constexpr unsigned int DEFAULT_HEIGHT = 960;
+constexpr unsigned int MAX_FPS = 60;
+constexpr unsigned int MIN_FPS = 30;
+constexpr double MAX_BPM_DEVIATION = 0.1;
 
 constexpr unsigned int ICON_SIZE = 64;
 constexpr ImVec2 IMGUI_WIN_SIZE = {ICON_SIZE * 8, ICON_SIZE * 5};

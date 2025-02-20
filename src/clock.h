@@ -13,10 +13,14 @@ public:
         return clock;
     }
 
-    float getDelta() { return delta_; };
-    bool isTime();
+    bool shouldStep();
+    bool shouldDraw();
 
-    static unsigned int getCounter() { return counter_; };
+    static unsigned int getStepCounter()
+    {
+        step_counter_ = step_counter_ % MAX_SUBDIVISION;
+        return step_counter_;
+    };
 
     float getBPM() { return bpm_; };
     void setBPM(float bpm) { bpm_ = bpm; };
@@ -24,16 +28,22 @@ public:
     bool isRunning() { return running_; };
     void setRunning(bool running) { running_ = running; };
 
+    size_t getFPS() { return fps_; }
+
 private:
-    Clock() { last_time_ = SDL_GetPerformanceCounter(); }
+    Clock() {};
     Clock(const Clock &) = delete;
     Clock &operator=(const Clock &) = delete;
 
     bool running_ = true;
 
-    Uint64 last_time_;
-    double delta_;
+    Uint64 last_step_ = SDL_GetPerformanceCounter();
+    Uint64 last_draw_ = SDL_GetPerformanceCounter();
     float bpm_ = DEFAULT_BPM;
+    size_t fps_ = MAX_FPS;
 
-    static unsigned int counter_;
+    size_t step_overshoot_ = 0;
+    size_t min_possible_step_ = PERFORMANCE_FREQUENCY * 60.0f / bpm_ / MAX_SUBDIVISION;
+
+    inline static unsigned int step_counter_ = 0;
 };

@@ -19,16 +19,18 @@ public:
 
     bool empty() { return audio_ == nullptr; };
     pitch_t getRoot() { return root_; };
-    void setRoot(pitch_t root) { root_ = root; };
+    void setRoot(pitch_t root) { root_ = root <= 0.0f ? 0.1f : root; };
     bool open();
     bool openPath(std::string path = "");
     void updatePath();
 
     void setPath(std::string path) { path_ = path; }
     std::string getPath() { return path_; }
+    std::string getName() { return name_; }
 
     SDL_AudioSpec getSpec() { return spec_; }
     void setSpec(const SDL_AudioSpec &spec) { spec_ = spec; }
+    double getFsRatio() { return fs_ratio_; }
 
     Uint32 getAudioLen() { return audio_len_; }
     void setAudioLen(Uint32 len) { audio_len_ = len; }
@@ -41,7 +43,7 @@ public:
     float *getWave() { return sample_; };
     void copyWave(float *, size_t);
 
-    size_t getSize() { return sample_size_; }
+    int getSize() { return sample_size_; }
 
     void setPlayed(bool played) { played_ = played; }
     bool isPlayed() { return played_; }
@@ -56,14 +58,15 @@ public:
 
 private:
     std::string path_ = "";
+    std::string name_ = "";
     SDL_AudioSpec spec_ = {};
     Uint8 *audio_ = nullptr;
     Uint32 audio_len_ = -1;
 
-    float fs_ratio_ = 1.0f;
+    double fs_ratio_ = 1.0f;
 
     float *sample_ = nullptr;
-    size_t sample_size_ = 0;
+    int sample_size_ = 0;
 
     bool played_ = false;
     bool trigger_ = true;

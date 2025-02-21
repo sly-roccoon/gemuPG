@@ -49,8 +49,9 @@ constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 4;
 constexpr int MAX_HARMONIC = 32;
 constexpr double ENV_TIME_CONST = 3;
 
-constexpr long long int AUDIO_S16_PEAK = 65536 / 2;
-constexpr long long int AUDIO_S32_PEAK = 4294967296 / 2;
+constexpr double AUDIO_S16_PEAK = 65536 / 2;
+constexpr double AUDIO_S32_PEAK = 4294967296 / 2;
+constexpr double AUDIO_F32_PEAK = 1.0f;
 
 using pitch_t = float;
 

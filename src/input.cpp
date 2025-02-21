@@ -205,7 +205,8 @@ void Input::handleSaveLoad(SDL_Event *event)
 			save_as = true;
 		if (key.key == SDLK_S && key.type == SDL_EVENT_KEY_DOWN)
 		{
-			Interface::getInstance().stop();
+			if (save_as)
+				Interface::getInstance().stop();
 			SaveLoad::save(save_as);
 		}
 		else if (key.key == SDLK_O && key.type == SDL_EVENT_KEY_DOWN)

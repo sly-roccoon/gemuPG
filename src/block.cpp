@@ -78,21 +78,28 @@ BlockGenerator::~BlockGenerator()
 double BlockGenerator::getPhase()
 {
 	if (getWaveForm() != WAVE_SAMPLE)
-		data_.phase = SDL_fmod(data_.phase + (getFrequency() / fs_), 1.0f);
+		data_.phase = SDL_fmod(data_.phase + (getFrequency() / fs_), 1.0);
 	else if (sample_.getSize() > 0)
 	{
 		double root = sample_.getRoot();
-		if (root <= 0.0)
-			root = 1.0;
-		data_.phase = data_.phase + getFrequency() / (root * fs_);
+
+		if (sample_.getTrigger() && sample_.getPlayType() == ONE_SHOT)
+		{
+			data_.phase = 0.0; // first sample of retrigger should always be [0]
+			sample_.setTrigger(false);
+		}
+		else
+			data_.phase = data_.phase + getFrequency() / (root * sample_.getSize());
+
 		if (data_.phase > 1.0)
 		{
 			sample_.setPlayed(true);
 		}
+
 		data_.phase = SDL_fmod(data_.phase, 1.0);
 	}
 	else
-		data_.phase = 0;
+		data_.phase = 0.0;
 
 	data_.phase = SDL_clamp(data_.phase, 0.0, 1.0);
 	return data_.phase;
@@ -145,13 +152,10 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 				if (sample->getSize() != 0 && (!sample->isPlayed() || sample->getPlayType() == REPEAT))
 				{
 					double idx = 0.0;
-					if (sample->getTrigger() && sample->getPlayType() == ONE_SHOT)
-					{
-						block->getData()->phase = 0.0; // first sample of retrigger should always be [0]
-						sample->setTrigger(false);
-					}
-					else
-						idx = block->getPhase() * (sample->getSize());
+
+					float phase = block->getPhase();
+					long size = block->getSample()->getSize();
+					idx = SDL_fmod(phase * size, size);
 
 					samples[i] = amp * interpTable(sample->getWave(), sample->getSize(), idx);
 				}
@@ -217,18 +221,17 @@ void BlockGenerator::setFrequency(pitch_t freq)
 	if (freq == 0.0f)
 	{
 		data_.freq = 0.0f;
+		last_freq_ = data_.freq;
 		return;
 	}
-	// else if (freq == last_freq_)
-	// 	return;
 
 	sample_.setPlayed(false);
 	sample_.setTrigger(true);
-	last_freq_ = data_.freq;
+
 	gliss_freq_ = last_freq_;
-	env_amp_ = 0.0f;
 	last_note_change_ = SDL_GetPerformanceCounter();
 	data_.freq = SDL_clamp((freq + rel_freq_) * freq_factor_, 0.0, fs_ / 2);
+	last_freq_ = data_.freq;
 }
 
 double BlockGenerator::getAmp()
@@ -328,16 +331,12 @@ void BlockGenerator::drawGUI()
 	{
 		if (ImGui::Button("load sample", {ICON_SIZE * RENDER_SCALE * 2, 0}))
 		{
-			bool running = Clock::getInstance().isRunning();
-
-			Clock::getInstance().setRunning(false);
 			sample_.open();
-			Clock::getInstance().setRunning(running);
 
 			data_.disp_wave = *sample_.getDispWave();
 		}
 		ImGui::SameLine();
-		ImGui::Text(sample_.getPath().c_str());
+		ImGui::Text(sample_.getName().c_str());
 
 		if (is_in_area_)
 		{
@@ -353,9 +352,8 @@ void BlockGenerator::drawGUI()
 		}
 
 		pitch_t root = sample_.getRoot();
-		if (ImGui::SliderFloat("sample root frequency", &root, 20.0f, 20'000.0f, "%.2fHz", ImGuiSliderFlags_Logarithmic))
-			if (root > 0)
-				sample_.setRoot(root);
+		if (ImGui::SliderFloat("sample root frequency", &root, 1.0f, 10'000.0f, "%.2fHz", ImGuiSliderFlags_Logarithmic))
+			sample_.setRoot(root);
 	}
 
 	ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, {ICON_SIZE * RENDER_SCALE * 8 - margins.x * 2, ICON_SIZE * RENDER_SCALE * 2 - margins.y * 2});

@@ -218,15 +218,18 @@ void BlockGenerator::setWave(WAVE_FORMS waveform)
 
 void BlockGenerator::setFrequency(pitch_t freq)
 {
+	last_freq_ = data_.freq;
 	if (freq == 0.0f)
 	{
-		last_freq_ = data_.freq;
 		data_.freq = 0.0f;
 		return;
 	}
 
-	sample_.setPlayed(false);
-	sample_.setTrigger(true);
+	if (last_freq_ == 0.0f)
+	{
+		sample_.setPlayed(false);
+		sample_.setTrigger(true);
+	}
 
 	gliss_freq_ = last_freq_;
 	last_note_change_ = SDL_GetPerformanceCounter();

@@ -220,8 +220,8 @@ void BlockGenerator::setFrequency(pitch_t freq)
 {
 	if (freq == 0.0f)
 	{
-		data_.freq = 0.0f;
 		last_freq_ = data_.freq;
+		data_.freq = 0.0f;
 		return;
 	}
 
@@ -230,8 +230,8 @@ void BlockGenerator::setFrequency(pitch_t freq)
 
 	gliss_freq_ = last_freq_;
 	last_note_change_ = SDL_GetPerformanceCounter();
-	data_.freq = SDL_clamp((freq + rel_freq_) * freq_factor_, 0.0, fs_ / 2);
 	last_freq_ = data_.freq;
+	data_.freq = SDL_clamp((freq + rel_freq_) * freq_factor_, 0.0, fs_ / 2);
 }
 
 double BlockGenerator::getAmp()

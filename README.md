@@ -18,6 +18,12 @@ Left Click on Block/Area = Edit Block/Area
 
 **Edit and Remove only works with respective tool**
 
+On Hover:
+
+Ctrl + C = Copy Block
+
+Ctrl + V = Paste Block
+
 ----------------------------
 Ctrl + S = Save
 

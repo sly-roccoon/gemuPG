@@ -121,7 +121,10 @@ void Area::removeSequencer(BlockSequencer *sequencer)
 	{
 		sequencer->removeArea(this);
 		if (sequencer->hasNoAreas())
+		{
 			delete sequencer;
+			sequencer = nullptr;
+		}
 		updateSequence();
 	}
 }

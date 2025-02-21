@@ -225,16 +225,17 @@ void BlockGenerator::setFrequency(pitch_t freq)
 		return;
 	}
 
-	if (last_freq_ == 0.0f)
+	gliss_freq_ = last_freq_;
+	last_note_change_ = SDL_GetPerformanceCounter();
+	double new_freq = SDL_clamp((freq + rel_freq_) * freq_factor_, 0.0, fs_ / 2);
+
+	if (last_freq_ != new_freq)
 	{
 		sample_.setPlayed(false);
 		sample_.setTrigger(true);
 	}
 
-	gliss_freq_ = last_freq_;
-	last_note_change_ = SDL_GetPerformanceCounter();
-	last_freq_ = data_.freq;
-	data_.freq = SDL_clamp((freq + rel_freq_) * freq_factor_, 0.0, fs_ / 2);
+	data_.freq = new_freq;
 }
 
 double BlockGenerator::getAmp()
@@ -269,8 +270,8 @@ double BlockGenerator::getAmp()
 
 double BlockGenerator::getFrequency()
 {
-	constexpr float e = 10e-6;
-	if (!is_in_area_ || last_freq_ == 0.0f || gliss_time_ == 0 || std::abs(data_.freq - gliss_freq_) < e)
+	constexpr float e = 10e-3;
+	if (!is_in_area_ || last_freq_ == 0.0f || gliss_time_ == 0 || std::abs(1.0 - data_.freq / gliss_freq_) < e)
 		return data_.freq;
 
 	Uint64 now = SDL_GetPerformanceCounter();

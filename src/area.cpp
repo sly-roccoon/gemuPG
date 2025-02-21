@@ -263,7 +263,8 @@ void Area::stepSequence()
 	{
 		sequence_.at(cur_note_idx_)->setActive(true);
 
-		switch (sequence_.at(cur_note_idx_)->getPitchType())
+		pitch_type_t pitch_type = sequence_.at(cur_note_idx_)->getPitchType();
+		switch (pitch_type)
 		{
 		case PITCH_ABS_FREQUENCY:
 		case PITCH_NOTE:
@@ -278,10 +279,13 @@ void Area::stepSequence()
 			break;
 		}
 
-		while (last_freq_ < 20.0f)
-			last_freq_ += 20000.0f - 20.0f;
-		while (last_freq_ > 20000.0f)
-			last_freq_ -= 20000.0 - 20.0f;
+		if (pitch_type == PITCH_REL_FREQUENCY || pitch_type == PITCH_INTERVAL) // wrap around [20;20'000] Hz range if relative pitch change
+		{
+			while (last_freq_ < 20.0f)
+				last_freq_ += 20000.0f - 20.0f;
+			while (last_freq_ > 20000.0f)
+				last_freq_ -= 20000.0 - 20.0f;
+		}
 
 		setNotes(last_freq_);
 	}

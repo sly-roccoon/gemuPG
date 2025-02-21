@@ -249,15 +249,13 @@ double BlockGenerator::getAmp()
 	double dt = static_cast<double>(now - last_note_change_) / static_cast<double>(PERFORMANCE_FREQUENCY);
 	if (now - last_note_change_ < attack_time_ * PERFORMANCE_FREQUENCY && attack_time_ != 0.0)
 	{
-		// env_amp_ += dt * data_.amp / attack_time_;
-		double factor = SDL_exp(-ENV_TIME_CONST * static_cast<double>(dt) / static_cast<double>(attack_time_));
-		env_amp_ = SDL_clamp(data_.amp * (1.0 - factor), 0.0, data_.amp);
+		// double factor = SDL_exp(-ENV_TIME_CONST * static_cast<double>(dt) / static_cast<double>(attack_time_));
+		// env_amp_ = SDL_clamp(data_.amp * (1.0 - factor), 0.0, data_.amp);
+		double factor = static_cast<double>(dt) / static_cast<double>(attack_time_);
+		env_amp_ = SDL_clamp(data_.amp * factor, 0.0, data_.amp);
 	}
 	else if (now - last_note_change_ > release_time_ * PERFORMANCE_FREQUENCY)
 	{
-		// if (release_time_ == note_length_)
-		// 	release_time_ = note_length_ * 0.99;
-		// env_amp_ -= dt * data_.amp / (note_length_ - release_time_);
 		dt -= release_time_;
 		double factor = SDL_exp(-ENV_TIME_CONST * static_cast<double>(dt) / static_cast<double>(note_length_ - release_time_));
 		env_amp_ = SDL_clamp(data_.amp * factor, 0.0, data_.amp);

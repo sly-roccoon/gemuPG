@@ -5,14 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(gemupg VERSION 1.0)
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-	message(STATUS "Using clang")
-	add_compile_options(-Wno-int-conversions)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	message(STATUS "Using GCC")
-	add_compile_options(-Wno-pmf-conversions)
-endif()
-
 # SDL
 find_package(SDL3 CONFIG REQUIRED)
 
@@ -29,6 +21,13 @@ target_link_libraries(IMGUI PUBLIC SDL3::SDL3)
 target_include_directories(IMGUI PUBLIC "include/imgui")
 
 # GEMUPG
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	message(STATUS "Using clang")
+	add_compile_options(-Wno-int-conversions)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	message(STATUS "Using GCC")
+	add_compile_options(-Wno-pmf-conversions)
+endif()
 
 file (GLOB_RECURSE gemupg_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 file (GLOB_RECURSE gemupg_HEADERS CONFIGURE_DEPENDS "src/*.h")

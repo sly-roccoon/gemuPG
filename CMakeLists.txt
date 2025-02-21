@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.28)
 set(CMAKE_COLOR_DIAGNOSTICS OFF)
 set(CMAKE_CXX_STANDARD 20)
 
-project(gemupg VERSION 0.9)
+project(gemupg VERSION 1.0)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	message(STATUS "Using clang")

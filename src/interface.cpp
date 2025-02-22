@@ -9,7 +9,7 @@ Interface::Interface() : camera_{Camera::getInstance()}
 	if (!SDL_Init(SDL_INIT_VIDEO))
 		exit(SDL_APP_FAILURE);
 
-	if (!SDL_CreateWindowAndRenderer("GemuPG", width_, height_, 0, &window_, &renderer_))
+	if (!SDL_CreateWindowAndRenderer(TITLE, width_, height_, 0, &window_, &renderer_))
 		exit(SDL_APP_FAILURE);
 
 	if (!TTF_Init())
@@ -54,9 +54,9 @@ void Interface::setPlaying(bool playing)
 void Interface::updateTitle(std::string path)
 {
 	if (path.empty())
-		SDL_SetWindowTitle(window_, "GemuPG");
+		SDL_SetWindowTitle(window_, TITLE);
 	else
-		SDL_SetWindowTitle(window_, std::format("GemuPG [{}]", path).c_str());
+		SDL_SetWindowTitle(window_, std::format("{} [{}]", TITLE, path).c_str());
 }
 
 void Interface::stop()

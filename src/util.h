@@ -11,6 +11,7 @@
 #define DRAW_DEBUG false
 #define FONT "Sono-SemiBold.ttf"
 
+constexpr const char *TITLE = "gemuPG";
 constexpr bool ADJUST_AMP_BY_CREST = true;
 constexpr float ONE_DIV_SQRT_THREE = 0.5773502691896258;
 

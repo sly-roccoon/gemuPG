@@ -11,7 +11,7 @@
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 {
-	SDL_SetAppMetadata("GemuPG", "0.1.0", "Poly* Audio Software");
+	SDL_SetAppMetadata(TITLE, "0.1.0", "Poly* Audio Software");
 
 	Interface &interface = Interface::getInstance();
 	Input &input = Input::getInstance();

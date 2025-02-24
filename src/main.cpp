@@ -18,6 +18,9 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 	AudioEngine &audio = AudioEngine::getInstance();
 	GUI::init(interface.getWindow(), interface.getRenderer());
 
+	if (argc > 1)
+		SaveLoad::loadPath(argv[1]);
+
 	return SDL_APP_CONTINUE;
 }
 

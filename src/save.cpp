@@ -29,6 +29,13 @@ void SaveLoad::load()
     SDL_ShowOpenFileDialog(load_dialog_callback, (void *)grid, window, &save_filter, 1, NULL, false);
 }
 
+void SaveLoad::loadPath(std::string path)
+{
+    Grid *grid = &Interface::getInstance().getGrid();
+    SaveLoad::loadJSON(path, grid);
+    Interface::getInstance().updateTitle(SaveLoad::getPath());
+}
+
 void SaveLoad::saveJSON(std::string path, Grid *grid)
 {
     std::string file_ext = save_filter.pattern;

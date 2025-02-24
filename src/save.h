@@ -18,6 +18,7 @@ public:
 
     static void save(bool save_as);
     static void load();
+    static void loadPath(std::string path);
 
     static void saveJSON(std::string path, Grid *grid);
     static void loadJSON(std::string path, Grid *grid);

@@ -130,8 +130,6 @@ bool Sample::open()
     Interface::getInstance().setPlaying(false);
     SDL_ShowOpenFileDialog(callback, this, nullptr, &wav_filter, 1, SDL_GetCurrentDirectory(), false);
 
-    SDL_WaitSemaphore(sem);
-
     if (empty())
         return false;
 
@@ -159,10 +157,7 @@ void callback(void *userdata, const char *const *filelist, int filter)
 {
     Sample *sample = (Sample *)userdata;
     if (filelist == NULL || !filelist[0])
-    {
-        SDL_SignalSemaphore(sample->sem);
         return;
-    }
 
     SDL_AudioSpec spec;
     Uint8 *audio;
@@ -176,6 +171,4 @@ void callback(void *userdata, const char *const *filelist, int filter)
 
         sample->setPath(filelist[0]);
     }
-
-    SDL_SignalSemaphore(sample->sem);
 }

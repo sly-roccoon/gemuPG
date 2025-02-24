@@ -54,8 +54,6 @@ public:
     sample_play_type_t getPlayType() { return play_type_; };
     void setPlayType(sample_play_type_t play_type) { play_type_ = play_type; }
 
-    SDL_Semaphore *sem = SDL_CreateSemaphore(0);
-
 private:
     std::string path_ = "";
     std::string name_ = "";

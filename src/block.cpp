@@ -333,9 +333,11 @@ void BlockGenerator::drawGUI()
 	{
 		if (ImGui::Button("load sample", {ICON_SIZE * RENDER_SCALE * 2, 0}))
 		{
+			bool playing = Clock::getInstance().isRunning();
+			Interface::getInstance().setPlaying(false);
 			sample_.open();
-
 			data_.disp_wave = *sample_.getDispWave();
+			Interface::getInstance().setPlaying(playing);
 		}
 		ImGui::SameLine();
 		ImGui::Text(sample_.getName().c_str());

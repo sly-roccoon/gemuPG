@@ -257,7 +257,7 @@ void Input::handleShortcuts(SDL_Event *event)
 	if (key.key == SDLK_SPACE && key.type == SDL_EVENT_KEY_DOWN)
 		Interface::getInstance().togglePlayPause();
 
-	if (key.key == SDLK_Q && key.type == SDL_EVENT_KEY_DOWN)
+	if ((key.key == SDLK_Q || key.key == SDLK_ESCAPE) && key.type == SDL_EVENT_KEY_DOWN)
 		Interface::getInstance().closeAllWindows();
 
 	if (key.key == SDLK_D && key.type == SDL_EVENT_KEY_DOWN)

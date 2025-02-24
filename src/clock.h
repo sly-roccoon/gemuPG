@@ -18,7 +18,6 @@ public:
 
     static unsigned int getStepCounter()
     {
-        step_counter_ = step_counter_ % MAX_SUBDIVISION;
         return step_counter_;
     };
 

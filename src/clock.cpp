@@ -13,7 +13,7 @@ bool Clock::shouldStep()
         step_overshoot_ = min_possible_step_ - dt;
 
         last_step_ += dt;
-        step_counter_++;
+        step_counter_ = ++step_counter_ % MAX_SUBDIVISION;
         return true;
     }
 

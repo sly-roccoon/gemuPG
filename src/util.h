@@ -27,7 +27,7 @@ constexpr float TEXT_TYPE_SIZE_DIV = 4;
 constexpr float TEXT_VALUE_SIZE_DIV = 2;
 
 constexpr float DEFAULT_BPM = 60.0f;
-constexpr unsigned int MAX_SUBDIVISION = 64;
+constexpr unsigned int MAX_SUBDIVISION = 64 * 3 * 5; // no idea how to solve this better atm
 
 constexpr bool SEQUENCER_RANDOMIZED = true;
 

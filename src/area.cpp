@@ -248,8 +248,8 @@ void Area::setNotes(pitch_t freq)
 void Area::stepSequence()
 {
 	unsigned int counter = Clock::getStepCounter();
-	if (counter % (MAX_SUBDIVISION / bpm_subdivision_) != 0)
-		return;
+	if (SDL_floor(SDL_fmod(counter, static_cast<float>(MAX_SUBDIVISION) / static_cast<float>(bpm_subdivision_))) != 0)
+		return (void)counter;
 
 	last_note_idx_ = cur_note_idx_;
 	cur_note_idx_ = cur_note_idx_ >= sequence_.size() - 1 ? 0 : cur_note_idx_ + 1;

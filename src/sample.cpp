@@ -124,19 +124,9 @@ bool Sample::openPath(std::string path)
     return false;
 }
 
-bool Sample::open()
+void Sample::open()
 {
-    bool running = Clock::getInstance().isRunning();
-    Interface::getInstance().setPlaying(false);
     SDL_ShowOpenFileDialog(callback, this, nullptr, &wav_filter, 1, SDL_GetCurrentDirectory(), false);
-
-    if (empty())
-        return false;
-
-    updatePath();
-    updateWave();
-    Interface::getInstance().setPlaying(running);
-    return true;
 }
 
 void Sample::updateWave()
@@ -170,5 +160,17 @@ void callback(void *userdata, const char *const *filelist, int filter)
         sample->setAudioLen(audio_len);
 
         sample->setPath(filelist[0]);
+        sample->updateWave();
+        sample->updatePath();
+        sample->setNewLoad();
     }
+}
+
+bool Sample::isNewLoad()
+{
+    if (!new_load)
+        return false;
+
+    new_load = false;
+    return true;
 }

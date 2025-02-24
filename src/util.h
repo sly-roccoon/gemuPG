@@ -40,7 +40,7 @@ constexpr int GRID_SIZE = 512;
 constexpr SDL_Color GRID_COLOR = {128, 128, 128, SDL_ALPHA_OPAQUE};
 
 constexpr float MIN_CAMERA_ZOOM = 16.0f;
-constexpr float MAX_CAMERA_ZOOM = 255.0f;
+constexpr float MAX_CAMERA_ZOOM = 512.0f;
 const float DEFAULT_CAMERA_ZOOM = std::sqrt(std::pow(MIN_CAMERA_ZOOM, 2) + std::pow(MAX_CAMERA_ZOOM, 2));
 
 constexpr unsigned int BUFFER_SIZE = 512;

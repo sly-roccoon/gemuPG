@@ -39,6 +39,14 @@ void LowPassFilter::process(float *samples, int n_samples)
 
 		prev_y_.at(2) = prev_y_.at(1);
 		prev_y_.at(1) = samples[sample];
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (std::isnan(prev_x_.at(i)))
+				prev_x_.at(i) = 0.0;
+			if (std::isnan(prev_y_.at(i)))
+				prev_y_.at(i) = 0.0;
+		}
 	}
 }
 

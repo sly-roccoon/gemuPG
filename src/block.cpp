@@ -317,7 +317,7 @@ void BlockGenerator::drawGUI()
 	if (ImGui::BeginCombo("waveform", preview))
 	{
 		if (ImGui::Selectable("sample"))
-			setWave(WAVE_SAMPLE); // TODO: implement sample loading
+			setWave(WAVE_SAMPLE);
 		if (ImGui::Selectable("saw"))
 			setWave(WAVE_SAW);
 		if (ImGui::Selectable("sine"))
@@ -333,11 +333,7 @@ void BlockGenerator::drawGUI()
 	{
 		if (ImGui::Button("load sample", {ICON_SIZE * RENDER_SCALE * 2, 0}))
 		{
-			bool playing = Clock::getInstance().isRunning();
-			Interface::getInstance().setPlaying(false);
 			sample_.open();
-			data_.disp_wave = *sample_.getDispWave();
-			Interface::getInstance().setPlaying(playing);
 		}
 		ImGui::SameLine();
 		ImGui::Text(sample_.getName().c_str());
@@ -359,6 +355,9 @@ void BlockGenerator::drawGUI()
 		if (ImGui::SliderFloat("sample root frequency", &root, 1.0f, 10'000.0f, "%.2fHz", ImGuiSliderFlags_Logarithmic))
 			sample_.setRoot(root);
 	}
+
+	if (!sample_.empty() && sample_.isNewLoad())
+		setWave(WAVE_SAMPLE);
 
 	ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(), 0, "WAVEFORM", -1.0f, 1.0f, {ICON_SIZE * RENDER_SCALE * 8 - margins.x * 2, ICON_SIZE * RENDER_SCALE * 2 - margins.y * 2});
 
@@ -449,6 +448,8 @@ void BlockSequencer::drawGUI()
 	{
 		ImGui::SliderFloat("interval", &interval_, -octave_subdivision_ * 2, octave_subdivision_ * 2, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
 		ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f, "%.1f", ImGuiSliderFlags_NoRoundToFormat);
+		if (octave_subdivision_ <= 0.0f)
+			octave_subdivision_ = 1.0f;
 	}
 
 	if (pitch_type_ == PITCH_NOTE)

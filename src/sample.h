@@ -20,7 +20,7 @@ public:
     bool empty() { return audio_ == nullptr; };
     pitch_t getRoot() { return root_; };
     void setRoot(pitch_t root) { root_ = root <= 0.0f ? 0.1f : root; };
-    bool open();
+    void open();
     bool openPath(std::string path = "");
     void updatePath();
 
@@ -42,6 +42,8 @@ public:
     std::array<float, WAVE_SIZE> *getDispWave() { return &disp_wave_; };
     float *getWave() { return sample_; };
     void copyWave(float *, size_t);
+    bool isNewLoad();
+    void setNewLoad() { new_load = true; }
 
     int getSize() { return sample_size_; }
 
@@ -68,6 +70,8 @@ private:
 
     bool played_ = false;
     bool trigger_ = true;
+
+    bool new_load = false;
 
     std::array<float, WAVE_SIZE> disp_wave_ = {};
 

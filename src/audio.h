@@ -23,8 +23,8 @@ private:
 	std::array<double, 3> b_;
 	std::array<double, 3> a_;
 
-	std::array<float, 3> prev_x_ = {0.0f, 0.0f};
-	std::array<float, 3> prev_y_ = {0.0f, 0.0f};
+	std::array<float, 3> prev_x_ = {0.0f, 0.0f, 0.0f};
+	std::array<float, 3> prev_y_ = {0.0f, 0.0f, 0.0f};
 	void calculateCoefficients();
 };
 

@@ -9,10 +9,23 @@ project(gemupg VERSION 1.0)
 find_package(SDL3 CONFIG REQUIRED)
 
 # SDL_ttf
-# ! needs to run script under include/SDL_ttf/external first!
-set(SDLTTF_VENDORED ON)
-set(SDLTTF_HARFBUZZ OFF)
-add_subdirectory(include/SDL_ttf EXCLUDE_FROM_ALL)
+set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf")  # create the variable
+set_property(CACHE GEMUPG_SYSTEM_SDL_TTF PROPERTY STRINGS AUTO ON OFF)  #  define list of values GUI will offer for the variable
+if(GEMUPG_SYSTEM_SDL_TTF STREQUAL "AUTO")
+  find_package(SDL3_ttf CONFIG)
+elseif(GEMUPG_SYSTEM_SDL_TTF STREQUAL "ON")
+  find_package(SDL3_ttf CONFIG REQUIRED)
+endif()
+
+if(SDL3_ttf_FOUND)
+  message(STATUS "Using system provided SDL3-ttf")
+else()
+   # ! needs to run script under include/SDL_ttf/external first!
+   set(SDLTTF_VENDORED ON)
+   set(SDLTTF_HARFBUZZ OFF)
+   add_subdirectory(include/SDL_ttf EXCLUDE_FROM_ALL)
+   message(STATUS "Using vendored SDL3-ttf")
+endif()
 
 # IMGUI
 file (GLOB_RECURSE IMGUI_SOURCES CONFIGURE_DEPENDS "include/imgui/*.cpp")

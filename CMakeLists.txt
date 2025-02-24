@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.25)
 
 set(CMAKE_COLOR_DIAGNOSTICS OFF)
 set(CMAKE_CXX_STANDARD 20)
@@ -15,10 +15,10 @@ set(SDLTTF_HARFBUZZ OFF)
 add_subdirectory(include/SDL_ttf EXCLUDE_FROM_ALL)
 
 # IMGUI
-file (GLOB IMGUI_SOURCES CONFIGURE_DEPENDS "include/imgui/*.cpp")
-add_library(IMGUI ${IMGUI_SOURCES})
-target_link_libraries(IMGUI PUBLIC SDL3::SDL3)
-target_include_directories(IMGUI PUBLIC "include/imgui")
+file (GLOB_RECURSE IMGUI_SOURCES CONFIGURE_DEPENDS "include/imgui/*.cpp")
+# add_library(IMGUI ${IMGUI_SOURCES})
+# target_link_libraries(IMGUI PUBLIC SDL3::SDL3)
+# target_include_directories(IMGUI PUBLIC "include/imgui")
 
 # GEMUPG
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -39,16 +39,22 @@ list (APPEND geumpg_INCLUDE_DIRS ${_dir})
 endforeach()
 list (REMOVE_DUPLICATES gemupg_INCLUDE_DIRS)
 
-add_executable(${PROJECT_NAME} ${gemupg_SOURCES})
+add_executable(${PROJECT_NAME} ${gemupg_SOURCES} ${IMGUI_SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
-target_include_directories(${PROJECT_NAME} PRIVATE "include")
+target_include_directories(${PROJECT_NAME} PRIVATE "include" "include/imgui")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 IMGUI SDL3_ttf::SDL3_ttf)
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
+if(WIN32)
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>
+		COMMAND_EXPAND_LISTS
+		)
+endif()
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}>
+	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/assets/icon.bmp $<TARGET_FILE_DIR:${PROJECT_NAME}>
 	COMMAND_EXPAND_LISTS
 	)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:${PROJECT_NAME}> ${CMAKE_SOURCE_DIR}/assets/*
+	COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/assets/Sono-SemiBold.ttf $<TARGET_FILE_DIR:${PROJECT_NAME}>
 	COMMAND_EXPAND_LISTS
 	)

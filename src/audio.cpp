@@ -72,7 +72,11 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 			SDL_GetAudioStreamData(gen_block->getStream(), new_samples, n_samples * sizeof(float));
 
 			for (int i = 0; i < n_samples; i++)
+			{
+				if (std::isnan(new_samples[i]))
+					new_samples[i] = 0.0;
 				samples[i] += new_samples[i] * audio->getAmp();
+			}
 		}
 
 		for (int a = 0; a < grid.getAreas().size(); a++)
@@ -88,7 +92,11 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 				SDL_GetAudioStreamData(gen_block->getStream(), new_samples, n_samples * sizeof(float));
 
 				for (int i = 0; i < n_samples; i++)
+				{
+					if (std::isnan(new_samples[i]))
+						new_samples[i] = 0.0;
 					samples[i] += new_samples[i] * audio->getAmp() * area->getAmp();
+				}
 			}
 		}
 

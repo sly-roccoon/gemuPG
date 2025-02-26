@@ -23,6 +23,7 @@ else()
    # ! needs to run script under include/SDL_ttf/external first!
    set(SDLTTF_VENDORED ON)
    set(SDLTTF_HARFBUZZ OFF)
+   set(SDLTTF_PLUTOSVG OFF)
    add_subdirectory(include/SDL_ttf EXCLUDE_FROM_ALL)
    message(STATUS "Using vendored SDL3-ttf")
 endif()

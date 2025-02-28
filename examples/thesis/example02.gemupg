@@ -1,0 +1,179 @@
+{
+    "areas": [
+        {
+            "amp": 0.6000000238418579,
+            "attack_percent": 0.0,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    1.0,
+                    1.0
+                ],
+                [
+                    1.0,
+                    2.0
+                ]
+            ],
+            "release_percent": 100.0
+        },
+        {
+            "amp": 1.0,
+            "attack_percent": 69.9000015258789,
+            "bpm_subdivision": 8,
+            "gliss_percent": 60.5,
+            "positions": [
+                [
+                    3.0,
+                    0.0
+                ],
+                [
+                    3.0,
+                    1.0
+                ],
+                [
+                    3.0,
+                    2.0
+                ],
+                [
+                    4.0,
+                    2.0
+                ]
+            ],
+            "release_percent": 0.0
+        }
+    ],
+    "bpm": 60.0,
+    "generators": [
+        {
+            "amp": 0.30000001192092896,
+            "freq": 0.0,
+            "freq_factor": 1.0,
+            "pos": [
+                1.0,
+                1.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 3
+        },
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 2.0,
+            "pos": [
+                3.0,
+                1.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 2
+        }
+    ],
+    "sequencers": [
+        {
+            "interval": -4.0,
+            "octave_subdivision": 12.0,
+            "pitch": 123.4800033569336,
+            "pitch_type": 2,
+            "pos": [
+                2.0,
+                1.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 77.80000305175781,
+            "pitch_type": 3,
+            "pos": [
+                0.0,
+                2.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 116.55999755859375,
+            "pitch_type": 2,
+            "pos": [
+                1.0,
+                0.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 92.4800033569336,
+            "pitch_type": 3,
+            "pos": [
+                1.0,
+                3.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 116.55999755859375,
+            "pitch_type": 3,
+            "pos": [
+                2.0,
+                2.0
+            ]
+        },
+        {
+            "interval": -4.0,
+            "octave_subdivision": 12.0,
+            "pitch": 728.61962890625,
+            "pitch_type": 2,
+            "pos": [
+                3.0,
+                -1.0
+            ]
+        },
+        {
+            "interval": 1.0,
+            "octave_subdivision": 12.0,
+            "pitch": 72.88948822021484,
+            "pitch_type": 2,
+            "pos": [
+                4.0,
+                1.0
+            ]
+        },
+        {
+            "interval": -4.0,
+            "octave_subdivision": 12.0,
+            "pitch": 123.4800033569336,
+            "pitch_type": 2,
+            "pos": [
+                2.0,
+                1.0
+            ]
+        },
+        {
+            "interval": 12.0,
+            "octave_subdivision": 12.0,
+            "pitch": 514.6799926757813,
+            "pitch_type": 2,
+            "pos": [
+                4.0,
+                3.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 116.55999755859375,
+            "pitch_type": 3,
+            "pos": [
+                2.0,
+                2.0
+            ]
+        }
+    ]
+}

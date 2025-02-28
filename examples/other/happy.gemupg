@@ -1,0 +1,321 @@
+{
+    "areas": [
+        {
+            "amp": 1.0,
+            "attack_percent": 0.0,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    1.0,
+                    1.0
+                ],
+                [
+                    2.0,
+                    1.0
+                ],
+                [
+                    3.0,
+                    1.0
+                ],
+                [
+                    3.0,
+                    2.0
+                ],
+                [
+                    2.0,
+                    2.0
+                ],
+                [
+                    1.0,
+                    2.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ],
+                [
+                    0.0,
+                    2.0
+                ],
+                [
+                    0.0,
+                    3.0
+                ],
+                [
+                    1.0,
+                    3.0
+                ],
+                [
+                    2.0,
+                    3.0
+                ],
+                [
+                    3.0,
+                    3.0
+                ],
+                [
+                    4.0,
+                    3.0
+                ],
+                [
+                    4.0,
+                    2.0
+                ],
+                [
+                    4.0,
+                    1.0
+                ]
+            ],
+            "release_percent": 25.0
+        },
+        {
+            "amp": 1.0,
+            "attack_percent": 25.0,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    6.0,
+                    -2.0
+                ],
+                [
+                    7.0,
+                    -2.0
+                ],
+                [
+                    8.0,
+                    -2.0
+                ],
+                [
+                    9.0,
+                    -2.0
+                ],
+                [
+                    10.0,
+                    -2.0
+                ],
+                [
+                    11.0,
+                    -2.0
+                ],
+                [
+                    9.0,
+                    -4.0
+                ],
+                [
+                    8.0,
+                    -4.0
+                ],
+                [
+                    7.0,
+                    -4.0
+                ],
+                [
+                    6.0,
+                    -4.0
+                ],
+                [
+                    10.0,
+                    -4.0
+                ],
+                [
+                    11.0,
+                    -4.0
+                ],
+                [
+                    12.0,
+                    -4.0
+                ],
+                [
+                    12.0,
+                    -3.0
+                ],
+                [
+                    12.0,
+                    -2.0
+                ]
+            ],
+            "release_percent": 25.0
+        }
+    ],
+    "bpm": 60.0,
+    "generators": [
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 1.0,
+            "pos": [
+                1.0,
+                2.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 4
+        },
+        {
+            "amp": 0.5,
+            "freq": 3.0625,
+            "freq_factor": 2.450000047683716,
+            "pos": [
+                2.0,
+                2.0
+            ],
+            "rel_freq": 1.25,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 4
+        },
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 1.5,
+            "pos": [
+                3.0,
+                2.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 4
+        },
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 1.0,
+            "pos": [
+                9.0,
+                -4.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 3
+        },
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 0.5,
+            "pos": [
+                10.0,
+                -4.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 3
+        },
+        {
+            "amp": 0.5537840127944946,
+            "freq": 0.0,
+            "freq_factor": 0.25,
+            "pos": [
+                11.0,
+                -4.0
+            ],
+            "rel_freq": -2.5799999237060547,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 2
+        }
+    ],
+    "sequencers": [
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 261.6000061035156,
+            "pitch_type": 3,
+            "pos": [
+                4.0,
+                0.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 573.4343872070313,
+            "pitch_type": 1,
+            "pos": [
+                2.0,
+                4.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 91.5039291381836,
+            "pitch_type": 1,
+            "pos": [
+                0.0,
+                4.0
+            ]
+        },
+        {
+            "interval": 5.0,
+            "octave_subdivision": 12.0,
+            "pitch": -1.46771240234375,
+            "pitch_type": 2,
+            "pos": [
+                2.0,
+                0.0
+            ]
+        },
+        {
+            "interval": 2.0,
+            "octave_subdivision": 12.0,
+            "pitch": 203.8774871826172,
+            "pitch_type": 2,
+            "pos": [
+                1.0,
+                0.0
+            ]
+        },
+        {
+            "interval": 1.0,
+            "octave_subdivision": 15.0,
+            "pitch": 66.05374145507813,
+            "pitch_type": 2,
+            "pos": [
+                -1.0,
+                2.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 884.387451171875,
+            "pitch_type": 0,
+            "pos": [
+                4.0,
+                4.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 738.9329223632813,
+            "pitch_type": 3,
+            "pos": [
+                5.0,
+                2.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 227.059326171875,
+            "pitch_type": 0,
+            "pos": [
+                11.0,
+                -3.0
+            ]
+        }
+    ]
+}

@@ -1,0 +1,195 @@
+{
+    "areas": [
+        {
+            "amp": 1.0,
+            "attack_percent": 32.599998474121094,
+            "bpm_subdivision": 4,
+            "gliss_percent": 10.800000190734863,
+            "positions": [
+                [
+                    -2.0,
+                    0.0
+                ],
+                [
+                    -2.0,
+                    1.0
+                ],
+                [
+                    -2.0,
+                    2.0
+                ],
+                [
+                    -1.0,
+                    2.0
+                ],
+                [
+                    0.0,
+                    2.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ],
+                [
+                    0.0,
+                    0.0
+                ]
+            ],
+            "release_percent": 28.799999237060547
+        },
+        {
+            "amp": 0.4000000059604645,
+            "attack_percent": 1.600000023841858,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    4.0,
+                    0.0
+                ],
+                [
+                    3.0,
+                    0.0
+                ],
+                [
+                    3.0,
+                    1.0
+                ]
+            ],
+            "release_percent": 75.0
+        }
+    ],
+    "bpm": 65.0,
+    "generators": [
+        {
+            "amp": 1.0,
+            "freq": 84.25679779052734,
+            "freq_factor": 1.0,
+            "pos": [
+                -2.0,
+                1.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg\\sounds\\2nd-violins-sus-g5-.wav",
+            "sample_play_type": 0,
+            "sample_root": 783.989990234375,
+            "waveform": 0
+        },
+        {
+            "amp": 0.5,
+            "freq": 691.455078125,
+            "freq_factor": 1.0,
+            "pos": [
+                4.0,
+                0.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 1
+        }
+    ],
+    "sequencers": [
+        {
+            "interval": 2.0,
+            "octave_subdivision": 16.0,
+            "pitch": 607.622802734375,
+            "pitch_type": 2,
+            "pos": [
+                -1.0,
+                1.0
+            ]
+        },
+        {
+            "interval": -3.0,
+            "octave_subdivision": 16.0,
+            "pitch": 607.622802734375,
+            "pitch_type": 2,
+            "pos": [
+                -2.0,
+                3.0
+            ]
+        },
+        {
+            "interval": 2.0,
+            "octave_subdivision": 16.0,
+            "pitch": 607.622802734375,
+            "pitch_type": 2,
+            "pos": [
+                1.0,
+                1.0
+            ]
+        },
+        {
+            "interval": 2.0,
+            "octave_subdivision": 16.0,
+            "pitch": 607.622802734375,
+            "pitch_type": 2,
+            "pos": [
+                -3.0,
+                0.0
+            ]
+        },
+        {
+            "interval": -3.0,
+            "octave_subdivision": 16.0,
+            "pitch": 607.622802734375,
+            "pitch_type": 2,
+            "pos": [
+                -1.0,
+                0.0
+            ]
+        },
+        {
+            "interval": -7.0,
+            "octave_subdivision": 16.0,
+            "pitch": 607.622802734375,
+            "pitch_type": 2,
+            "pos": [
+                0.0,
+                3.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 7.0,
+            "pitch": -300.0,
+            "pitch_type": 0,
+            "pos": [
+                4.0,
+                1.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 7.0,
+            "pitch": -50.0,
+            "pitch_type": 0,
+            "pos": [
+                3.0,
+                -1.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 7.0,
+            "pitch": 200.0,
+            "pitch_type": 0,
+            "pos": [
+                2.0,
+                0.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 7.0,
+            "pitch": 25.0,
+            "pitch_type": 0,
+            "pos": [
+                3.0,
+                2.0
+            ]
+        }
+    ]
+}

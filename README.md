@@ -1,6 +1,6 @@
 # GemuPG
 
-Generative Music Playground
+A Generative Music Poly* Grid
 
 ### Compile Instructions
 CMake >= 3.25

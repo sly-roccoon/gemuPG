@@ -7,11 +7,11 @@ CMake >= 3.25
 GCC >= 13
 SDL >= 3.2.0 (via vcpkg or system package manager)
 
+might need to install libasound2-dev libpulse-dev before building sdl with audio support
+
 ```
-git clone https://git.iem.at/aronpetritz/gemupg --recurse-submodules
+git clone https://git.iem.at/aronpetritz/gemupg --recurse-submodules #recurse-submodules is important!!
 cd gemupg
-include/SDL_ttf/external/download.sh (on Linux)
-include/SDL_ttf/external/Get-GitModules.ps1 (on Windows)
 mkdir build
 cd build
 cmake -S .. -B .

@@ -1,6 +1,6 @@
 .vscode
 .VSCodeCounter
-build
 CMakeSettings.json
 
-.codegpt
+vcpkg_installed/
+build/

@@ -6,7 +6,19 @@ set(CMAKE_CXX_STANDARD 20)
 project(gemupg VERSION 1.0)
 
 # SDL
-find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3 CONFIG QUIET)
+if(NOT SDL3_FOUND)
+	message(STATUS "SDL3 not found, fetching from GitHub...")
+	include(FetchContent)
+	FetchContent_Declare(
+		SDL3
+		GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+		GIT_TAG release-3.2.8
+	)
+	FetchContent_MakeAvailable(SDL3)
+else()
+	message(STATUS "SDL3 found, using system provided version")
+endif()
 
 # SDL_ttf
 set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf")  # create the variable

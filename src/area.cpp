@@ -258,38 +258,38 @@ void Area::stepSequence()
 		if (sequence_.at(last_note_idx_))
 			sequence_.at(last_note_idx_)->setActive(false);
 
-	if (sequence_.size() > cur_note_idx_)
+	// if (sequence_.size() > cur_note_idx_)
+	// {
+	if (!sequence_.at(cur_note_idx_))
+		setNotes(0.0f);
+	else
 	{
-		if (!sequence_.at(cur_note_idx_))
-			setNotes(0.0f);
-		else
+		sequence_.at(cur_note_idx_)->setActive(true);
+
+		pitch_type_t pitch_type = sequence_.at(cur_note_idx_)->getPitchType();
+		switch (pitch_type)
 		{
-			sequence_.at(cur_note_idx_)->setActive(true);
-
-			pitch_type_t pitch_type = sequence_.at(cur_note_idx_)->getPitchType();
-			switch (pitch_type)
-			{
-			case PITCH_ABS_FREQUENCY:
-			case PITCH_NOTE:
-				last_freq_ = sequence_.at(cur_note_idx_)->getPitch();
-				break;
-			case PITCH_REL_FREQUENCY:
-				last_freq_ += sequence_.at(cur_note_idx_)->getPitch();
-				break;
-			case PITCH_INTERVAL:
-				auto [interval, oct_sub] = sequence_.at(cur_note_idx_)->getInterval();
-				last_freq_ = last_freq_ * intervalToRatio(interval, oct_sub);
-				break;
-			}
-
-			if (pitch_type == PITCH_REL_FREQUENCY || pitch_type == PITCH_INTERVAL) // wrap around [20;20'000] Hz range if relative pitch change
-			{
-				while (last_freq_ < 20.0f)
-					last_freq_ += 20000.0f - 20.0f;
-				while (last_freq_ > 20000.0f)
-					last_freq_ -= 20000.0 - 20.0f;
-			}
+		case PITCH_ABS_FREQUENCY:
+		case PITCH_NOTE:
+			last_freq_ = sequence_.at(cur_note_idx_)->getPitch();
+			break;
+		case PITCH_REL_FREQUENCY:
+			last_freq_ += sequence_.at(cur_note_idx_)->getPitch();
+			break;
+		case PITCH_INTERVAL:
+			auto [interval, oct_sub] = sequence_.at(cur_note_idx_)->getInterval();
+			last_freq_ = last_freq_ * intervalToRatio(interval, oct_sub);
+			break;
 		}
+
+		if (pitch_type == PITCH_REL_FREQUENCY || pitch_type == PITCH_INTERVAL) // wrap around [20;20'000] Hz range if relative pitch change
+		{
+			while (last_freq_ < 20.0f)
+				last_freq_ += 20000.0f - 20.0f;
+			while (last_freq_ > 20000.0f)
+				last_freq_ -= 20000.0 - 20.0f;
+		}
+		// }
 
 		setNotes(last_freq_);
 	}

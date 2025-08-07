@@ -1,23 +1,34 @@
 #include "clock.h"
 
-bool Clock::shouldStep()
+#include "interface.h"
+
+void Clock::setRunning(bool running)
 {
-    if (!running_)
-        return false;
-
-    size_t min_possible_step_ = PERFORMANCE_FREQUENCY * 60.0f / bpm_ / MAX_SUBDIVISION;
-    Uint64 now = SDL_GetPerformanceCounter();
-    Uint64 dt = now - last_step_;
-    if (dt >= min_possible_step_)
+    if (running_ == false && running == true)
     {
-        step_overshoot_ = min_possible_step_ - dt;
-
-        last_step_ += dt;
-        step_counter_ = ++step_counter_ % MAX_SUBDIVISION;
-        return true;
+        // Start the timer when the clock is set to running
+        timer_ = SDL_AddTimerNS(0, Clock::stepCallback, nullptr);
+    }
+    else if (running == false)
+    {
+        // Stop the timer when the clock is set to not running
+        SDL_RemoveTimer(timer_);
     }
 
-    return false;
+    running_ = running;
+}
+
+Uint64 Clock::stepCallback(void* userdata, SDL_TimerID id, Uint64 interval)
+{
+    if (!Clock::getInstance().isRunning())
+        return 0;
+
+    //TODO: add drift compensation
+    Uint64 next_delay_NS = 1e9 * 60.0 / Clock::getInstance().getBPM() / TICKS_PER_BAR;
+    step_counter_ = ++step_counter_ % TICKS_PER_BAR;
+    Interface::getInstance().getGrid().stepSequence();
+
+    return next_delay_NS == 0 ? 1 : next_delay_NS;
 }
 
 bool Clock::shouldDraw()

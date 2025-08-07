@@ -76,18 +76,18 @@ void Interface::destroy()
 bool Interface::addBlock(Vector2f pos)
 {
 	pos = floorVec(pos);
-	BlockFactory &block_factory = BlockFactory::getInstance();
+	BlockFactory& block_factory = BlockFactory::getInstance();
 
 	if (grid_.getBlock(pos) != nullptr)
 		return false;
 
-	Block *block = block_factory.createBlock(cur_selection_, pos);
+	Block* block = block_factory.createBlock(cur_selection_, pos);
 	grid_.addBlock(block);
 
 	return true;
 }
 
-void Interface::addBlock(Block *block)
+void Interface::addBlock(Block* block)
 {
 	grid_.addBlock(block);
 }
@@ -97,7 +97,7 @@ bool Interface::removeBlock(Vector2f pos)
 	return grid_.removeBlock(pos);
 }
 
-void Interface::removeBlock(Block *block)
+void Interface::removeBlock(Block* block)
 {
 	grid_.removeBlock(block);
 }
@@ -106,6 +106,7 @@ void Interface::updateBlockTimes()
 {
 	for (auto area : grid_.getAreas())
 	{
+		area->updateNoteLength();
 		area->updateEnvelope();
 		area->updateGlissando();
 	}
@@ -147,7 +148,7 @@ void Interface::drawBlocks()
 
 void Interface::drawSequencerGUI()
 {
-	std::vector<BlockSequencer *> sequencers;
+	std::vector<BlockSequencer*> sequencers;
 	for (auto area : grid_.getAreas())
 		for (auto sequencer : area->getSequence())
 			sequencers.push_back(sequencer);
@@ -155,8 +156,10 @@ void Interface::drawSequencerGUI()
 	// remove nullptrs
 	sequencers.erase(
 		std::remove_if(sequencers.begin(), sequencers.end(),
-					   [](BlockSequencer *sequencer)
-					   { return sequencer == nullptr; }),
+		               [](BlockSequencer* sequencer)
+		               {
+			               return sequencer == nullptr;
+		               }),
 		sequencers.end());
 
 	// remove duplicates
@@ -172,7 +175,9 @@ void Interface::drawSequencerGUI()
 
 void Interface::drawBlockSelection()
 {
-	SDL_FRect rect = {ICON_SIZE * RENDER_SCALE / 8, ICON_SIZE * RENDER_SCALE / 8, ICON_SIZE * RENDER_SCALE, ICON_SIZE * RENDER_SCALE};
+	SDL_FRect rect = {
+		ICON_SIZE * RENDER_SCALE / 8, ICON_SIZE * RENDER_SCALE / 8, ICON_SIZE * RENDER_SCALE, ICON_SIZE * RENDER_SCALE
+	};
 	SDL_Color col = {};
 
 	switch (cur_selection_)
@@ -197,11 +202,11 @@ void Interface::drawGUI()
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
 
-	for (auto &block : grid_.getBlocks())
+	for (auto& block : grid_.getBlocks())
 		if (block->getType() == BLOCK_GENERATOR)
 			block->drawGUI(); // TODO: crackling when changing values
 
-	for (auto &area : grid_.getAreas())
+	for (auto& area : grid_.getAreas())
 		area->drawGUI();
 
 	drawSequencerGUI();
@@ -218,7 +223,7 @@ void Interface::drawGUI()
 
 void Interface::closeAllWindows()
 {
-	for (auto &area : grid_.getAreas())
+	for (auto& area : grid_.getAreas())
 		area->setGUI(false);
 
 	for (auto block : grid_.getBlocks())
@@ -230,7 +235,8 @@ void Interface::drawDebug()
 	int w;
 	SDL_GetWindowSizeInPixels(window_, &w, NULL);
 	SDL_SetRenderDrawColor(renderer_, 0, 0, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderDebugTextFormat(renderer_, w - 2 * SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE, 0, "%d", Clock::getInstance().getFPS());
+	SDL_RenderDebugTextFormat(renderer_, w - 2 * SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE, 0, "%d",
+	                          Clock::getInstance().getFPS());
 }
 
 //--------------------------------------------------------

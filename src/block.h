@@ -185,7 +185,7 @@ public:
 	void randomize();
 
 private:
-	bool is_active_;
+	bool is_active_ = false;
 	pitch_t pitch_;
 	pitch_type_t pitch_type_;
 

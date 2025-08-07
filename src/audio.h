@@ -49,7 +49,7 @@ public:
 	float getSampleRate() { return spec_.freq; }
 
 	float *getOutput() { return output_; }
-	void setOutput(const float *, const int n);
+	void setOutput(const float *, const int n);	
 
 	SDL_AudioSpec *getSpec() { return &spec_; }
 	static std::array<float, WAVE_SIZE> *getWaveTable(WAVE_FORMS wave, pitch_t freq);

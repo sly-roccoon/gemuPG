@@ -370,6 +370,8 @@ BlockSequencer::BlockSequencer(Vector2f pos) : Block(pos)
 	type_ = BLOCK_SEQUENCER;
 	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
 
+	is_active_ = false;
+
 	pitch_type_ = PITCH_ABS_FREQUENCY;
 	pitch_ = 440.0f;
 

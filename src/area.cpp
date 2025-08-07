@@ -6,16 +6,23 @@
 bool Area::isInside(Vector2f pos)
 {
 	pos = floorVec(pos);
-	for (auto &field : positions_)
+	for (auto& field : positions_)
 		if (field == pos)
 			return true;
 
 	return false;
 }
 
+Area::Area()
+{
+	positions_.reserve(64);
+	blocks_.reserve(64);
+	sequence_.reserve(64);
+}
+
 void Area::addPositions(std::vector<Vector2f> positions)
 {
-	for (auto &pos : positions)
+	for (auto& pos : positions)
 		positions_.push_back(pos);
 }
 
@@ -34,19 +41,21 @@ void Area::removePosition(Vector2f pos)
 
 	positions_.erase(
 		std::remove_if(positions_.begin(), positions_.end(),
-					   [pos](auto p)
-					   { return p == pos; }),
+		               [pos](auto p)
+		               {
+			               return p == pos;
+		               }),
 		positions_.end());
 }
 
-Block *Area::addBlock(Block *block)
+Block* Area::addBlock(Block* block)
 {
 	if (block)
 	{
 		blocks_.push_back(block);
 		if (block->getType() == BLOCK_GENERATOR)
 		{
-			BlockGenerator *block_g = (BlockGenerator *)block;
+			BlockGenerator* block_g = (BlockGenerator*)block;
 			block_g->setInArea(true);
 			updateGlissando(block_g);
 			updateEnvelope(block_g);
@@ -57,52 +66,57 @@ Block *Area::addBlock(Block *block)
 	return nullptr;
 }
 
-void Area::removeBlock(Block *block)
+void Area::removeBlock(Block* block)
 {
 	blocks_.erase(
 		std::remove_if(blocks_.begin(), blocks_.end(),
-					   [block](auto b)
-					   { return b == block; }),
+		               [block](auto b)
+		               {
+			               return b == block;
+		               }),
 		blocks_.end());
 
 	if (block && block->getType())
-		((BlockGenerator *)block)->setInArea(false);
+		((BlockGenerator*)block)->setInArea(false);
 }
 
 bool Area::removeBlock(Vector2f pos)
 {
 	pos = floorVec(pos);
 
-	return (blocks_.end() != blocks_.erase(
-								 std::remove_if(blocks_.begin(), blocks_.end(),
-												[pos](auto block)
-												{ return block->getPos() == pos; }),
-								 blocks_.end()));
+	for (auto& block : blocks_)
+		if (block->getPos() == pos)
+		{
+			removeBlock(block);
+			return true;
+		}
+
+	return false;
 }
 
-Block *Area::getBlock(Vector2f pos)
+Block* Area::getBlock(Vector2f pos)
 {
 	pos = floorVec(pos);
 
-	for (auto &block : blocks_)
+	for (auto& block : blocks_)
 		if (block->getPos() == pos)
 			return block;
 
 	return nullptr;
 }
 
-BlockSequencer *Area::getSequencer(Vector2f pos)
+BlockSequencer* Area::getSequencer(Vector2f pos)
 {
 	pos = floorVec(pos);
 
-	for (auto &sequencer : sequence_)
+	for (auto& sequencer : sequence_)
 		if (sequencer && sequencer->getPos() == pos)
 			return sequencer;
 
 	return nullptr;
 }
 
-Block *Area::addSequencer(BlockSequencer *sequencer)
+Block* Area::addSequencer(BlockSequencer* sequencer)
 {
 	sequence_.push_back(sequencer);
 	sequencer->addArea(this);
@@ -111,13 +125,15 @@ Block *Area::addSequencer(BlockSequencer *sequencer)
 	return sequencer;
 }
 
-void Area::removeSequencer(BlockSequencer *sequencer)
+void Area::removeSequencer(BlockSequencer* sequencer)
 {
 	if (sequence_.erase(
-			std::remove_if(sequence_.begin(), sequence_.end(),
-						   [sequencer](auto s)
-						   { return s == sequencer; }),
-			sequence_.end()) != sequence_.end())
+		std::remove_if(sequence_.begin(), sequence_.end(),
+		               [sequencer](auto s)
+		               {
+			               return s == sequencer;
+		               }),
+		sequence_.end()) != sequence_.end())
 	{
 		sequencer->removeArea(this);
 		if (sequencer->hasNoAreas())
@@ -155,8 +171,10 @@ void Area::removeDanglingSequencers()
 		{
 			sequence_.erase(
 				std::remove_if(sequence_.begin(), sequence_.end(),
-							   [sequencer](auto s)
-							   { return s == sequencer; }),
+				               [sequencer](auto s)
+				               {
+					               return s == sequencer;
+				               }),
 				sequence_.end());
 			sequencer->removeArea(this);
 
@@ -170,7 +188,7 @@ Vector2f Area::getTopLeft()
 {
 	Vector2f top_left = {GRID_SIZE + 1, GRID_SIZE + 1};
 
-	for (auto &pos : positions_) // find topleft most position, top > left
+	for (auto& pos : positions_) // find topleft most position, top > left
 	{
 		if (pos.y < top_left.y)
 			top_left = pos;
@@ -186,8 +204,10 @@ void Area::cleanupSequence()
 	// remove nullptrs
 	sequence_.erase(
 		std::remove_if(sequence_.begin(), sequence_.end(),
-					   [](BlockSequencer *sequencer)
-					   { return sequencer == nullptr; }),
+		               [](BlockSequencer* sequencer)
+		               {
+			               return sequencer == nullptr;
+		               }),
 		sequence_.end());
 
 	// remove duplicates
@@ -201,7 +221,7 @@ void Area::cleanupSequence()
 
 void Area::updateSequence()
 {
-	std::vector<BlockSequencer *> new_sequence;
+	std::vector<BlockSequencer*> new_sequence;
 
 	cleanupSequence();
 
@@ -209,14 +229,18 @@ void Area::updateSequence()
 	auto cur_pos = getAdjacentPositions(getTopLeft()).at(dir);
 	auto start_pos = cur_pos;
 	auto next_dir = [](int dir, int n_times = 1)
-	{ return (dir + n_times) % 4; };
+	{
+		return (dir + n_times) % 4;
+	};
 
 	do // directions: 0 = up, 1 = left, 2 = down, 3 = right | normal direction from side of area
-	{  // i know this looks convoluted, but i swear this makes sense...
+	{
+		// i know this looks convoluted, but i swear this makes sense...
 		auto adj_pos = getAdjacentPositions(cur_pos);
 		new_sequence.push_back(getSequencer(cur_pos));
 
-		if (!isInside(getAdjacentPositions(adj_pos.at(next_dir(dir))).at(next_dir(dir, 2)))) // outer corner / left rotation
+		if (!isInside(getAdjacentPositions(adj_pos.at(next_dir(dir))).at(next_dir(dir, 2))))
+		// outer corner / left rotation
 		{
 			cur_pos = getAdjacentPositions(adj_pos.at(next_dir(dir))).at(next_dir(dir, 2));
 			dir = next_dir(dir);
@@ -232,8 +256,8 @@ void Area::updateSequence()
 		// around the inner corner / right rotation
 		// cur_pos = cur_pos;  //position stays the same because in inner corner two sides of an area block touch sequencer block
 		dir = next_dir(dir, 3); // rotate 3 times effectively
-
-	} while (cur_pos != start_pos);
+	}
+	while (cur_pos != start_pos);
 
 	sequence_ = new_sequence;
 }
@@ -242,14 +266,17 @@ void Area::setNotes(pitch_t freq)
 {
 	for (auto block : blocks_)
 		if (block->getType() == BLOCK_GENERATOR)
-			((BlockGenerator *)block)->setFrequency(freq);
+			((BlockGenerator*)block)->setFrequency(freq);
 };
 
 void Area::stepSequence()
 {
 	unsigned int counter = Clock::getStepCounter();
-	if (SDL_floor(SDL_fmod(counter, static_cast<float>(MAX_SUBDIVISION) / static_cast<float>(bpm_subdivision_))) != 0)
-		return (void)counter;
+	double subdivision_interval = TICKS_PER_BAR / bpm_subdivision_;
+	if (SDL_ceil(SDL_fmod(counter, subdivision_interval)) != 0)
+		return;
+
+	updateNoteLength();
 
 	last_note_idx_ = cur_note_idx_;
 	cur_note_idx_ = cur_note_idx_ >= sequence_.size() - 1 ? 0 : cur_note_idx_ + 1;
@@ -258,8 +285,6 @@ void Area::stepSequence()
 		if (sequence_.at(last_note_idx_))
 			sequence_.at(last_note_idx_)->setActive(false);
 
-	// if (sequence_.size() > cur_note_idx_)
-	// {
 	if (!sequence_.at(cur_note_idx_))
 		setNotes(0.0f);
 	else
@@ -282,7 +307,8 @@ void Area::stepSequence()
 			break;
 		}
 
-		if (pitch_type == PITCH_REL_FREQUENCY || pitch_type == PITCH_INTERVAL) // wrap around [20;20'000] Hz range if relative pitch change
+		if (pitch_type == PITCH_REL_FREQUENCY || pitch_type == PITCH_INTERVAL)
+		// wrap around [20;20'000] Hz range if relative pitch change
 		{
 			while (last_freq_ < 20.0f)
 				last_freq_ += 20000.0f - 20.0f;
@@ -301,43 +327,45 @@ void Area::stopSequence()
 	last_note_idx_ = sequence_.size() - 1;
 }
 
-void Area::updateGlissando(BlockGenerator *block)
+void Area::updateNoteLength()
 {
-	double time = (gliss_percent_ / 100.0f) * (60.0f / (bpm_subdivision_ * Clock::getInstance().getBPM()));
+	note_length_ = (60.0f / (bpm_subdivision_ * Clock::getInstance().getBPM()));
+}
+
+void Area::updateGlissando(BlockGenerator* block)
+{
+	double time = (gliss_percent_ / 100.0f) * note_length_;
 
 	if (block)
 	{
-		((BlockGenerator *)block)->setGlissTime(time);
+		((BlockGenerator*)block)->setGlissTime(time);
 		return;
 	}
 
 	for (auto block : blocks_)
 		if (block->getType() == BLOCK_GENERATOR)
-			((BlockGenerator *)block)->setGlissTime(time);
+			((BlockGenerator*)block)->setGlissTime(time);
 }
 
-void Area::updateEnvelope(BlockGenerator *block)
+void Area::updateEnvelope(BlockGenerator* block)
 {
-	double note_length = (60.0f / (bpm_subdivision_ * Clock::getInstance().getBPM()));
-
-	double attack_time = (attack_percent_ / 100.0f) * note_length;
-
-	double release_time = (1.0 - (release_percent_ / 100.0f)) * note_length;
+	double attack_time = (attack_percent_ / 100.0f) * note_length_;
+	double release_time = (1.0 - (release_percent_ / 100.0f)) * note_length_;
 
 	if (block)
 	{
-		((BlockGenerator *)block)->setAttackTime(attack_time);
-		((BlockGenerator *)block)->setReleaseTime(release_time);
-		((BlockGenerator *)block)->setNoteLength(note_length);
+		((BlockGenerator*)block)->setAttackTime(attack_time);
+		((BlockGenerator*)block)->setReleaseTime(release_time);
+		((BlockGenerator*)block)->setNoteLength(note_length_);
 		return;
 	}
 
 	for (auto block : blocks_)
 		if (block->getType() == BLOCK_GENERATOR)
 		{
-			((BlockGenerator *)block)->setAttackTime(attack_time);
-			((BlockGenerator *)block)->setReleaseTime(release_time);
-			((BlockGenerator *)block)->setNoteLength(note_length);
+			((BlockGenerator*)block)->setAttackTime(attack_time);
+			((BlockGenerator*)block)->setReleaseTime(release_time);
+			((BlockGenerator*)block)->setNoteLength(note_length_);
 		}
 }
 

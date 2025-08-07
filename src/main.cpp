@@ -9,13 +9,13 @@
 #include "clock.h"
 #include "util.h"
 
-SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
+SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 {
 	SDL_SetAppMetadata(TITLE, "0.1.0", "Poly* Audio Software");
 
-	Interface &interface = Interface::getInstance();
-	Input &input = Input::getInstance();
-	AudioEngine &audio = AudioEngine::getInstance();
+	Interface& interface = Interface::getInstance();
+	Input& input = Input::getInstance();
+	AudioEngine& audio = AudioEngine::getInstance();
 	GUI::init(interface.getWindow(), interface.getRenderer());
 
 	if (argc > 1)
@@ -24,18 +24,15 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 	return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult SDL_AppIterate(void *appstate)
+SDL_AppResult SDL_AppIterate(void* appstate)
 {
-	if (Clock::getInstance().shouldStep())
-		Interface::getInstance().getGrid().stepSequence();
-
 	if (Clock::getInstance().shouldDraw())
 		Interface::getInstance().draw();
 
 	return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
+SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 {
 	if (event->type == SDL_EVENT_QUIT)
 		return SDL_APP_SUCCESS;
@@ -50,7 +47,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 	return SDL_APP_CONTINUE;
 }
 
-void SDL_AppQuit(void *appstate, SDL_AppResult result)
+void SDL_AppQuit(void* appstate, SDL_AppResult result)
 {
 	GUI::destroy();
 	AudioEngine::getInstance().destroy();

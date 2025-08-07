@@ -11,7 +11,7 @@
 #define DRAW_DEBUG false
 #define FONT "Sono-SemiBold.ttf"
 
-constexpr const char *TITLE = "gemuPG";
+constexpr const char* TITLE = "gemuPG";
 constexpr bool ADJUST_AMP_BY_CREST = true;
 constexpr float ONE_DIV_SQRT_THREE = 0.5773502691896258;
 
@@ -27,7 +27,7 @@ constexpr float TEXT_TYPE_SIZE_DIV = 4;
 constexpr float TEXT_VALUE_SIZE_DIV = 2;
 
 constexpr float DEFAULT_BPM = 60.0f;
-constexpr unsigned int MAX_SUBDIVISION = 64 * 3 * 5; // no idea how to solve this better atm
+constexpr unsigned int TICKS_PER_BAR = 27'720; //LCM 1 through 12 https://billydm.github.io/blog/time-keeping/
 
 constexpr bool SEQUENCER_RANDOMIZED = true;
 
@@ -41,7 +41,7 @@ constexpr SDL_Color GRID_COLOR = {128, 128, 128, SDL_ALPHA_OPAQUE};
 
 constexpr float MIN_CAMERA_ZOOM = 16.0f;
 constexpr float MAX_CAMERA_ZOOM = 512.0f;
-const float DEFAULT_CAMERA_ZOOM = std::sqrt(std::pow(MIN_CAMERA_ZOOM, 2) + std::pow(MAX_CAMERA_ZOOM, 2));
+const float DEFAULT_CAMERA_ZOOM = (MIN_CAMERA_ZOOM + MAX_CAMERA_ZOOM) / 2.0f;
 
 constexpr unsigned int BUFFER_SIZE = 512;
 constexpr unsigned int CHANNELS = 1;
@@ -90,14 +90,17 @@ struct Vector2
 	T y{};
 
 	constexpr Vector2() = default;
-	constexpr Vector2(T x, T y) : x(x), y(y) {}
+
+	constexpr Vector2(T x, T y) : x(x), y(y)
+	{
+	}
 
 	Vector2 operator/(T scalar) const { return Vector2(x / scalar, y / scalar); }
-	Vector2 operator+(const Vector2 &other) const { return Vector2(x + other.x, y + other.y); }
-	Vector2 operator-(const Vector2 &other) const { return Vector2(x - other.x, y - other.y); }
+	Vector2 operator+(const Vector2& other) const { return Vector2(x + other.x, y + other.y); }
+	Vector2 operator-(const Vector2& other) const { return Vector2(x - other.x, y - other.y); }
 	Vector2 operator*(T scalar) const { return Vector2(x * scalar, y * scalar); }
-	bool operator==(const Vector2 &other) const { return x == other.x && y == other.y; }
-	Vector2 operator+=(const Vector2 &other) const { return {x + other.x, y + other.y}; }
+	bool operator==(const Vector2& other) const { return x == other.x && y == other.y; }
+	Vector2 operator+=(const Vector2& other) const { return {x + other.x, y + other.y}; }
 };
 
 using Vector2f = Vector2<float>;
@@ -117,7 +120,7 @@ pitch_t intervalToRatio(float interval, float octave_subdivision);
 
 SDL_Color invertColor(SDL_Color);
 
-double interpTable(float *array, size_t size, double idx);
+double interpTable(float* array, size_t size, double idx);
 
 extern float RENDER_SCALE;
 extern Uint32 PERFORMANCE_FREQUENCY;

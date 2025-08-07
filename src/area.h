@@ -8,24 +8,26 @@
 class Area
 {
 public:
+    Area();
+
     auto getPositions() { return positions_; }
     void addPositions(std::vector<Vector2f>);
     bool addPosition(Vector2f);
     void removePosition(Vector2f);
     bool isInside(Vector2f);
 
-    Block *addBlock(Block *);
-    void removeBlock(Block *);
+    Block* addBlock(Block*);
+    void removeBlock(Block*);
     bool removeBlock(Vector2f);
     auto getBlocks() { return blocks_; }
-    Block *getBlock(Vector2f);
+    Block* getBlock(Vector2f);
 
-    Block *addSequencer(BlockSequencer *);
-    void removeSequencer(BlockSequencer *);
+    Block* addSequencer(BlockSequencer*);
+    void removeSequencer(BlockSequencer*);
     bool removeSequencer(Vector2f);
     void updateSequence();
-    std::vector<BlockSequencer *> getSequence() { return sequence_; }
-    BlockSequencer *getSequencer(Vector2f);
+    std::vector<BlockSequencer*> getSequence() { return sequence_; }
+    BlockSequencer* getSequencer(Vector2f);
     void stepSequence();
     void stopSequence();
 
@@ -39,10 +41,12 @@ public:
     void toggleGUI() { viewGUI_ = !viewGUI_; }
     void setGUI(bool view) { viewGUI_ = view; }
 
-    void updateGlissando(BlockGenerator *block = nullptr);
-    void updateEnvelope(BlockGenerator *block = nullptr);
+    void updateNoteLength();
+    void updateGlissando(BlockGenerator* block = nullptr);
+    void updateEnvelope(BlockGenerator* block = nullptr);
 
     float getGlissPercent() { return gliss_percent_; }
+
     void setGlissPercent(float gliss_percent)
     {
         gliss_percent_ = gliss_percent;
@@ -50,12 +54,15 @@ public:
     }
 
     float getAttackPercent() { return attack_percent_; }
+
     void setAttackPercent(float attack_percent)
     {
         attack_percent_ = attack_percent;
         updateEnvelope();
     }
+
     float getReleasePercent() { return release_percent_; }
+
     void setReleasePercent(float release_percent)
     {
         release_percent_ = release_percent;
@@ -70,12 +77,14 @@ private:
     void setNotes(pitch_t);
 
     std::vector<Vector2f> positions_;
-    std::vector<Block *> blocks_;
-    std::vector<BlockSequencer *> sequence_;
+    std::vector<Block*> blocks_;
+    std::vector<BlockSequencer*> sequence_;
 
     int cur_note_idx_ = 0;
     int last_note_idx_ = 0;
     pitch_t last_freq_ = 0.0f;
+
+    float note_length_ = 0.0f;
 
     float amp_ = 1.0f;
 

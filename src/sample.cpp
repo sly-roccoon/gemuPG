@@ -126,7 +126,9 @@ bool Sample::openPath(std::string path)
 
 void Sample::open()
 {
+#ifndef EMSCRIPTEN
     SDL_ShowOpenFileDialog(callback, this, nullptr, &wav_filter, 1, SDL_GetCurrentDirectory(), false);
+#endif
 }
 
 void Sample::updateWave()

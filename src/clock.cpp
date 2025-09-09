@@ -20,7 +20,7 @@ void Clock::setRunning(bool running)
 
 static Uint64 last = 0;
 
-Uint64 Clock::stepCallback(void* userdata, SDL_TimerID id, Uint64 interval)
+Uint64 Clock::stepCallback(void *userdata, SDL_TimerID id, Uint64 interval)
 {
     if (!Clock::getInstance().isRunning())
         return 0;
@@ -38,6 +38,8 @@ Uint64 Clock::stepCallback(void* userdata, SDL_TimerID id, Uint64 interval)
     }
 
     step_counter_ = ++step_counter_ % TICKS_PER_BAR;
+
+    printf("end of clock callback \n");
 
     return next_delay_NS_int == 0 ? 1 : next_delay_NS_int;
 }

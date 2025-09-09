@@ -7,13 +7,13 @@
 class Clock
 {
 public:
-    static Clock& getInstance()
+    static Clock &getInstance()
     {
         static Clock clock;
         return clock;
     }
 
-    static Uint64 stepCallback(void* userdata, SDL_TimerID id, Uint64 interval);
+    static Uint64 stepCallback(void *userdata, SDL_TimerID id, Uint64 interval);
     bool shouldDraw();
 
     static unsigned int getStepCounter()
@@ -32,11 +32,10 @@ public:
     size_t getFPS() { return fps_; }
 
 private:
-    Clock()
-    {
+    Clock() {
     };
-    Clock(const Clock&) = delete;
-    Clock& operator=(const Clock&) = delete;
+    Clock(const Clock &) = delete;
+    Clock &operator=(const Clock &) = delete;
 
     bool running_ = true;
     SDL_TimerID timer_ = 0;

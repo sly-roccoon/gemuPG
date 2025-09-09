@@ -5,6 +5,14 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(gemupg VERSION 1.0)
 
+if(EMSCRIPTEN)
+    set(BUILD_SHARED_LIBS OFF)
+    set(SDL_SHARED OFF)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+    set(CMAKE_EXECUTABLE_SUFFIX ".html" CACHE INTERNAL "")
+endif()
+
 # SDL
 find_package(SDL3 CONFIG QUIET)
 if (NOT SDL3_FOUND)
@@ -70,6 +78,31 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE "include" "include/imgui")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
+
+if (EMSCRIPTEN)
+target_link_options( ${PROJECT_NAME} PRIVATE
+    "-s PTHREAD_POOL_SIZE=4"
+    "-pthread"
+)
+endif()
+
+# set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
+# target_link_options(${PROJECT_NAME} PUBLIC "-s WASM=1" "-o ${PROJECT_NAME}.html")
+
+target_compile_options(${PROJECT_NAME} PRIVATE 
+    $<$<CXX_COMPILER_ID:MSVC>:/fp:fast>
+    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-ffast-math>
+)
+
+if(EMSCRIPTEN)
+    # on the web, we have to put the files inside of the webassembly
+    # somewhat unintuitively, this is done via a linker argument.
+    target_link_libraries(${PROJECT_NAME} PRIVATE 
+        "--preload-file \"${CMAKE_SOURCE_DIR}/assets/Sono-SemiBold.ttf@/\""
+        "--preload-file \"${CMAKE_SOURCE_DIR}/assets/icon.bmp@/\""
+)
+endif()
+
 if (WIN32)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>

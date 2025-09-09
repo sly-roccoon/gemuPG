@@ -26,8 +26,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
 
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
-	if (Clock::getInstance().shouldDraw())
-		Interface::getInstance().draw();
+	// if (Clock::getInstance().shouldDraw())
+	Interface::getInstance().draw();
 
 	return SDL_APP_CONTINUE;
 }

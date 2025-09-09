@@ -18,17 +18,28 @@ void Clock::setRunning(bool running)
     running_ = running;
 }
 
+static Uint64 last = 0;
+
 Uint64 Clock::stepCallback(void* userdata, SDL_TimerID id, Uint64 interval)
 {
     if (!Clock::getInstance().isRunning())
         return 0;
 
-    //TODO: add drift compensation
-    Uint64 next_delay_NS = 1e9 * 60.0 / Clock::getInstance().getBPM() / TICKS_PER_BAR;
-    step_counter_ = ++step_counter_ % TICKS_PER_BAR;
     Interface::getInstance().getGrid().stepSequence();
 
-    return next_delay_NS == 0 ? 1 : next_delay_NS;
+    double next_delay_NS = 1e9 * 60.0 / Clock::getInstance().getBPM() / TICKS_PER_BAR;
+    Uint64 next_delay_NS_int = SDL_trunc(next_delay_NS);
+
+    delay_remainder_NS_ += next_delay_NS - next_delay_NS_int;
+    if (delay_remainder_NS_ >= 1.0)
+    {
+        delay_remainder_NS_ = 0.0;
+        next_delay_NS_int += 1;
+    }
+
+    step_counter_ = ++step_counter_ % TICKS_PER_BAR;
+
+    return next_delay_NS_int == 0 ? 1 : next_delay_NS_int;
 }
 
 bool Clock::shouldDraw()

@@ -48,5 +48,6 @@ private:
 
     size_t step_overshoot_ = 0;
 
-    inline static unsigned int step_counter_ = 0;
+    inline static Uint64 step_counter_ = 0;
+    inline static double delay_remainder_NS_ = 0.0;
 };

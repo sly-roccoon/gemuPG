@@ -138,8 +138,8 @@ void Area::removeSequencer(BlockSequencer *sequencer)
 			// delete sequencer;
 			sequencer = nullptr;
 		}
-		updateSequence();
 	}
+	updateSequence();
 }
 
 bool Area::removeSequencer(Vector2f pos)

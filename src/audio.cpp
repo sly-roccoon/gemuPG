@@ -137,8 +137,11 @@ AudioEngine::AudioEngine()
 
 	SDL_ResumeAudioStreamDevice(stream_);
 
-	printf("starting clock... \n"); // DEBUG
+#ifndef EMSCRIPTEN
 	Clock::getInstance().setTimerID(SDL_AddTimerNS(0, Clock::stepCallback, nullptr));
+#else
+	SDL_DetachThread(SDL_CreateThread(Clock::stepThread, "clockThread", (void *)NULL));
+#endif
 }
 
 void AudioEngine::destroy()

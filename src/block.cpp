@@ -8,6 +8,8 @@ Block::Block(Vector2f pos)
 {
 	type_ = BLOCK_GENERATOR;
 	rect_ = {pos.x, pos.y, 1.0f, 1.0f};
+	render_rect_ = Block::smallerFRect(rect_);
+	render_rect_ = Camera::resizeFRect(render_rect_);
 }
 
 SDL_FRect Block::smallerFRect(SDL_FRect rect)

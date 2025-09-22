@@ -14,6 +14,8 @@ public:
     }
 
     static Uint64 stepCallback(void *userdata, SDL_TimerID id, Uint64 interval);
+    static int stepThread(void *);
+    inline static SDL_Semaphore *clock_sem = SDL_CreateSemaphore(0);
     bool shouldDraw();
 
     static unsigned int getStepCounter()

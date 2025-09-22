@@ -17,11 +17,11 @@ public:
         case BLOCK_GENERATOR:
         {
             auto blocks = Interface::getInstance().getGrid().getBlocks();
-            for (auto block : blocks)
+            for (int i = 0; i < blocks.size(); i++)
             {
-                if (block->getType() == BLOCK_GENERATOR)
+                if (blocks.at(i)->getType() == BLOCK_GENERATOR)
                 {
-                    float phase = ((BlockGenerator *)block)->getData()->phase;
+                    float phase = ((BlockGenerator *)blocks.at(i))->getData()->phase;
                     return new BlockGenerator(pos, phase);
                 }
             }

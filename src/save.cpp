@@ -134,7 +134,7 @@ void SaveLoad::loadJSON(std::string path, Grid *grid)
 
     for (auto &area_json : j["areas"])
     {
-        Area *area;
+        Area *area = nullptr;
         for (auto &pos_json : area_json["positions"])
         {
             Vector2f pos = {pos_json[0], pos_json[1]};

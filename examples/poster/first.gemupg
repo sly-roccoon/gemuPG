@@ -1,0 +1,403 @@
+{
+    "areas": [
+        {
+            "amp": 1.0,
+            "attack_percent": 0.0,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    0.0,
+                    1.0
+                ],
+                [
+                    0.0,
+                    2.0
+                ],
+                [
+                    1.0,
+                    2.0
+                ],
+                [
+                    2.0,
+                    2.0
+                ],
+                [
+                    1.0,
+                    1.0
+                ],
+                [
+                    2.0,
+                    1.0
+                ]
+            ],
+            "release_percent": 0.0
+        },
+        {
+            "amp": 1.0,
+            "attack_percent": 0.0,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    6.0,
+                    2.0
+                ],
+                [
+                    7.0,
+                    2.0
+                ]
+            ],
+            "release_percent": 100.0
+        },
+        {
+            "amp": 1.0,
+            "attack_percent": 25.0,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    0.0,
+                    6.0
+                ],
+                [
+                    1.0,
+                    6.0
+                ],
+                [
+                    2.0,
+                    6.0
+                ],
+                [
+                    0.0,
+                    7.0
+                ],
+                [
+                    1.0,
+                    7.0
+                ],
+                [
+                    2.0,
+                    7.0
+                ]
+            ],
+            "release_percent": 25.0
+        },
+        {
+            "amp": 1.0,
+            "attack_percent": 25.0,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    9.0,
+                    6.0
+                ],
+                [
+                    10.0,
+                    6.0
+                ],
+                [
+                    11.0,
+                    6.0
+                ]
+            ],
+            "release_percent": 25.0
+        }
+    ],
+    "bpm": 60.0,
+    "generators": [
+        {
+            "amp": 0.5139999985694885,
+            "freq": 179.46246337890625,
+            "freq_factor": 1.0,
+            "pos": [
+                1.0,
+                1.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Quack-164.81Hz.wav",
+            "sample_play_type": 0,
+            "sample_root": 293.6600036621094,
+            "waveform": 0
+        },
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 1.0,
+            "pos": [
+                7.0,
+                2.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 1
+        },
+        {
+            "amp": 0.5,
+            "freq": 89.17962646484375,
+            "freq_factor": 1.0,
+            "pos": [
+                1.0,
+                6.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 4
+        },
+        {
+            "amp": 0.5,
+            "freq": 19867.416015625,
+            "freq_factor": 1.0,
+            "pos": [
+                11.0,
+                6.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 2
+        },
+        {
+            "amp": 0.5,
+            "freq": 19867.416015625,
+            "freq_factor": 1.0,
+            "pos": [
+                9.0,
+                6.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Quack-164.81Hz.wav",
+            "sample_play_type": 1,
+            "sample_root": 159.75,
+            "waveform": 0
+        }
+    ],
+    "sequencers": [
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 152.90496826171875,
+            "pitch_type": 3,
+            "pos": [
+                1.0,
+                0.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 369.9200134277344,
+            "pitch_type": 3,
+            "pos": [
+                3.0,
+                1.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 154.6025848388672,
+            "pitch_type": 0,
+            "pos": [
+                3.0,
+                2.0
+            ]
+        },
+        {
+            "interval": 2.0,
+            "octave_subdivision": 3.0,
+            "pitch": 263.01556396484375,
+            "pitch_type": 2,
+            "pos": [
+                1.0,
+                3.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 179.46246337890625,
+            "pitch_type": 1,
+            "pos": [
+                -1.0,
+                1.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 76.98155975341797,
+            "pitch_type": 1,
+            "pos": [
+                6.0,
+                3.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 244.4731903076172,
+            "pitch_type": 1,
+            "pos": [
+                7.0,
+                1.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 225.89730834960938,
+            "pitch_type": 0,
+            "pos": [
+                5.0,
+                2.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 84.33494567871094,
+            "pitch_type": 1,
+            "pos": [
+                3.0,
+                6.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 74.30999755859375,
+            "pitch_type": 1,
+            "pos": [
+                2.0,
+                8.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 81.01000213623047,
+            "pitch_type": 1,
+            "pos": [
+                2.0,
+                5.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 81.94999694824219,
+            "pitch_type": 1,
+            "pos": [
+                0.0,
+                5.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 74.30999755859375,
+            "pitch_type": 1,
+            "pos": [
+                0.0,
+                8.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 125.13591003417969,
+            "pitch_type": 1,
+            "pos": [
+                -1.0,
+                7.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 698.5599975585938,
+            "pitch_type": 3,
+            "pos": [
+                -1.0,
+                6.0
+            ]
+        },
+        {
+            "interval": 5.0,
+            "octave_subdivision": 19.0,
+            "pitch": 232.12149047851563,
+            "pitch_type": 2,
+            "pos": [
+                3.0,
+                7.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 107.28758239746094,
+            "pitch_type": 0,
+            "pos": [
+                1.0,
+                5.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 86.62288665771484,
+            "pitch_type": 1,
+            "pos": [
+                8.0,
+                6.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": -199.20655822753906,
+            "pitch_type": 0,
+            "pos": [
+                9.0,
+                7.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 431.0666198730469,
+            "pitch_type": 1,
+            "pos": [
+                9.0,
+                5.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 166.17245483398438,
+            "pitch_type": 1,
+            "pos": [
+                11.0,
+                5.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 112.56185150146484,
+            "pitch_type": 0,
+            "pos": [
+                11.0,
+                7.0
+            ]
+        }
+    ]
+}

@@ -11,7 +11,15 @@ constexpr int n_filters = 4;
 class LowPassFilter
 {
 public:
-	LowPassFilter() {}
+	LowPassFilter()
+		: fs_(0),
+		fc_(0.0),
+		d_(0.0),
+		b_{0.0, 0.0, 0.0},
+		a_{0.0, 0.0, 0.0},
+		prev_x_{0.0f, 0.0f, 0.0f},
+		prev_y_{0.0f, 0.0f, 0.0f}
+	{}
 	void init(int sample_rate);
 	void process(float *samples, int n_samples);
 
@@ -23,8 +31,8 @@ private:
 	std::array<double, 3> b_;
 	std::array<double, 3> a_;
 
-	std::array<float, 3> prev_x_ = {0.0f, 0.0f, 0.0f};
-	std::array<float, 3> prev_y_ = {0.0f, 0.0f, 0.0f};
+	std::array<float, 3> prev_x_;
+	std::array<float, 3> prev_y_;
 	void calculateCoefficients();
 };
 
@@ -49,7 +57,7 @@ public:
 	float getSampleRate() { return spec_.freq; }
 
 	float *getOutput() { return output_; }
-	void setOutput(const float *, const int n);	
+	void setOutput(const float *, const int n);
 
 	SDL_AudioSpec *getSpec() { return &spec_; }
 	static std::array<float, WAVE_SIZE> *getWaveTable(WAVE_FORMS wave, pitch_t freq);
@@ -57,6 +65,7 @@ public:
 
 private:
 	SDL_AudioStream *stream_;
+	static SDL_Thread *clockThread;
 	static SDL_AudioSpec spec_;
 
 	AudioEngine();

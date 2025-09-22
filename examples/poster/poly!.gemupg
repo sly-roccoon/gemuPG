@@ -1,0 +1,256 @@
+{
+    "areas": [
+        {
+            "amp": 1.0,
+            "attack_percent": 0.0,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    0.0,
+                    -1.0
+                ]
+            ],
+            "release_percent": 0.0
+        },
+        {
+            "amp": 1.0,
+            "attack_percent": 0.0,
+            "bpm_subdivision": 8,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    3.0,
+                    -1.0
+                ],
+                [
+                    4.0,
+                    -1.0
+                ],
+                [
+                    5.0,
+                    -1.0
+                ],
+                [
+                    6.0,
+                    -1.0
+                ]
+            ],
+            "release_percent": 22.200000762939453
+        },
+        {
+            "amp": 1.0,
+            "attack_percent": 56.0,
+            "bpm_subdivision": 4,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    1.0,
+                    1.0
+                ],
+                [
+                    2.0,
+                    1.0
+                ]
+            ],
+            "release_percent": 22.0
+        },
+        {
+            "amp": 1.0,
+            "attack_percent": 0.0,
+            "bpm_subdivision": 8,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    7.0,
+                    1.0
+                ],
+                [
+                    7.0,
+                    2.0
+                ],
+                [
+                    8.0,
+                    1.0
+                ],
+                [
+                    7.0,
+                    3.0
+                ],
+                [
+                    9.0,
+                    1.0
+                ],
+                [
+                    7.0,
+                    4.0
+                ],
+                [
+                    9.0,
+                    2.0
+                ],
+                [
+                    8.0,
+                    4.0
+                ],
+                [
+                    9.0,
+                    3.0
+                ],
+                [
+                    9.0,
+                    4.0
+                ]
+            ],
+            "release_percent": 0.0
+        },
+        {
+            "amp": 0.699999988079071,
+            "attack_percent": 0.0,
+            "bpm_subdivision": 2,
+            "gliss_percent": 0.0,
+            "positions": [
+                [
+                    4.0,
+                    3.0
+                ]
+            ],
+            "release_percent": 100.0
+        }
+    ],
+    "bpm": 80.0,
+    "generators": [
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 1.0,
+            "pos": [
+                0.0,
+                -1.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Flugelhorn-523.25Hz.wav",
+            "sample_play_type": 0,
+            "sample_root": 523.25,
+            "waveform": 0
+        },
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 1.0,
+            "pos": [
+                3.0,
+                -1.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Clarinet-293.66Hz.wav",
+            "sample_play_type": 0,
+            "sample_root": 293.6600036621094,
+            "waveform": 0
+        },
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 1.0,
+            "pos": [
+                1.0,
+                1.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Choir-1-277.18Hz.wav",
+            "sample_play_type": 1,
+            "sample_root": 277.17999267578125,
+            "waveform": 0
+        },
+        {
+            "amp": 0.5,
+            "freq": 0.0,
+            "freq_factor": 1.0,
+            "pos": [
+                7.0,
+                1.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Quack-164.81Hz.wav",
+            "sample_play_type": 0,
+            "sample_root": 164.80999755859375,
+            "waveform": 0
+        },
+        {
+            "amp": 0.5,
+            "freq": 79.01627349853516,
+            "freq_factor": 1.0,
+            "pos": [
+                4.0,
+                3.0
+            ],
+            "rel_freq": 0.0,
+            "sample_path": "",
+            "sample_play_type": 0,
+            "sample_root": 440.0,
+            "waveform": 2
+        }
+    ],
+    "sequencers": [
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 331.40496826171875,
+            "pitch_type": 1,
+            "pos": [
+                0.0,
+                -2.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 466.239990234375,
+            "pitch_type": 3,
+            "pos": [
+                3.0,
+                -2.0
+            ]
+        },
+        {
+            "interval": 2.0,
+            "octave_subdivision": 12.0,
+            "pitch": 622.4000244140625,
+            "pitch_type": 3,
+            "pos": [
+                1.0,
+                0.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 73.4000015258789,
+            "pitch_type": 3,
+            "pos": [
+                7.0,
+                0.0
+            ]
+        },
+        {
+            "interval": 7.0,
+            "octave_subdivision": 12.0,
+            "pitch": 79.01627349853516,
+            "pitch_type": 3,
+            "pos": [
+                3.0,
+                3.0
+            ]
+        },
+        {
+            "interval": 2.0,
+            "octave_subdivision": 9.0,
+            "pitch": 66.26184844970703,
+            "pitch_type": 2,
+            "pos": [
+                5.0,
+                3.0
+            ]
+        }
+    ]
+}

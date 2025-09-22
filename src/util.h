@@ -32,7 +32,7 @@ constexpr unsigned int TICKS_PER_BAR = 27'720; //LCM 1 through 12 https://billyd
 constexpr bool SEQUENCER_RANDOMIZED = true;
 
 constexpr SDL_Color GENERATOR_COLOR = {0, 0, 255, SDL_ALPHA_OPAQUE};
-constexpr SDL_Color AREA_COLOR = {128, 128, 128, 128};
+constexpr SDL_Color AREA_COLOR = {128, 128, 128, SDL_ALPHA_OPAQUE};
 constexpr SDL_Color SEQUENCER_COLOR = {255, 255, 0, SDL_ALPHA_OPAQUE};
 
 constexpr float BLOCK_SIZE_FACTOR = 0.8f;

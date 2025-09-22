@@ -236,7 +236,7 @@ void Interface::drawDebug()
 	SDL_GetWindowSizeInPixels(window_, &w, NULL);
 	SDL_SetRenderDrawColor(renderer_, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderDebugTextFormat(renderer_, w - 2 * SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE, 0, "%d",
-	                          Clock::getInstance().getFPS());
+	                          (int)Clock::getInstance().getFPS());
 }
 
 //--------------------------------------------------------

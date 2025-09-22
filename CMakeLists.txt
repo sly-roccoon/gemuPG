@@ -81,8 +81,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
 
 if (EMSCRIPTEN)
 target_link_options( ${PROJECT_NAME} PRIVATE
-    "-s PTHREAD_POOL_SIZE=4"
+    "-s PTHREAD_POOL_SIZE=16"
     "-pthread"
+    "--emrun"
+    "-sALLOW_MEMORY_GROWTH"
+    "-sPROXY_TO_PTHREAD"
 )
 endif()
 
@@ -117,3 +120,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/assets/Sono-SemiBold.ttf $<TARGET_FILE_DIR:${PROJECT_NAME}>
         COMMAND_EXPAND_LISTS
 )
+
+if (WIN32)
+    set_target_properties(gemupg PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()

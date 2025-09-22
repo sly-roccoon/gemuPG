@@ -45,7 +45,7 @@ private:
 class RemoveBlockCommand : public Command
 {
 public:
-	RemoveBlockCommand(Vector2f pos) : pos_{pos} {}
+	RemoveBlockCommand(Vector2f pos) : pos_{ pos }, block_{ nullptr } {}
 	bool execute() override
 	{
 		auto block = interface_.getBlock(floorVec(pos_));

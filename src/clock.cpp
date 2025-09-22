@@ -8,6 +8,7 @@ void Clock::setRunning(bool running)
     {
         // Start the timer when the clock is set to running
         timer_ = SDL_AddTimerNS(0, Clock::stepCallback, nullptr);
+        SDL_SignalSemaphore(clock_sem);
     }
     else if (running == false)
     {
@@ -39,9 +40,33 @@ Uint64 Clock::stepCallback(void *userdata, SDL_TimerID id, Uint64 interval)
 
     step_counter_ = ++step_counter_ % TICKS_PER_BAR;
 
-    printf("end of clock callback \n");
-
     return next_delay_NS_int == 0 ? 1 : next_delay_NS_int;
+}
+
+int Clock::stepThread(void *userdata)
+{
+    while (true)
+    {
+        if (!Clock::getInstance().isRunning())
+            SDL_WaitSemaphore(clock_sem);
+
+        Interface::getInstance().getGrid().stepSequence();
+
+        double next_delay_NS = 1e9 * 60.0 / Clock::getInstance().getBPM() / TICKS_PER_BAR;
+        Uint64 next_delay_NS_int = SDL_trunc(next_delay_NS);
+
+        delay_remainder_NS_ += next_delay_NS - next_delay_NS_int;
+        if (delay_remainder_NS_ >= 1.0)
+        {
+            delay_remainder_NS_ = 0.0;
+            next_delay_NS_int += 1;
+        }
+
+        step_counter_ = ++step_counter_ % TICKS_PER_BAR;
+
+        next_delay_NS_int = 0 ? 1 : next_delay_NS_int;
+        SDL_DelayNS(next_delay_NS_int);
+    }
 }
 
 bool Clock::shouldDraw()

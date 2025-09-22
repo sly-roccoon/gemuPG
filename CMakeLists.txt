@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.25)
 set(CMAKE_COLOR_DIAGNOSTICS OFF)
 set(CMAKE_CXX_STANDARD 20)
 
-project(gemupg VERSION 1.0)
+project(gemupg VERSION 0.1)
 
 if(EMSCRIPTEN)
     set(BUILD_SHARED_LIBS OFF)

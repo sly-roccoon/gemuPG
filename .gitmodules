@@ -1,6 +1,3 @@
 [submodule "include/SDL_ttf"]
 	path = include/SDL_ttf
 	url = https://github.com/libsdl-org/SDL_ttf
-[submodule "include/pvs-studio-cmake-module"]
-	path = include/pvs-studio-cmake-module
-	url = https://github.com/viva64/pvs-studio-cmake-module/

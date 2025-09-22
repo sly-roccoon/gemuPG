@@ -32,7 +32,18 @@ endif ()
 set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf")  # create the variable
 set_property(CACHE GEMUPG_SYSTEM_SDL_TTF PROPERTY STRINGS AUTO ON OFF)  #  define list of values GUI will offer for the variable
 if (GEMUPG_SYSTEM_SDL_TTF STREQUAL "AUTO")
-    find_package(SDL3_ttf CONFIG)
+    find_package(SDL3_ttf CONFIG QUIET)
+if (NOT SDL3_ttf_FOUND)
+    message(STATUS "SDL3-ttf not found, fetching from GitHub...")
+    include(FetchContent)
+    FetchContent_Declare(
+        SDL3_ttf
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
+        GIT_TAG release-3.2.2
+    )
+    FetchContent_MakeAvailable(SDL3_ttf)
+    add_subdirectory(${SDL3_ttf_SOURCE_DIR} ${SDL3_ttf_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 elseif (GEMUPG_SYSTEM_SDL_TTF STREQUAL "ON")
     find_package(SDL3_ttf CONFIG REQUIRED)
 endif ()

@@ -306,7 +306,7 @@
                 -2.0
             ],
             "rel_freq": 0.0,
-            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Sax-349.23.wav",
+            "sample_path": "sounds\\Sax-349.23.wav",
             "sample_play_type": 1,
             "sample_root": 349.2300109863281,
             "waveform": 0
@@ -320,7 +320,7 @@
                 -1.0
             ],
             "rel_freq": 0.0,
-            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Sax-349.23.wav",
+            "sample_path": "sounds\\Sax-349.23.wav",
             "sample_play_type": 1,
             "sample_root": 349.2300109863281,
             "waveform": 0
@@ -432,7 +432,7 @@
                 -1.0
             ],
             "rel_freq": 0.0,
-            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Flugelhorn-523.25Hz.wav",
+            "sample_path": "sounds\\Flugelhorn-523.25Hz.wav",
             "sample_play_type": 1,
             "sample_root": 523.25,
             "waveform": 0
@@ -460,7 +460,7 @@
                 3.0
             ],
             "rel_freq": 0.0,
-            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Choir-1-277.18Hz.wav",
+            "sample_path": "sounds\\Choir-1-277.18Hz.wav",
             "sample_play_type": 0,
             "sample_root": 277.17999267578125,
             "waveform": 0

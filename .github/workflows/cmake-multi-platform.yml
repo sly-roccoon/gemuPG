@@ -1,6 +1,4 @@
-# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
-name: CMake on multiple platforms
+name: CMake - Linux (GCC, Clang), Windows (CL), WASM (Emscripten)
 
 permissions:
   contents: write
@@ -162,6 +160,7 @@ jobs:
           generate_release_notes: false
           fail_on_unmatched_files: true
           append_body: true
+          draft: false
           files: |
             gemuPG-${{github.ref_name}}-win.zip 
             gemuPG-${{github.ref_name}}-linux-g++.tar.gz

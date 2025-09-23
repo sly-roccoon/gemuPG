@@ -116,7 +116,7 @@
                 1.0
             ],
             "rel_freq": 0.0,
-            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Quack-164.81Hz.wav",
+            "sample_path": "sounds\\Quack-164.81Hz.wav",
             "sample_play_type": 0,
             "sample_root": 293.6600036621094,
             "waveform": 0
@@ -172,7 +172,7 @@
                 6.0
             ],
             "rel_freq": 0.0,
-            "sample_path": "C:\\Users\\rocco\\Desktop\\gemupg-win64-msvc\\sounds\\Quack-164.81Hz.wav",
+            "sample_path": "sounds\\Quack-164.81Hz.wav",
             "sample_play_type": 1,
             "sample_root": 159.75,
             "waveform": 0

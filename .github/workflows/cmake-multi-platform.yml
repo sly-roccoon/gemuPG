@@ -102,8 +102,8 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
 
-      - name: Fix permissions on artifacts
-        run: sudo chmod -R a+rwX artifacts/
+      # - name: Fix permissions on artifacts
+      #   run: sudo chmod -R a+rwX artifacts/
 
       - name: Create release archives
         run: |
@@ -114,15 +114,11 @@ jobs:
             examples sounds artifacts/build-windows-latest-cl/Release/*
           \
           tar czf gemuPG-${{github.ref_name}}-linux-g++.tar.gz \
-          examples sounds \
-          artifacts/build-ubuntu-latest-g++/Sono-SemiBold.ttf
-          artifacts/build-ubuntu-latest-g++/icon.bmp
+          examples sounds assets/* \
           artifacts/build-ubuntu-latest-g++/gemupg
           \
           tar czf gemuPG-${{github.ref_name}}-linux-clang++.tar.gz \
-          examples sounds \
-          artifacts/build-ubuntu-latest-clang++/Sono-SemiBold.ttf
-          artifacts/build-ubuntu-latest-clang++/icon.bmp
+          examples sounds assets/* \
           artifacts/build-ubuntu-latest-clang++/gemupg
 
       - name: GH Release

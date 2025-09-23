@@ -4,7 +4,6 @@ name: CMake on multiple platforms
 
 on:
   push:
-    branches: ["main"]
     tags: ["v*"]
 
 jobs:
@@ -83,7 +82,7 @@ jobs:
       - name: upload-artifact
         uses: actions/upload-artifact@v4.6.2
         with:
-          name: build-output-${{matrix.os}}-${{matrix.cpp_compiler}}
+          name: build-${{matrix.os}}-${{matrix.cpp_compiler}}
           path: ${{ steps.strings.outputs.build-output-dir }}/
 
   release:
@@ -98,12 +97,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-      # - name: GH Release
-      #   uses: softprops/action-gh-release@v2.3.3
-      #   with:
-      #     prerelease: false
-      #     generate_release_notes: false
-      #     fail_on_unmatched_files: true
-      #     append_body: true
-      #     files: |
-      #       ${{ steps.strings.outputs.build-output-dir }}/**
+      - name: Display structure of downloaded files
+        run: ls -R
+    # - name: GH Release
+    #   uses: softprops/action-gh-release@v2.3.3
+    #   with:
+    #     prerelease: false
+    #     generate_release_notes: false
+    #     fail_on_unmatched_files: true
+    #     append_body: true
+    #     files: |
+    #       ${{ steps.strings.outputs.build-output-dir }}/**

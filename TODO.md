@@ -7,6 +7,7 @@
 - [ ] add emscripten build to github actions
 - [ ] minimize dependencies in github actions
 - [ ] Write unit tests
+- [ ] fix clock timing not taking processing time into account
 
 ---
 

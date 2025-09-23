@@ -4,16 +4,16 @@ set(CMAKE_COLOR_DIAGNOSTICS OFF)
 set(CMAKE_CXX_STANDARD 20)
 
 project(gemupg VERSION 0.1)
+set(BUILD_SHARED_LIBS OFF)
 
 if(EMSCRIPTEN)
-    set(BUILD_SHARED_LIBS OFF)
-    set(SDL_SHARED OFF)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
-    set(CMAKE_EXECUTABLE_SUFFIX ".html" CACHE INTERNAL "")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+set(CMAKE_EXECUTABLE_SUFFIX ".html" CACHE INTERNAL "")
 endif()
 
 # SDL
+set(SDL_STATIC ON)
 find_package(SDL3 CONFIG QUIET)
 if (NOT SDL3_FOUND)
     message(STATUS "SDL3 not found, fetching from GitHub...")
@@ -29,6 +29,7 @@ else ()
 endif ()
 
 # SDL_ttf
+set(SDLTTF_BUILD_SHARED_LIBS OFF)
 set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf")  # create the variable
 set_property(CACHE GEMUPG_SYSTEM_SDL_TTF PROPERTY STRINGS AUTO ON OFF)  #  define list of values GUI will offer for the variable
 if (GEMUPG_SYSTEM_SDL_TTF STREQUAL "AUTO")
@@ -40,6 +41,8 @@ endif ()
 if (SDL3_ttf_FOUND)
     message(STATUS "Using system provided SDL3-ttf")
 else ()
+    include(cmake/UpdateSubmodules.cmake)
+
     # ! needs to run script under include/SDL_ttf/external first!
     set(SDLTTF_VENDORED ON)
     set(SDLTTF_HARFBUZZ OFF)

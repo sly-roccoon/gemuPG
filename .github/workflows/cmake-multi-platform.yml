@@ -150,6 +150,10 @@ jobs:
           tar czf gemuPG-${{github.ref_name}}-linux-clang++.tar.gz \
           examples sounds assets/* \
           -C artifacts/build-ubuntu-latest-clang++ gemupg
+          \
+          tar czf gemuPG-${{github.ref_name}}-wasm.tar.gz \
+          -C artifacts/build-ubuntu-latest-em++ \
+          gemupg.data gemupg.js gemupg.wasm
 
       - name: GH Release
         uses: softprops/action-gh-release@v2.3.3

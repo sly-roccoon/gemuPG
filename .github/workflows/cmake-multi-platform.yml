@@ -57,8 +57,8 @@ jobs:
       - name: Install dependencies
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install build-essential git make pkg-config cmake \
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential git make pkg-config cmake \
           libasound2-dev libpulse-dev libjack-dev \
           libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev \
           libwayland-dev libwayland-egl-backend-dev wayland-protocols \
@@ -107,7 +107,7 @@ jobs:
 
       - name: Create release archives
         run: |
-          sudo apt update
+          sudo apt update -y
           sudo apt install -y zip
           \
           zip -r gemuPG-${{github.ref_name}}-win.zip \

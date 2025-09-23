@@ -113,8 +113,10 @@ jobs:
           sudo apt update -y
           sudo apt install -y zip
           \
+          zip -r gemuPG-${{github.ref_name}}-win.zip \
+            examples sounds
           zip -j gemuPG-${{github.ref_name}}-win.zip \
-            examples sounds artifacts/build-windows-latest-cl/Release/*
+            artifacts/build-windows-latest-cl/Release/*
           \
           tar czf gemuPG-${{github.ref_name}}-linux-g++.tar.gz \
           examples sounds assets/* \

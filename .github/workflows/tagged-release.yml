@@ -84,7 +84,11 @@ jobs:
         run: |
           if [[ "${{ runner.os }}" == "Windows" ]]; then
             # Package Windows binaries
-            cd ${{ steps.strings.outputs.build-output-dir }}/Release
+            if [[ -d "${{ steps.strings.outputs.build-output-dir }}/Release" ]]; then
+              cd "${{ steps.strings.outputs.build-output-dir }}/Release"
+            else
+              cd "${{ steps.strings.outputs.build-output-dir }}"
+            fi
             7z a ../../gemupg-windows-${{ matrix.c_compiler }}.zip gemupg.exe *.dll *.ttf *.bmp
           else
             # Package Linux binaries

@@ -12,12 +12,12 @@
 
 ## 🛠️ In Progress
 
-- [ ] Github Actions
 
 ---
 
 ## ✅ Completed
 
+- [x] Github Actions
 - [x] minimize dependencies in github actions
 
 ---

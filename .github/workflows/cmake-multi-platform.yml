@@ -26,7 +26,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release]
-        c_compiler: [gcc, clang, cl]
+        c_compiler: [gcc, clang, cl, emscripten]
         include:
           - os: windows-latest
             c_compiler: cl
@@ -37,11 +37,16 @@ jobs:
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
+          - os: ubuntu-latest
+            c_compiler: emscripten
+            cpp_compiler: em++
         exclude:
           - os: windows-latest
             c_compiler: gcc
           - os: windows-latest
             c_compiler: clang
+          - os: windows-latest
+            c_compiler: emscripten
           - os: ubuntu-latest
             c_compiler: cl
 
@@ -69,13 +74,32 @@ jobs:
           libgl1-mesa-dev libegl1-mesa-dev \
           libdbus-1-dev libudev-dev
 
-      - name: Configure CMake
+      - name: Set up Emscripten
+        if: matrix.c_compiler == 'emscripten'
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install latest
+          ./emsdk activate latest
+          source ./emsdk_env.sh
+          cd ..
+
+      - name: Configure CMake for Desktop
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
         # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+        if: matrix.c_compiler != 'emscripten'
         run: >
           cmake -B ${{ steps.strings.outputs.build-output-dir }}
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -S ${{ github.workspace }}
+
+      - name: Configure CMake for Emscripten
+        if: matrix.c_compiler == 'emscripten'
+        run: >
+          emcmake cmake
+          -B ${{ steps.strings.outputs.build-output-dir }}
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
           -S ${{ github.workspace }}
 

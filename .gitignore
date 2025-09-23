@@ -6,5 +6,5 @@
 CMakeSettings.json
 
 vcpkg_installed/
-build/
+build*/
 webasm/

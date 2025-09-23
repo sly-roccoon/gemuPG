@@ -15,8 +15,10 @@ endif()
 # SDL
 set(SDL_STATIC ON)
 find_package(SDL3 CONFIG QUIET)
-if (NOT SDL3_FOUND)
-    message(STATUS "SDL3 not found, fetching from GitHub...")
+if (NOT SDL3_FOUND OR SDL_STATIC)
+    if (NOT SDL3_FOUND)
+        message(STATUS "SDL3 not found, fetching from GitHub...")
+    endif()
     include(FetchContent)
     FetchContent_Declare(
             SDL3
@@ -100,15 +102,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-ffast-math>
 )
 
-if(EMSCRIPTEN)
-    # on the web, we have to put the files inside of the webassembly
-    # somewhat unintuitively, this is done via a linker argument.
-    target_link_libraries(${PROJECT_NAME} PRIVATE 
-        "--preload-file \"${CMAKE_SOURCE_DIR}/assets/Sono-SemiBold.ttf@/\""
-        "--preload-file \"${CMAKE_SOURCE_DIR}/assets/icon.bmp@/\""
-)
-endif()
-
 # not needed anymore due to static build
 # if (WIN32)
 #     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
@@ -116,14 +109,6 @@ endif()
 #             COMMAND_EXPAND_LISTS
 #     )
 # endif ()
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/assets/icon.bmp $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        COMMAND_EXPAND_LISTS
-)
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/assets/Sono-SemiBold.ttf $<TARGET_FILE_DIR:${PROJECT_NAME}>
-        COMMAND_EXPAND_LISTS
-)
 
 if (WIN32)
     set_target_properties(gemupg PROPERTIES WIN32_EXECUTABLE TRUE)

@@ -3,11 +3,10 @@
 A Generative Music Poly* Grid
 
 ### Compile Instructions
-CMake >= 3.25
-GCC >= 13
-SDL >= 3.2.0 (via vcpkg or system package manager)
-
-might need to install libasound2-dev libpulse-dev before building sdl with audio support
+CMake >= 3.25 \
+GCC >= 13 \
+also check SDL3 build dependencies: https://github.com/libsdl-org/SDL/blob/main/docs/README-linux.md#build-dependencies
+<!-- SDL >= 3.2.0 (via vcpkg or system package manager) -->
 
 ```
 git clone https://git.iem.at/aronpetritz/gemupg --recurse-submodules #recurse-submodules is important!!

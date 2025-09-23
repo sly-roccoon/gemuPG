@@ -70,7 +70,9 @@ jobs:
           libwayland-dev libwayland-egl-backend-dev wayland-protocols \
           libxkbcommon-dev libdrm-dev libgbm-dev \
           libgl1-mesa-dev libegl1-mesa-dev \
-          libdbus-1-dev libudev-dev
+          libdbus-1-dev libudev-dev ninja-build gnome-desktop-testing \
+          libsndio-dev libxss-dev libxtst-dev libgles2-mesa-dev libibus-1.0-dev \
+          libpipewire-0.3-dev libdecor-0-dev liburing-dev
 
       - name: Set up Emscripten
         if: matrix.c_compiler == 'emscripten'

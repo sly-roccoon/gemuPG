@@ -3,17 +3,21 @@
 ## 📝 Tasks
 
 - [ ] Update README.md
+- [ ] fix bug where generator blocks apparently dont connect to areas anymore when area size is reduced
 - [ ] fix sample waveform loading on load project
 - [ ] change default file opening location to be executable location
 - [ ] fix clock timing not taking processing time into account
 - [ ] go over block.cpp to fix clicking/glissandi etc.
-- [ ] add emscripten build to github actions
 - [ ] Write unit tests
+- [ ] add mute groups
+- [ ] add modulator blocks
+- [ ] add conditionals
 
 ---
 
 ## 🛠️ In Progress
 
+- [ ] no windowing on gnome?
 
 ---
 
@@ -21,6 +25,8 @@
 
 - [x] Github Actions
 - [x] minimize dependencies in github actions
+- [x] add emscripten build to github actions
+- [x] SDL_ttf doesn't seem to work in linux builds...
 
 ---
 

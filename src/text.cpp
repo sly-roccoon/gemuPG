@@ -1,4 +1,5 @@
 #include "text.h"
+#include "assets/font.ttf.h"
 
 TTF_Font *Text::default_font_ = nullptr;
 TTF_TextEngine *Text::text_engine_ = nullptr;
@@ -10,7 +11,9 @@ void Text::init(SDL_Renderer *renderer)
     std::string font_path = SDL_GetBasePath();
     font_path.append("/");
     font_path.append(FONT);
-    default_font_ = TTF_OpenFont(font_path.c_str(), 128);
+    // default_font_ = TTF_OpenFont(font_path.c_str(), 128);
+    SDL_IOStream *rw = SDL_IOFromConstMem(font_ttf, font_ttf_len);
+    default_font_ = TTF_OpenFontIO(rw, 1, 128);
     text_engine_ = TTF_CreateRendererTextEngine(renderer_);
 }
 

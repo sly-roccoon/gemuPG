@@ -102,6 +102,9 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
 
+      - name: Fix permissions on artifacts
+        run: chmod -R a+r artifacts/
+
       - name: Create release archives
         run: |
           sudo apt update

@@ -5,7 +5,6 @@
 - [ ] Update README.md
 - [ ] go over block.cpp to fix clicking/glissandi etc.
 - [ ] add emscripten build to github actions
-- [ ] minimize dependencies in github actions
 - [ ] Write unit tests
 - [ ] fix clock timing not taking processing time into account
 
@@ -18,6 +17,8 @@
 ---
 
 ## ✅ Completed
+
+- [x] minimize dependencies in github actions
 
 ---
 

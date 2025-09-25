@@ -15,7 +15,7 @@ void SaveLoad::save(bool save_as)
     if (save_as || save_path.empty())
     {
         SDL_Window *window = Interface::getInstance().getWindow();
-        SDL_ShowSaveFileDialog(save_dialog_callback, (void *)grid, window, &save_filter, 1, NULL);
+        SDL_ShowSaveFileDialog(save_dialog_callback, (void *)grid, window, &save_filter, 1, work_dir);
     }
     else
     {
@@ -29,7 +29,7 @@ void SaveLoad::load()
 #ifndef EMSCRIPTEN // TODO: add javascript file loading for emscripten
     Grid *grid = &Interface::getInstance().getGrid();
     SDL_Window *window = Interface::getInstance().getWindow();
-    SDL_ShowOpenFileDialog(load_dialog_callback, (void *)grid, window, &save_filter, 1, NULL, false);
+    SDL_ShowOpenFileDialog(load_dialog_callback, (void *)grid, window, &save_filter, 1, work_dir, false);
 #endif
 }
 
@@ -172,6 +172,7 @@ void SaveLoad::loadJSON(std::string path, Grid *grid)
         generator->getSample()->openPath(generator_json["sample_path"]);
         generator->getSample()->setRoot(generator_json["sample_root"]);
         generator->getSample()->setPlayType(generator_json["sample_play_type"]);
+        generator->getSample()->setNewLoad();
 
         grid->addBlock(generator);
     }

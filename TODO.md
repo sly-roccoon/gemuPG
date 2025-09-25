@@ -3,10 +3,9 @@
 ## 📝 Tasks
 
 - [ ] Update README.md
-- [ ] fix sample waveform loading on load project
-- [ ] change default file opening location to be executable location
 - [ ] fix clock timing not taking processing time into account
 - [ ] go over block.cpp to fix clicking/glissandi etc.
+- [ ] add emscripten javascript file io
 - [ ] make hold down right click to delete draw possible
 - [ ] Write unit tests
 - [ ] add mute groups
@@ -23,6 +22,8 @@
 
 ## ✅ Completed
 
+- [x] fix sample waveform loading on load project
+- [x] change default file opening location to be executable location
 - [x] fix bug where generator blocks apparently dont connect to areas anymore when area size is reduced
 - [x] SDL_ttf doesn't seem to work in linux builds...
 - [x] add emscripten build to github actions

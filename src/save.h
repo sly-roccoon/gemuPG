@@ -25,5 +25,6 @@ public:
 
 private:
     static std::string save_path;
+    static const inline char *work_dir = SDL_GetBasePath();
     static const inline SDL_DialogFileFilter save_filter = {"gemuPG grid file (*.gemupg)", "gemupg"};
 };

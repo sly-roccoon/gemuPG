@@ -5,7 +5,8 @@ A Generative Music Poly* Grid
 ### Compile Instructions
 CMake >= 3.25 \
 GCC >= 13 \
-also check SDL3 build dependencies: https://github.com/libsdl-org/SDL/blob/main/docs/README-linux.md#build-dependencies
+also check SDL3 build dependencies: https://github.com/libsdl-org/SDL/blob/main/docs/README-linux.md#build-dependencies \
+or (attempt to) use system SDL3 & SDL3_ttf using USE_SHARED_LIBS=ON
 <!-- SDL >= 3.2.0 (via vcpkg or system package manager) -->
 
 ```

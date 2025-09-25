@@ -4,45 +4,49 @@ set(CMAKE_COLOR_DIAGNOSTICS OFF)
 set(CMAKE_CXX_STANDARD 20)
 
 project(gemupg VERSION 0.1)
-set(BUILD_SHARED_LIBS OFF)
+
+set(USE_SHARED_LIBS OFF)
+if(NOT USE_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS OFF)
+    set(SDL_STATIC ON)
+    set(SDLTTF_BUILD_SHARED_LIBS OFF)
+endif()
 
 if(EMSCRIPTEN)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
-set(CMAKE_EXECUTABLE_SUFFIX ".html" CACHE INTERNAL "")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
+    set(CMAKE_EXECUTABLE_SUFFIX ".html" CACHE INTERNAL "")
 endif()
 
 # SDL
-set(SDL_STATIC ON)
 find_package(SDL3 CONFIG QUIET)
-if (NOT SDL3_FOUND OR SDL_STATIC)
-    if (NOT SDL3_FOUND)
+if(NOT SDL3_FOUND OR SDL_STATIC)
+    if(NOT SDL3_FOUND)
         message(STATUS "SDL3 not found, fetching from GitHub...")
     endif()
     include(FetchContent)
     FetchContent_Declare(
-            SDL3
-            GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-            GIT_TAG release-3.2.8
+        SDL3
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+        GIT_TAG release-3.2.8
     )
     FetchContent_MakeAvailable(SDL3)
-else ()
+else()
     message(STATUS "SDL3 found, using system provided version")
-endif ()
+endif()
 
 # SDL_ttf
-set(SDLTTF_BUILD_SHARED_LIBS OFF)
-set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf")  # create the variable
-set_property(CACHE GEMUPG_SYSTEM_SDL_TTF PROPERTY STRINGS AUTO ON OFF)  #  define list of values GUI will offer for the variable
-if (GEMUPG_SYSTEM_SDL_TTF STREQUAL "AUTO")
+set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf") # create the variable
+set_property(CACHE GEMUPG_SYSTEM_SDL_TTF PROPERTY STRINGS AUTO ON OFF) #  define list of values GUI will offer for the variable
+if(GEMUPG_SYSTEM_SDL_TTF STREQUAL "AUTO")
     find_package(SDL3_ttf CONFIG)
-elseif (GEMUPG_SYSTEM_SDL_TTF STREQUAL "ON")
+elseif(GEMUPG_SYSTEM_SDL_TTF STREQUAL "ON")
     find_package(SDL3_ttf CONFIG REQUIRED)
-endif ()
+endif()
 
-if (SDL3_ttf_FOUND)
+if(SDL3_ttf_FOUND)
     message(STATUS "Using system provided SDL3-ttf")
-else ()
+else()
     include(cmake/UpdateSubmodules.cmake)
 
     # ! needs to run script under include/SDL_ttf/external first!
@@ -51,7 +55,7 @@ else ()
     set(SDLTTF_PLUTOSVG OFF)
     add_subdirectory(include/SDL_ttf EXCLUDE_FROM_ALL)
     message(STATUS "Using vendored SDL3-ttf")
-endif ()
+endif()
 
 # IMGUI
 file(GLOB_RECURSE IMGUI_SOURCES CONFIGURE_DEPENDS "include/imgui/*.cpp")
@@ -60,22 +64,22 @@ file(GLOB_RECURSE IMGUI_SOURCES CONFIGURE_DEPENDS "include/imgui/*.cpp")
 # target_include_directories(IMGUI PUBLIC "include/imgui")
 
 # GEMUPG
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message(STATUS "Using clang")
     add_compile_options(-Wno-int-conversions)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message(STATUS "Using GCC")
     add_compile_options(-Wno-pmf-conversions)
-endif ()
+endif()
 
 file(GLOB_RECURSE gemupg_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB_RECURSE gemupg_HEADERS CONFIGURE_DEPENDS "src/*.h")
 
 set(gemupg_INCLUDE_DIRS "")
-foreach (_headerFile ${gemupg_HEADERS})
+foreach(_headerFile ${gemupg_HEADERS})
     get_filename_component(_dir ${_headerFile} PATH)
     list(APPEND geumpg_INCLUDE_DIRS ${_dir})
-endforeach ()
+endforeach()
 list(REMOVE_DUPLICATES gemupg_INCLUDE_DIRS)
 
 add_executable(${PROJECT_NAME} ${gemupg_SOURCES} ${IMGUI_SOURCES})
@@ -84,20 +88,20 @@ target_include_directories(${PROJECT_NAME} PRIVATE "include" "include/imgui")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
 
-if (EMSCRIPTEN)
-target_link_options( ${PROJECT_NAME} PRIVATE
-    "-s PTHREAD_POOL_SIZE=16"
-    "-pthread"
-    "--emrun"
-    "-sALLOW_MEMORY_GROWTH"
-    "-sPROXY_TO_PTHREAD"
-)
+if(EMSCRIPTEN)
+    target_link_options(${PROJECT_NAME} PRIVATE
+        "-s PTHREAD_POOL_SIZE=16"
+        "-pthread"
+        "--emrun"
+        "-sALLOW_MEMORY_GROWTH"
+        "-sPROXY_TO_PTHREAD"
+    )
 endif()
 
 # set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
 # target_link_options(${PROJECT_NAME} PUBLIC "-s WASM=1" "-o ${PROJECT_NAME}.html")
 
-target_compile_options(${PROJECT_NAME} PRIVATE 
+target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/fp:fast>
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-ffast-math>
 )
@@ -110,6 +114,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 #     )
 # endif ()
 
-if (WIN32)
+if(WIN32)
     set_target_properties(gemupg PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()

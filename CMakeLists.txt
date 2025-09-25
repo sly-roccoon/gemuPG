@@ -14,54 +14,50 @@ endif()
 
 if(EMSCRIPTEN)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
-    set(BUILD_SHARED_LIBS OFF)
     set(SDL_SHARED OFF)
     set(SDL_PTHREADS ON)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
     set(CMAKE_EXECUTABLE_SUFFIX ".html" CACHE INTERNAL "")
-    set(USE_FLAGS "-s USE_SDL=3 -s USE_SDL_TTF=3 -s USE_FREETYPE=1 -s USE_HARFBUZZ=1")
 endif()
 
 # SDL
-if(NOT EMSCRIPTEN)
-    find_package(SDL3 CONFIG QUIET)
-    if(NOT SDL3_FOUND OR SDL_STATIC)
-        if(NOT SDL3_FOUND)
-            message(STATUS "SDL3 not found, fetching from GitHub...")
-        endif()
-        include(FetchContent)
-        FetchContent_Declare(
-            SDL3
-            GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-            GIT_TAG release-3.2.8
-        )
-        FetchContent_MakeAvailable(SDL3)
-    else()
-        message(STATUS "SDL3 found, using system provided version")
+find_package(SDL3 CONFIG QUIET)
+if(NOT SDL3_FOUND OR SDL_STATIC)
+    if(NOT SDL3_FOUND)
+        message(STATUS "SDL3 not found, fetching from GitHub...")
     endif()
+    include(FetchContent)
+    FetchContent_Declare(
+        SDL3
+        GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+        GIT_TAG release-3.2.8
+    )
+    FetchContent_MakeAvailable(SDL3)
+else()
+    message(STATUS "SDL3 found, using system provided version")
+endif()
 
-    # SDL_ttf
-    set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf") # create the variable
-    set_property(CACHE GEMUPG_SYSTEM_SDL_TTF PROPERTY STRINGS AUTO ON OFF) #  define list of values GUI will offer for the variable
-    if(GEMUPG_SYSTEM_SDL_TTF STREQUAL "AUTO")
-        find_package(SDL3_ttf CONFIG)
-    elseif(GEMUPG_SYSTEM_SDL_TTF STREQUAL "ON")
-        find_package(SDL3_ttf CONFIG REQUIRED)
-    endif()
+# SDL_ttf
+set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf") # create the variable
+set_property(CACHE GEMUPG_SYSTEM_SDL_TTF PROPERTY STRINGS AUTO ON OFF) #  define list of values GUI will offer for the variable
+if(GEMUPG_SYSTEM_SDL_TTF STREQUAL "AUTO")
+    find_package(SDL3_ttf CONFIG)
+elseif(GEMUPG_SYSTEM_SDL_TTF STREQUAL "ON")
+    find_package(SDL3_ttf CONFIG REQUIRED)
+endif()
 
-    if(SDL3_ttf_FOUND)
-        message(STATUS "Using system provided SDL3-ttf")
-    else()
-        include(cmake/UpdateSubmodules.cmake)
+if(SDL3_ttf_FOUND)
+    message(STATUS "Using system provided SDL3-ttf")
+else()
+    include(cmake/UpdateSubmodules.cmake)
 
-        # ! needs to run script under include/SDL_ttf/external first!
-        set(SDLTTF_VENDORED ON)
-        set(SDLTTF_HARFBUZZ ON)
-        set(SDLTTF_PLUTOSVG OFF)
-        add_subdirectory(include/SDL_ttf EXCLUDE_FROM_ALL)
-        message(STATUS "Using vendored SDL3-ttf")
-    endif()
+    # ! needs to run script under include/SDL_ttf/external first!
+    set(SDLTTF_VENDORED ON)
+    set(SDLTTF_HARFBUZZ ON)
+    set(SDLTTF_PLUTOSVG OFF)
+    add_subdirectory(include/SDL_ttf EXCLUDE_FROM_ALL)
+    message(STATUS "Using vendored SDL3-ttf")
 endif()
 
 
@@ -94,17 +90,12 @@ add_executable(${PROJECT_NAME} ${gemupg_SOURCES} ${IMGUI_SOURCES} bt.rc)
 target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE "include" "include/imgui")
 
-if(EMSCRIPTEN)
-    target_link_libraries(${PROJECT_NAME} PRIVATE SDL3 SDL3_ttf)
-else()
-    target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
-endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
 
 if(EMSCRIPTEN)
     target_link_options(${PROJECT_NAME} PRIVATE
         "-s PTHREAD_POOL_SIZE=16"
         "-pthread"
-        "--emrun"
         "-sALLOW_MEMORY_GROWTH=1"
         "-sMAXIMUM_MEMORY=1gb"
         "-sPROXY_TO_PTHREAD"

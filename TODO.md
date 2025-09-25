@@ -16,12 +16,14 @@
 
 ## 🛠️ In Progress
 
-- [ ] no windowing on gnome?
 
 ---
 
 ## ✅ Completed
 
+- [x] chmod +x the linux builds on actions
+- [x] no windowing on gnome?
+- [x] add windows exe icon
 - [x] fix sample waveform loading on load project
 - [x] change default file opening location to be executable location
 - [x] fix bug where generator blocks apparently dont connect to areas anymore when area size is reduced

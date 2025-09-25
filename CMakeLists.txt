@@ -82,7 +82,7 @@ foreach(_headerFile ${gemupg_HEADERS})
 endforeach()
 list(REMOVE_DUPLICATES gemupg_INCLUDE_DIRS)
 
-add_executable(${PROJECT_NAME} ${gemupg_SOURCES} ${IMGUI_SOURCES})
+add_executable(${PROJECT_NAME} ${gemupg_SOURCES} ${IMGUI_SOURCES} bt.rc)
 target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE "include" "include/imgui")
 
@@ -105,14 +105,6 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/fp:fast>
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-ffast-math>
 )
-
-# not needed anymore due to static build
-# if (WIN32)
-#     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-#             COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>
-#             COMMAND_EXPAND_LISTS
-#     )
-# endif ()
 
 if(WIN32)
     set_target_properties(gemupg PROPERTIES WIN32_EXECUTABLE TRUE)

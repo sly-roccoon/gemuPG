@@ -109,11 +109,7 @@ void Interface::removeBlock(Block *block)
 void Interface::updateBlockTimes()
 {
 	for (auto area : grid_.getAreas())
-	{
 		area->updateNoteLength();
-		area->updateEnvelope();
-		area->updateGlissando();
-	}
 }
 
 //--------------------------------------------------------

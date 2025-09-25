@@ -50,17 +50,15 @@ void Area::removePosition(Vector2f pos)
 
 Block *Area::addBlock(Block *block)
 {
-	if (block)
-	{
-		blocks_.push_back(block);
-		BlockGenerator *block_g = (BlockGenerator *)blocks_.back();
-		block_g->setInArea(true);
-		updateGlissando(block_g);
-		updateEnvelope(block_g);
-		(block_g)->setFrequency(0.0f);
-		return block;
-	}
-	return nullptr;
+	if (!block || block->getType() != BLOCK_GENERATOR)
+		return nullptr;
+
+	blocks_.push_back((BlockGenerator *)block);
+	blocks_.back()->setInArea(true);
+	updateGlissando(blocks_.back());
+	updateEnvelope(blocks_.back());
+	blocks_.back()->setFrequency(0.0f);
+	return block;
 }
 
 void Area::removeBlock(Block *block)
@@ -326,6 +324,8 @@ void Area::stopSequence()
 void Area::updateNoteLength()
 {
 	note_length_ = (60.0f / (bpm_subdivision_ * Clock::getInstance().getBPM()));
+	updateEnvelope();
+	updateGlissando();
 }
 
 void Area::updateGlissando(BlockGenerator *block)

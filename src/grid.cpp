@@ -227,7 +227,7 @@ bool Grid::removeGlobalBlock(Vector2f pos)
 	for (auto &block : blocks_)
 		if (block->getPos() == pos)
 		{
-			removeBlock(block);
+			removeGlobalBlock(block);
 			return true;
 		}
 
@@ -470,6 +470,7 @@ Area *Grid::addArea(Vector2f pos)
 		if (sequencerExists(adj_pos))
 			area->addSequencer((BlockSequencer *)getBlock(adj_pos));
 
+	area->updateNoteLength();
 	area->addBlock(getBlock(pos));
 	removeGlobalBlock(pos);
 
@@ -515,6 +516,11 @@ void Grid::splitAreas(Area *area)
 		{
 			remaining_pos.erase(std::remove(remaining_pos.begin(), remaining_pos.end(), pos), remaining_pos.end());
 			Block *block = area->getBlock(pos);
+			if (block)
+			{
+				area->removeBlock(block);
+				new_area->addBlock(block);
+			}
 			area->removePosition(pos);
 			new_area->addPosition(pos);
 		}

@@ -218,6 +218,20 @@ void BlockGenerator::setWave(WAVE_FORMS waveform)
 	data_.crest = calcCrest(data_.disp_wave);
 }
 
+void BlockGenerator::setInArea(bool in_area)
+{
+	is_in_area_ = in_area;
+	if (in_area)
+	{
+		sample_.setPlayType(ONE_SHOT);
+		env_amp_ = 0.0;
+		last_note_change_ = SDL_GetPerformanceCounter();
+	}
+	else
+		sample_.setPlayType(REPEAT);
+	sample_.setPlayed(false);
+}
+
 void BlockGenerator::setFrequency(pitch_t freq)
 {
 	last_freq_ = data_.freq;
@@ -267,6 +281,7 @@ double BlockGenerator::getAmp()
 	{
 		env_amp_ = data_.amp;
 	}
+
 	return SDL_clamp(env_amp_, 0.0, 1.0);
 }
 

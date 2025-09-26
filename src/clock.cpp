@@ -60,7 +60,9 @@ int Clock::stepThread(void *userdata)
         if (!Clock::getInstance().isRunning())
             SDL_WaitSemaphore(clock_sem);
 
-        double next_delay_NS = 1000000000ULL * 60.0 / Clock::getInstance().getBPM() / TICKS_PER_BAR;
+        Interface::getInstance().getGrid().stepSequence();
+
+        double next_delay_NS = 1e9 * 60.0 / Clock::getInstance().getBPM() / TICKS_PER_BAR;
         Uint64 next_delay_NS_int = SDL_trunc(next_delay_NS);
 
         delay_remainder_NS_ += next_delay_NS - next_delay_NS_int;
@@ -70,24 +72,9 @@ int Clock::stepThread(void *userdata)
             next_delay_NS_int += 1;
         }
 
-        Uint64 timer_delay_comp_NS = 0;
-
-		//TODO: use getPerformanceCounter instead of getTicks for better precision
-
-        if (last_call_)
-            timer_delay_comp_NS = (SDL_GetTicksNS() - last_call_) - next_delay_NS_int;
-
         step_counter_ = ++step_counter_ % TICKS_PER_BAR;
 
-        Uint64 before_step = SDL_GetTicksNS();
-        Interface::getInstance().getGrid().stepSequence();
-        Uint64 step_time_NS = SDL_GetTicksNS() - before_step;
-
-        next_delay_NS_int = next_delay_NS_int - timer_delay_comp_NS - step_time_NS;
-
-        last_call_ = SDL_GetTicksNS();
-
-        next_delay_NS_int = next_delay_NS_int == 0 ? 1 : next_delay_NS_int;
+        next_delay_NS_int = 0 ? 1 : next_delay_NS_int;
         SDL_DelayNS(next_delay_NS_int);
     }
 }

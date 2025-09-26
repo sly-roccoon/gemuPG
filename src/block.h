@@ -104,11 +104,8 @@ public:
 
 	void setBypass(bool bypass) { bypass_ = bypass; }
 	bool getBypass() { return bypass_; }
-
-	void setGlissTime(double s) { gliss_time_ = s; }
-	void setAttackTime(double s) { attack_time_ = s; }
-	void setReleaseTime(double s) { release_time_ = s; }
-	void setNoteLength(double s) { note_length_ = s; }
+	
+	void setTimes(double note, double gliss, double attack, double release);
 
 private:
 	bool bypass_ = false;
@@ -122,17 +119,21 @@ private:
 		.freq = 440.0f,
 		.phase = 0};
 	int fs_;
-	Uint64 last_note_change_ = 0;
 
 	double gliss_freq_ = -1.0f;
 	double last_freq_ = -1.0f;
-	double gliss_time_ = 0.0f;
+	Uint64 gliss_len_samples_ = 0;
 
-	Uint64 now = 0;
 	double env_amp_ = 0.0f;
-	double attack_time_ = 0.0f;
-	double release_time_ = 0.0f;
-	double note_length_ = 0.0f;
+	Uint64 attack_len_samples_ = 0;
+	Uint64 release_start_time_samples_ = 0;
+	Uint64 note_len_samples_ = 0;
+	Uint64 min_env_time_samples_ = 0;
+
+	Uint64 cur_note_sample_pos_ = 0;
+
+	double last_phase_freq_ = 0.0f;
+	double last_phase_value_ = 0.0f;
 
 	pitch_t rel_freq_ = 0.0f;
 	float freq_factor_ = 1.0f;

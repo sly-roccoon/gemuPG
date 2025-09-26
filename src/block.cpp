@@ -79,8 +79,15 @@ BlockGenerator::~BlockGenerator()
 
 double BlockGenerator::getPhase()
 {
+	if (is_in_area_)
+		cur_note_sample_pos_++;
+
 	if (getWaveForm() != WAVE_SAMPLE)
-		data_.phase = SDL_fmod(data_.phase + (getFrequency() / fs_), 1.0);
+	{
+		double curr_freq = getFrequency();
+		data_.phase = SDL_fmod(data_.phase + (curr_freq / fs_), 1.0);
+		last_phase_value_ = data_.phase;
+	}
 	else if (sample_.getSize() > 0)
 	{
 		double root = sample_.getRoot();
@@ -104,6 +111,8 @@ double BlockGenerator::getPhase()
 		data_.phase = 0.0;
 
 	data_.phase = SDL_clamp(data_.phase, 0.0, 1.0);
+	if (data_.phase == 1.0)
+		data_.phase = 0.0;
 	return data_.phase;
 }
 
@@ -119,16 +128,18 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 		float samples[BUFFER_SIZE] = {};
 		const int total = SDL_min(additional_amount, BUFFER_SIZE);
 		int i;
-		double freq = block->getFrequency();
 
 		std::array<float, WAVE_SIZE> *simple_wave;
 		Sample *sample = block->getSample();
 
 		if (block->getWaveForm() != WAVE_SAMPLE)
-			simple_wave = AudioEngine::getWaveTable(block->getWaveForm(), freq);
+			simple_wave = AudioEngine::getWaveTable(block->getWaveForm(), block->getFrequency());
 
 		for (i = 0; i < total; i++)
 		{
+			double freq = block->getFrequency();
+			double amp = block->getAmp();
+			
 			if (freq == 0.0f)
 			{
 				block->getPhase();
@@ -139,8 +150,6 @@ void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream, int 
 				samples[i] = 0.0f;
 				continue;
 			}
-
-			double amp = block->getAmp();
 			if (block->getWaveForm() != WAVE_SAMPLE)
 			{
 				double idx = block->getPhase() * (WAVE_SIZE);
@@ -187,7 +196,7 @@ void BlockGenerator::setWave(WAVE_FORMS waveform)
 	{
 		data_.disp_wave = {};
 		for (int i = 0; i < WAVE_SIZE; i++)
-			data_.disp_wave.at(i) = sinf(TWOPI * i / WAVE_SIZE);
+			data_.disp_wave[i] = sinf(TWOPI * i / WAVE_SIZE);
 	}
 
 	else if (waveform == WAVE_SAW)
@@ -225,7 +234,7 @@ void BlockGenerator::setInArea(bool in_area)
 	{
 		sample_.setPlayType(ONE_SHOT);
 		env_amp_ = 0.0;
-		last_note_change_ = SDL_GetPerformanceCounter();
+		cur_note_sample_pos_ = 0;
 	}
 	else
 		sample_.setPlayType(REPEAT);
@@ -242,10 +251,10 @@ void BlockGenerator::setFrequency(pitch_t freq)
 	}
 
 	gliss_freq_ = last_freq_;
-	last_note_change_ = SDL_GetPerformanceCounter();
-	double new_freq = SDL_clamp((freq + rel_freq_) * freq_factor_, 0.0, fs_ / 2);
+	cur_note_sample_pos_ = 0;
+	double new_freq = SDL_clamp((freq + rel_freq_) * freq_factor_, 10.0, fs_ / 2);
 
-	if (last_freq_ != new_freq)
+	if (last_freq_ != new_freq && getWaveForm() == WAVE_SAMPLE)
 	{
 		sample_.setPlayed(false);
 		sample_.setTrigger(true);
@@ -254,47 +263,86 @@ void BlockGenerator::setFrequency(pitch_t freq)
 	data_.freq = new_freq;
 }
 
+void BlockGenerator::setTimes(double note, double gliss, double attack, double release)
+{
+	note_len_samples_ = note * fs_;
+	gliss_len_samples_ = gliss * fs_;
+	attack_len_samples_ = attack * fs_;
+	release_start_time_samples_ = release * fs_;
+
+	if (note < 0.25) {
+		double scale_factor = note / 0.25;
+		min_env_time_samples_ = static_cast<Uint64>(MIN_ENV_TIME_S * fs_ * scale_factor);
+		min_env_time_samples_ = std::max(min_env_time_samples_, static_cast<Uint64>(MIN_ENV_SAMPLES));
+	}
+	else {
+		min_env_time_samples_ = MIN_ENV_TIME_S * fs_;
+	}
+}
+
 double BlockGenerator::getAmp()
 {
-	if (!is_in_area_)
-		return data_.amp;
+    double target_amp = 0.0;
+    
+    if (!is_in_area_)
+        target_amp = data_.amp;
+    else if (!data_.freq)
+        target_amp = 0.0;
+    else if (gliss_len_samples_ != 0 && attack_len_samples_ == 0 && release_start_time_samples_ == note_len_samples_)
+        target_amp = data_.amp;
+    else
+    {
+        Uint64 effective_attack_len_samples = attack_len_samples_;
+        if (attack_len_samples_ < min_env_time_samples_)
+            effective_attack_len_samples = min_env_time_samples_;
 
-	// Uint64 last = now;
-	now = SDL_GetPerformanceCounter();
+        Uint64 release_len_samples_ = note_len_samples_ - release_start_time_samples_;
+        Uint64 effective_release_start_time_samples = release_start_time_samples_;
+        if (release_len_samples_ < min_env_time_samples_)
+            effective_release_start_time_samples = note_len_samples_ - min_env_time_samples_;
 
-	// double dt = static_cast<double>(now - last) / static_cast<double>(PERFORMANCE_FREQUENCY);
-	double dt = static_cast<double>(now - last_note_change_) / static_cast<double>(PERFORMANCE_FREQUENCY);
-	if (now - last_note_change_ < attack_time_ * PERFORMANCE_FREQUENCY && attack_time_ != 0.0)
-	{
-		// double factor = SDL_exp(-ENV_TIME_CONST * static_cast<double>(dt) / static_cast<double>(attack_time_));
-		// env_amp_ = SDL_clamp(data_.amp * (1.0 - factor), 0.0, data_.amp);
-		double factor = static_cast<double>(dt) / static_cast<double>(attack_time_);
-		env_amp_ = SDL_clamp(data_.amp * factor, 0.0, data_.amp);
-	}
-	else if (now - last_note_change_ > release_time_ * PERFORMANCE_FREQUENCY)
-	{
-		dt -= release_time_;
-		double factor = SDL_exp(-ENV_TIME_CONST * static_cast<double>(dt) / static_cast<double>(note_length_ - release_time_));
-		env_amp_ = SDL_clamp(data_.amp * factor, 0.0, data_.amp);
-	}
-	else
-	{
-		env_amp_ = data_.amp;
-	}
+        // handle overlap
+        if (effective_attack_len_samples > effective_release_start_time_samples)
+            effective_attack_len_samples = effective_release_start_time_samples;
+        if (effective_release_start_time_samples < effective_attack_len_samples)
+            effective_release_start_time_samples = effective_attack_len_samples;
 
-	return SDL_clamp(env_amp_, 0.0, 1.0);
+        //ATTACK (linear)
+        if (cur_note_sample_pos_ < effective_attack_len_samples)
+        {
+            double factor = static_cast<double>(cur_note_sample_pos_) / static_cast<double>(effective_attack_len_samples);
+            target_amp = data_.amp * factor;
+        }
+        //RELEASE (exponential)
+        else if (cur_note_sample_pos_ >= effective_release_start_time_samples)
+        {
+            Uint64 release_elapsed_samples_ = cur_note_sample_pos_ - effective_release_start_time_samples;
+            Uint64 effective_release_len_samples_ = note_len_samples_ - effective_release_start_time_samples;
+
+            double factor = 1.0 / (1.0 + ENV_TIME_CONST * static_cast<double>(release_elapsed_samples_) / static_cast<double>(effective_release_len_samples_));
+            target_amp = data_.amp * factor;
+        }
+        //SUSTAIN
+        else
+        {
+            target_amp = data_.amp;
+        }
+    }
+
+    // Apply smoothing to prevent clicks
+    constexpr double SMOOTHING_FACTOR = 0.998; // Adjust this value as needed (closer to 1.0 = more smoothing)
+    env_amp_ = env_amp_ * SMOOTHING_FACTOR + target_amp * (1.0 - SMOOTHING_FACTOR);
+    
+    return SDL_clamp(env_amp_, 0.0, 1.0);
 }
 
 double BlockGenerator::getFrequency()
 {
 	constexpr float e = 10e-3;
-	if (!is_in_area_ || last_freq_ == 0.0f || gliss_time_ == 0 || std::abs(1.0 - data_.freq / gliss_freq_) < e)
+	if (!is_in_area_ || last_freq_ == 0.0f || gliss_len_samples_ == 0 || std::abs(1.0 - data_.freq / gliss_freq_) < e)
 		return data_.freq;
 
-	Uint64 now = SDL_GetPerformanceCounter();
-	double dt = static_cast<double>(now - last_note_change_) / static_cast<double>(SDL_GetPerformanceFrequency());
-
-	double factor = static_cast<double>(dt) / static_cast<double>(gliss_time_);
+	double factor = static_cast<double>(cur_note_sample_pos_) / static_cast<double>(gliss_len_samples_);
 	factor = SDL_clamp(factor, 0.0, 1.0);
 	double ratio = data_.freq / last_freq_;
 	gliss_freq_ = last_freq_ * pow(ratio, factor);

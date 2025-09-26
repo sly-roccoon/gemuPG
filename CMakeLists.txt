@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.25)
 
 set(CMAKE_COLOR_DIAGNOSTICS OFF)
@@ -109,6 +110,26 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/fp:fast>
     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:-ffast-math>
 )
+
+# Configure for dynamic library loading
+if(WIN32)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE WIN32s_HOT_RELOAD=1)
+        
+    # Enable PDB generation for better debugging during hot reload
+    target_compile_options(${PROJECT_NAME} PRIVATE 
+        $<$<CXX_COMPILER_ID:MSVC>:/Zi>)
+        
+    # Set linker flags for incremental linking to support hot reload
+    target_link_options(${PROJECT_NAME} PRIVATE 
+        $<$<CXX_COMPILER_ID:MSVC>:/INCREMENTAL>)
+            
+elseif(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
+    # Linux specific hot reload settings
+    target_compile_definitions(${PROJECT_NAME} PRIVATE LINUX_HOT_RELOAD=1)
+        
+    # Add necessary linker flags
+    target_link_libraries(${PROJECT_NAME} PRIVATE dl)
+endif()
 
 if(WIN32)
     set_target_properties(gemupg PROPERTIES WIN32_EXECUTABLE TRUE)

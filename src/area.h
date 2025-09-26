@@ -26,7 +26,7 @@ public:
     void removeSequencer(BlockSequencer *);
     bool removeSequencer(Vector2f);
     void updateSequence();
-    std::vector<BlockSequencer *> getSequence() { return sequence_; }
+    const std::vector<BlockSequencer *>& getSequence() const { return sequence_; }
     BlockSequencer *getSequencer(Vector2f);
     void stepSequence();
     void stopSequence();
@@ -41,16 +41,14 @@ public:
     void toggleGUI() { viewGUI_ = !viewGUI_; }
     void setGUI(bool view) { viewGUI_ = view; }
 
-    void updateNoteLength();
-    void updateGlissando(BlockGenerator *block = nullptr);
-    void updateEnvelope(BlockGenerator *block = nullptr);
+    void updateNoteLength(BlockGenerator* block = nullptr);
 
     float getGlissPercent() { return gliss_percent_; }
 
     void setGlissPercent(float gliss_percent)
     {
         gliss_percent_ = gliss_percent;
-        updateGlissando();
+        updateNoteLength();
     }
 
     float getAttackPercent() { return attack_percent_; }
@@ -58,7 +56,7 @@ public:
     void setAttackPercent(float attack_percent)
     {
         attack_percent_ = attack_percent;
-        updateEnvelope();
+        updateNoteLength();
     }
 
     float getReleasePercent() { return release_percent_; }
@@ -66,7 +64,7 @@ public:
     void setReleasePercent(float release_percent)
     {
         release_percent_ = release_percent;
-        updateEnvelope();
+        updateNoteLength();
     }
 
 private:

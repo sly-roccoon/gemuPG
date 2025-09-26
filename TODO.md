@@ -3,12 +3,11 @@
 ## 📝 Tasks
 
 - [ ] Update README.md
-- [ ] fix clock timing not taking processing time into account
-- [ ] go over block.cpp to fix clicking/glissandi etc.
 - [ ] add emscripten javascript file io
 - [ ] make hold down right click to delete draw possible
 - [ ] Write unit tests
 - [ ] add mute groups
+- [ ] plugin support (midi as mute group controller)
 - [ ] add modulator blocks
 - [ ] add conditionals
 
@@ -16,11 +15,13 @@
 
 ## 🛠️ In Progress
 
+- [ ] fix clock timing not taking processing time into account, probably need to get buffer size in ms or sth...
 
 ---
 
 ## ✅ Completed
 
+- [x] go over block.cpp to fix clicking/glissandi etc.
 - [x] chmod +x the linux builds on actions
 - [x] no windowing on gnome?
 - [x] add windows exe icon
@@ -35,5 +36,3 @@
 ---
 
 ## 🗓️ Notes
-
-- i have no clue how github actions work

@@ -28,24 +28,24 @@ void LowPassFilter::process(float *samples, int n_samples)
 {
 	for (int sample = 0; sample < n_samples; sample++)
 	{
-		prev_x_.at(2) = prev_x_.at(1);
-		prev_x_.at(1) = prev_x_.at(0);
-		prev_x_.at(0) = samples[sample];
+		prev_x_[2] = prev_x_[1];
+		prev_x_[1] = prev_x_[0];
+		prev_x_[0] = samples[sample];
 
 		samples[sample] = 0.0f;
 		for (int i = 0; i < b_.size(); i++)
 		{
-			samples[sample] += b_.at(i) * prev_x_.at(i) - a_.at(i) * prev_y_.at(i);
+			samples[sample] += b_[i] * prev_x_[i] - a_[i] * prev_y_[i];
 		}
 
-		prev_y_.at(2) = prev_y_.at(1);
-		prev_y_.at(1) = samples[sample];
+		prev_y_[2] = prev_y_[1];
+		prev_y_[1] = samples[sample];
 
 		for (int i = 0; i < 3; i++)
 		{
-			if (std::isnan(prev_x_.at(i)))
+			if (std::isnan(prev_x_[i]))
 				prev_x_.at(i) = 0.0;
-			if (std::isnan(prev_y_.at(i)))
+			if (std::isnan(prev_y_[i]))
 				prev_y_.at(i) = 0.0;
 		}
 	}
@@ -66,7 +66,7 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 		for (int b = 0; b < grid.getGlobalBlocks().size(); b++)
 		// cannot use ranged for loop because of possible vector reallocation
 		{
-			Block *block = grid.getGlobalBlocks().at(b);
+			Block *block = grid.getGlobalBlocks()[b];
 			if (block->getType() != BLOCK_GENERATOR)
 				continue;
 
@@ -83,10 +83,10 @@ void audioCallback(void *userdata, SDL_AudioStream *stream, int additional_amoun
 
 		for (int a = 0; a < grid.getAreas().size(); a++)
 		{
-			Area *area = grid.getAreas().at(a);
+			Area *area = grid.getAreas()[a];
 			for (int b = 0; b < area->getBlocks().size(); b++)
 			{
-				Block *block = area->getBlocks().at(b);
+				Block *block = area->getBlocks()[b];
 				if (block->getType() != BLOCK_GENERATOR)
 					continue;
 
@@ -190,18 +190,18 @@ void AudioEngine::initWaveTables()
 			// SAW
 			float prev = wavetables_.at({WAVE_SAW, harmonic - 1}).at(i);
 			wavetables_.at({WAVE_SAW, harmonic}).at(i) = prev - (2.0 * INV_PI) * ((-1) + 2 * (harmonic % 2)) *
-																	sin(harmonic * phase) / harmonic;
+																	sinf(harmonic * phase) / harmonic;
 
 			// TRIANGLE
 			prev = wavetables_.at({WAVE_TRIANGLE, harmonic - 1}).at(i);
 			wavetables_.at({WAVE_TRIANGLE, harmonic}).at(i) = prev + -8.0 * INV_PI_SQ * ((-1) + 2 * (harmonic % 2)) *
-																		 sin((2 * harmonic - 1) * phase) / std::pow(2 * harmonic - 1, 2);
+																		 sinf((2 * harmonic - 1) * phase) / std::pow(2 * harmonic - 1, 2);
 		}
 
 		for (int harmonic = 1; harmonic <= MAX_HARMONIC; harmonic++)
 		{
 			float prev = wavetables_.at({WAVE_SQUARE, harmonic - 1}).at(i);
-			wavetables_.at({WAVE_SQUARE, harmonic}).at(i) = prev + 4.0 * INV_PI * sin((2 * harmonic - 1) * phase) / (2 * harmonic - 1);
+			wavetables_.at({WAVE_SQUARE, harmonic}).at(i) = prev + 4.0 * INV_PI * sinf((2 * harmonic - 1) * phase) / (2 * harmonic - 1);
 		}
 	}
 }
@@ -211,7 +211,7 @@ std::array<float, WAVE_SIZE> *AudioEngine::getWaveTable(WAVE_FORMS form, pitch_t
 	int n_harmonics = floor(spec_.freq / (2.0 * freq));
 	n_harmonics = std::clamp(n_harmonics, 1, MAX_HARMONIC);
 
-	return &wavetables_.at({form, n_harmonics});
+	return &wavetables_[{form, n_harmonics}];
 }
 
 SDL_AudioSpec AudioEngine::spec_ = {};

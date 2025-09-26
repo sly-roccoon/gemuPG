@@ -51,4 +51,6 @@ private:
 
     inline static Uint64 step_counter_ = 0;
     inline static double delay_remainder_NS_ = 0.0;
+    inline static Uint64 expected_delay_NS_ = 0;
+    inline static Uint64 last_call_ = 0;
 };

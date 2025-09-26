@@ -49,6 +49,8 @@ constexpr unsigned int CHANNELS = 1;
 constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 4;
 constexpr int MAX_HARMONIC = 32;
 constexpr double ENV_TIME_CONST = 3;
+constexpr double MIN_ENV_TIME_S = 5e-3; //5ms
+constexpr Uint64 MIN_ENV_SAMPLES = 10;
 
 constexpr double AUDIO_S16_PEAK = 65536 / 2;
 constexpr double AUDIO_S32_PEAK = 4294967296 / 2;

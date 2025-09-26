@@ -1,3 +1,4 @@
+
 #pragma once
 #include <SDL3/SDL.h>
 #include <cmath>
@@ -54,7 +55,7 @@ public:
 			filter.process(samples, n_samples);
 	}
 
-	float getSampleRate() { return spec_.freq; }
+	int getSampleRate() { return spec_.freq; }
 
 	float *getOutput() { return output_; }
 	void setOutput(const float *, const int n);

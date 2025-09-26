@@ -2,14 +2,13 @@
 
 ## 📝 Tasks
 
-- [ ] Update README.md
 - [ ] add emscripten javascript file io
 - [ ] make hold down right click to delete draw possible
 - [ ] Write unit tests
 - [ ] add mute groups
 - [ ] plugin support (midi as mute group controller)
 - [ ] add modulator blocks
-- [ ] add conditionals
+wx
 
 ---
 
@@ -21,6 +20,7 @@
 
 ## ✅ Completed
 
+- [x] Update README.md
 - [x] go over block.cpp to fix clicking/glissandi etc.
 - [x] chmod +x the linux builds on actions
 - [x] no windowing on gnome?

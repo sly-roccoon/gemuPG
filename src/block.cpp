@@ -319,7 +319,8 @@ double BlockGenerator::getAmp()
             Uint64 release_elapsed_samples_ = cur_note_sample_pos_ - effective_release_start_time_samples;
             Uint64 effective_release_len_samples_ = note_len_samples_ - effective_release_start_time_samples;
 
-            double factor = 1.0 / (1.0 + ENV_TIME_CONST * static_cast<double>(release_elapsed_samples_) / static_cast<double>(effective_release_len_samples_));
+            //double factor = 1.0 / (1.0 + ENV_TIME_CONST * static_cast<double>(release_elapsed_samples_) / static_cast<double>(effective_release_len_samples_));
+			double factor = SDL_exp(-ENV_TIME_CONST * static_cast<double>(release_elapsed_samples_) / static_cast<double>(effective_release_len_samples_));
             target_amp = data_.amp * factor;
         }
         //SUSTAIN

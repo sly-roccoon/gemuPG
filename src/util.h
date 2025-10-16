@@ -3,15 +3,15 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <imgui.h>
 
+#include <array>
 #include <cmath>
 #include <numbers>
-#include <array>
 #include <string>
 
 #define DRAW_DEBUG false
 #define FONT "Sono-SemiBold.ttf"
 
-constexpr const char* TITLE = "gemuPG";
+constexpr const char *TITLE = "gemuPG";
 constexpr bool ADJUST_AMP_BY_CREST = true;
 constexpr float ONE_DIV_SQRT_THREE = 0.5773502691896258;
 
@@ -27,7 +27,8 @@ constexpr float TEXT_TYPE_SIZE_DIV = 4;
 constexpr float TEXT_VALUE_SIZE_DIV = 2;
 
 constexpr float DEFAULT_BPM = 60.0f;
-constexpr unsigned int TICKS_PER_BAR = 27'720; //LCM 1 through 12 https://billydm.github.io/blog/time-keeping/
+constexpr unsigned int TICKS_PER_BAR =
+    960; // LCM 1 through 12 https://billydm.github.io/blog/time-keeping/
 
 constexpr bool SEQUENCER_RANDOMIZED = true;
 
@@ -49,7 +50,7 @@ constexpr unsigned int CHANNELS = 1;
 constexpr unsigned int WAVE_SIZE = BUFFER_SIZE * 4;
 constexpr int MAX_HARMONIC = 32;
 constexpr double ENV_TIME_CONST = 3;
-constexpr double MIN_ENV_TIME_S = 5e-3; //5ms
+constexpr double MIN_ENV_TIME_S = 5e-3; // 5ms
 constexpr Uint64 MIN_ENV_SAMPLES = 10;
 
 constexpr double AUDIO_S16_PEAK = 65536 / 2;
@@ -58,51 +59,52 @@ constexpr double AUDIO_F32_PEAK = 1.0f;
 
 using pitch_t = float;
 
-typedef enum
-{
-	WAVE_SAMPLE,
-	WAVE_SAW,
-	WAVE_SINE,
-	WAVE_SQUARE,
-	WAVE_TRIANGLE
+typedef enum {
+  WAVE_SAMPLE,
+  WAVE_SAW,
+  WAVE_SINE,
+  WAVE_SQUARE,
+  WAVE_TRIANGLE
 } WAVE_FORMS;
 
-typedef enum
-{
-	PITCH_REL_FREQUENCY,
-	PITCH_ABS_FREQUENCY,
-	PITCH_INTERVAL,
-	PITCH_NOTE
+typedef enum {
+  PITCH_REL_FREQUENCY,
+  PITCH_ABS_FREQUENCY,
+  PITCH_INTERVAL,
+  PITCH_NOTE
 } pitch_type_t;
 
-typedef enum
-{
-	AREA,
-	BLOCK_GENERATOR,
-	BLOCK_SEQUENCER,
-	// BLOCK_SETTINGS,
-	// BLOCK_EFFECT,
-	// BLOCK_MODULATOR
+typedef enum {
+  AREA,
+  BLOCK_GENERATOR,
+  BLOCK_SEQUENCER,
+  // BLOCK_SETTINGS,
+  // BLOCK_EFFECT,
+  // BLOCK_MODULATOR
 } block_type_t;
 
-template <typename T>
-struct Vector2
-{
-	T x{};
-	T y{};
+template <typename T> struct Vector2 {
+  T x{};
+  T y{};
 
-	constexpr Vector2() = default;
+  constexpr Vector2() = default;
 
-	constexpr Vector2(T x, T y) : x(x), y(y)
-	{
-	}
+  constexpr Vector2(T x, T y) : x(x), y(y) {}
 
-	Vector2 operator/(T scalar) const { return Vector2(x / scalar, y / scalar); }
-	Vector2 operator+(const Vector2& other) const { return Vector2(x + other.x, y + other.y); }
-	Vector2 operator-(const Vector2& other) const { return Vector2(x - other.x, y - other.y); }
-	Vector2 operator*(T scalar) const { return Vector2(x * scalar, y * scalar); }
-	bool operator==(const Vector2& other) const { return x == other.x && y == other.y; }
-	Vector2 operator+=(const Vector2& other) const { return {x + other.x, y + other.y}; }
+  Vector2 operator/(T scalar) const { return Vector2(x / scalar, y / scalar); }
+  Vector2 operator+(const Vector2 &other) const {
+    return Vector2(x + other.x, y + other.y);
+  }
+  Vector2 operator-(const Vector2 &other) const {
+    return Vector2(x - other.x, y - other.y);
+  }
+  Vector2 operator*(T scalar) const { return Vector2(x * scalar, y * scalar); }
+  bool operator==(const Vector2 &other) const {
+    return x == other.x && y == other.y;
+  }
+  Vector2 operator+=(const Vector2 &other) const {
+    return {x + other.x, y + other.y};
+  }
 };
 
 using Vector2f = Vector2<float>;
@@ -122,7 +124,7 @@ pitch_t intervalToRatio(float interval, float octave_subdivision);
 
 SDL_Color invertColor(SDL_Color);
 
-double interpTable(float* array, size_t size, double idx);
+double interpTable(float *array, size_t size, double idx);
 
 extern float RENDER_SCALE;
 extern Uint32 PERFORMANCE_FREQUENCY;

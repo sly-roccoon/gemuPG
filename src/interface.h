@@ -1,69 +1,66 @@
 #pragma once
-#include <SDL3/SDL.h>
-#include "grid.h"
-#include "camera.h"
 #include "audio.h"
+#include "camera.h"
+#include "grid.h"
+#include <SDL3/SDL.h>
 
-class Interface
-{
+class Interface {
 public:
-	static Interface &getInstance()
-	{
-		static Interface instance;
-		return instance;
-	}
-	void destroy();
+  static Interface &getInstance() {
+    static Interface instance;
+    return instance;
+  }
+  void destroy();
 
-	SDL_Window *getWindow() { return window_; }
-	SDL_Renderer *getRenderer() { return renderer_; }
+  SDL_Window *getWindow() { return window_; }
+  SDL_Renderer *getRenderer() { return renderer_; }
 
-	bool addBlock(Vector2f);
-	void addBlock(Block *);
-	bool removeBlock(Vector2f);
-	void removeBlock(Block *);
-	void draw();
-	void closeAllWindows();
-	Grid &getGrid() { return grid_; }
-	Block *getBlock(Vector2f pos) { return grid_.getBlock(pos); }
+  bool addBlock(Vector2f);
+  void addBlock(Block *);
+  bool removeBlock(Vector2f);
+  void removeBlock(Block *);
+  void draw();
+  void closeAllWindows();
+  Grid &getGrid() { return grid_; }
+  Block *getBlock(Vector2f pos) { return grid_.getBlock(pos); }
 
-	void updateBlockTimes();
+  void updateBlockTimes();
 
-	void setSelection(block_type_t selection) { cur_selection_ = selection; }
-	block_type_t getSelection() { return cur_selection_; }
+  void setSelection(block_type_t selection) { cur_selection_ = selection; }
+  block_type_t getSelection() { return cur_selection_; }
 
-	void toggleFullscreen();
-	void togglePlayPause();
-	void setPlaying(bool playing);
-	void updateTitle(std::string path);
-	static void updateScaling();
+  void toggleFullscreen();
+  void togglePlayPause();
+  void setPlaying(bool playing);
+  void updateTitle(std::string path);
+  static void updateScaling();
 
-	void stop();
+  void stop();
 
 private:
-	Interface();
-	Interface(const Interface &) = delete;
-	Interface &operator=(const Interface &) = delete;
+  Interface();
+  Interface(const Interface &) = delete;
+  Interface &operator=(const Interface &) = delete;
 
-	unsigned int width_ = DEFAULT_WIDTH;
-	unsigned int height_ = DEFAULT_HEIGHT;
-	bool is_fullscreen_ = false;
+  unsigned int width_ = DEFAULT_WIDTH;
+  unsigned int height_ = DEFAULT_HEIGHT;
+  bool is_fullscreen_ = false;
 
-	block_type_t cur_selection_ = AREA;
-	bool is_playing_ = true;
+  block_type_t cur_selection_ = AREA;
+  bool is_playing_ = true;
 
-	Camera &camera_;
-	Grid grid_{};
+  Camera &camera_;
+  Grid grid_{};
 
-	inline static SDL_Window *window_ = nullptr;
-	SDL_Renderer *renderer_ = nullptr;
+  inline static SDL_Window *window_ = nullptr;
+  SDL_Renderer *renderer_ = nullptr;
 
-	SDL_Surface *icon_;
+  SDL_Surface *icon_;
 
-	void drawGrid();
-	void drawAreas();
-	void drawBlocks();
-	void drawSequencerGUI();
-	void drawBlockSelection();
-	void drawGUI();
-	void drawDebug();
+  void drawGrid();
+  void drawAreas();
+  void drawBlocks();
+  void drawSequencerGUI();
+  void drawBlockSelection();
+  void drawGUI();
 };

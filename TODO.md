@@ -2,24 +2,31 @@
 
 ## 📝 Tasks
 
+- [ ] fix play/pause on file IO
+- [ ] fix sample artifacts
+- [ ] add area step desync/offset option
+- [ ] add generator phase rotation option
 - [ ] add emscripten javascript file io
 - [ ] make hold down right click to delete draw possible
-- [ ] Write unit tests
+- [ ] find better naming convention for bpm, bpm subdivision et.al.
 - [ ] add mute groups
 - [ ] plugin support (midi as mute group controller)
 - [ ] add modulator blocks
-wx
+- [ ] add conditionals
+- [ ] envelope and signal drawing
+- [ ] panning / ambisonics
+- [ ] effects... lua scriptable?
 
 ---
 
 ## 🛠️ In Progress
 
-- [ ] fix clock timing not taking processing time into account, probably need to get buffer size in ms or sth...
 
 ---
 
 ## ✅ Completed
 
+- [x] fix clock timing not taking processing time into account, probably need to get buffer size in ms or sth...
 - [x] Update README.md
 - [x] go over block.cpp to fix clicking/glissandi etc.
 - [x] chmod +x the linux builds on actions

@@ -22,7 +22,7 @@ if(EMSCRIPTEN)
 endif()
 
 # SDL
-if (NOT SDL3_STATIC)
+if(NOT SDL3_STATIC)
     find_package(SDL3 CONFIG QUIET)
 endif()
 if(NOT SDL3_FOUND)
@@ -115,19 +115,19 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 # Configure for dynamic library loading
 if(WIN32)
     target_compile_definitions(${PROJECT_NAME} PRIVATE WIN32s_HOT_RELOAD=1)
-        
+
     # Enable PDB generation for better debugging during hot reload
-    target_compile_options(${PROJECT_NAME} PRIVATE 
+    target_compile_options(${PROJECT_NAME} PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/Zi>)
-        
+
     # Set linker flags for incremental linking to support hot reload
-    target_link_options(${PROJECT_NAME} PRIVATE 
+    target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CXX_COMPILER_ID:MSVC>:/INCREMENTAL>)
-            
+
 elseif(UNIX AND NOT APPLE AND NOT EMSCRIPTEN)
     # Linux specific hot reload settings
     target_compile_definitions(${PROJECT_NAME} PRIVATE LINUX_HOT_RELOAD=1)
-        
+
     # Add necessary linker flags
     target_link_libraries(${PROJECT_NAME} PRIVATE dl)
 endif()

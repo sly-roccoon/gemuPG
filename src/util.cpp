@@ -4,18 +4,13 @@
 float RENDER_SCALE = 1.0f;
 Uint32 PERFORMANCE_FREQUENCY = SDL_GetPerformanceFrequency();
 
-Vector2f floorVec(Vector2f vec)
-{
-  return {floorf(vec.x), floorf(vec.y)};
-}
+Vector2f floorVec(Vector2f vec) { return {floorf(vec.x), floorf(vec.y)}; }
 
-float calcCrest(std::array<float, WAVE_SIZE> wave)
-{
+float calcCrest(std::array<float, WAVE_SIZE> wave) {
   float crest = 0.0f;
   float peak = 0.0f;
   float sq_sum = 0.0f;
-  for (int i = 0; i < WAVE_SIZE; i++)
-  {
+  for (int i = 0; i < WAVE_SIZE; i++) {
     peak = wave[i] > peak ? wave[i] : peak;
     sq_sum += powf(wave[i], 2);
   }
@@ -23,17 +18,18 @@ float calcCrest(std::array<float, WAVE_SIZE> wave)
   return crest;
 }
 
-ImVec4 toImVec4(SDL_Color color)
-{
-  return ImVec4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
+ImVec4 toImVec4(SDL_Color color) {
+  return ImVec4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f,
+                color.a / 255.0f);
 }
 
-SDL_Color toSDLColor(ImVec4 color)
-{
-  return {static_cast<Uint8>(color.x * 255), static_cast<Uint8>(color.y * 255), static_cast<Uint8>(color.z * 255), static_cast<Uint8>(color.w * 255)};
+SDL_Color toSDLColor(ImVec4 color) {
+  return {static_cast<Uint8>(color.x * 255), static_cast<Uint8>(color.y * 255),
+          static_cast<Uint8>(color.z * 255), static_cast<Uint8>(color.w * 255)};
 }
 
-std::array<Vector2f, 4> getAdjacentPositions(Vector2f pos) // in order UP, LEFT, DOWN, RIGHT
+std::array<Vector2f, 4>
+getAdjacentPositions(Vector2f pos) // in order UP, LEFT, DOWN, RIGHT
 {
   pos = floorVec(pos);
 
@@ -47,26 +43,14 @@ std::array<Vector2f, 4> getAdjacentPositions(Vector2f pos) // in order UP, LEFT,
 }
 
 std::map<std::string, pitch_t> noteToFreqMap = {
-    {"C", 16.35f},
-    {"C#", 17.32f},
-    {"D", 18.35f},
-    {"D#", 19.45f},
-    {"E", 20.60f},
-    {"F", 21.83f},
-    {"F#", 23.12f},
-    {"G", 24.50f},
-    {"G#", 25.96f},
-    {"A", 27.50f},
-    {"A#", 29.14f},
-    {"B", 30.87f}};
+    {"C", 16.35f},  {"C#", 17.32f}, {"D", 18.35f},  {"D#", 19.45f},
+    {"E", 20.60f},  {"F", 21.83f},  {"F#", 23.12f}, {"G", 24.50f},
+    {"G#", 25.96f}, {"A", 27.50f},  {"A#", 29.14f}, {"B", 30.87f}};
 
-std::pair<std::string, int>
-freqToNote(pitch_t freq)
-{
+std::pair<std::string, int> freqToNote(pitch_t freq) {
   freq = std::abs(freq);
   int octave = 0;
-  while (freq > 31.7762f)
-  {
+  while (freq > 31.7762f) {
     freq /= 2.0f;
     octave++;
   }
@@ -79,23 +63,20 @@ freqToNote(pitch_t freq)
   return {closest.first, octave};
 }
 
-pitch_t noteToFreq(std::string note, int octave)
-{
+pitch_t noteToFreq(std::string note, int octave) {
   return noteToFreqMap.at(note) * pow(2, octave);
 }
 
-pitch_t intervalToRatio(float interval, float octave_subdivision)
-{
+pitch_t intervalToRatio(float interval, float octave_subdivision) {
   return pow(2, interval / octave_subdivision);
 }
 
-SDL_Color invertColor(SDL_Color color)
-{
-  return {(Uint8)(255 - color.r), (Uint8)(255 - color.g), (Uint8)(255 - color.b), color.a};
+SDL_Color invertColor(SDL_Color color) {
+  return {(Uint8)(255 - color.r), (Uint8)(255 - color.g),
+          (Uint8)(255 - color.b), color.a};
 }
 
-double interpTable(float *array, size_t size, double idx)
-{
+double interpTable(float *array, size_t size, double idx) {
   int lower = std::floor(idx);
   int upper = std::ceil(idx);
 

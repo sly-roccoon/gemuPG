@@ -41,8 +41,10 @@ else()
 endif()
 
 # SDL_ttf
-set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf") # create the variable
-set_property(CACHE GEMUPG_SYSTEM_SDL_TTF PROPERTY STRINGS AUTO ON OFF) #  define list of values GUI will offer for the variable
+# create the variable
+set(GEMUPG_SYSTEM_SDL_TTF AUTO CACHE STRING "Use system provided SDL-ttf")
+#  define list of values GUI will offer for the variable
+set_property(CACHE GEMUPG_SYSTEM_SDL_TTF PROPERTY STRINGS AUTO ON OFF)
 if(GEMUPG_SYSTEM_SDL_TTF STREQUAL "AUTO")
     find_package(SDL3_ttf CONFIG)
 elseif(GEMUPG_SYSTEM_SDL_TTF STREQUAL "ON")
@@ -103,9 +105,6 @@ if(EMSCRIPTEN)
         "-sPROXY_TO_PTHREAD"
     )
 endif()
-
-# set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
-# target_link_options(${PROJECT_NAME} PUBLIC "-s WASM=1" "-o ${PROJECT_NAME}.html")
 
 target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/fp:fast>

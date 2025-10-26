@@ -1,566 +1,671 @@
 #include "block.h"
 #include "audio.h"
+#include "camera.h"
 #include "gui.h"
 
 #include <SDL3/SDL.h>
+#include <format>
+#include <numbers>
 
-Block::Block(Vector2f pos) {
-  type_ = BLOCK_GENERATOR;
-  rect_ = {pos.x, pos.y, 1.0f, 1.0f};
-  render_rect_ = Block::smallerFRect(rect_);
-  render_rect_ = Camera::resizeFRect(render_rect_);
+Block::Block (Vector2f pos)
+{
+    type_ = BLOCK_GENERATOR;
+    rect_ = { pos.x, pos.y, 1.0f, 1.0f };
+    render_rect_ = Block::smallerFRect (rect_);
+    render_rect_ = Camera::resizeFRect (render_rect_);
 }
 
-SDL_FRect Block::smallerFRect(SDL_FRect rect) {
-  rect.x += rect.w * (1 - BLOCK_SIZE_FACTOR) / 2;
-  rect.y += rect.h * (1 - BLOCK_SIZE_FACTOR) / 2;
-  rect.w *= BLOCK_SIZE_FACTOR;
-  rect.h *= BLOCK_SIZE_FACTOR;
-  return rect;
+SDL_FRect Block::smallerFRect (SDL_FRect rect)
+{
+    rect.x += rect.w * (1 - BLOCK_SIZE_FACTOR) / 2;
+    rect.y += rect.h * (1 - BLOCK_SIZE_FACTOR) / 2;
+    rect.w *= BLOCK_SIZE_FACTOR;
+    rect.h *= BLOCK_SIZE_FACTOR;
+    return rect;
 }
 
-SDL_FRect *Block::getFRect() {
-  render_rect_ = Block::smallerFRect(rect_);
-  render_rect_ = Camera::resizeFRect(render_rect_);
-  return &render_rect_;
+SDL_FRect* Block::getFRect()
+{
+    render_rect_ = Block::smallerFRect (rect_);
+    render_rect_ = Camera::resizeFRect (render_rect_);
+    return &render_rect_;
 }
 
-void BlockGenerator::copySample(Sample *sample) {
-  sample_.openPath(sample->getPath());
-  sample_.setPlayType(sample->getPlayType());
-  sample_.setRoot(sample->getRoot());
+void BlockGenerator::copySample (Sample* sample)
+{
+    sample_.openPath (sample->getPath());
+    sample_.setPlayType (sample->getPlayType());
+    sample_.setRoot (sample->getRoot());
 }
 
-BlockGenerator *BlockGenerator::clone() {
-  // BlockGenerator *copy = new BlockGenerator(*this);
-  // copy->createAudioStream(); //audiocallback crashes?
+BlockGenerator* BlockGenerator::clone()
+{
+    // BlockGenerator *copy = new BlockGenerator(*this);
+    // copy->createAudioStream(); //audiocallback crashes?
 
-  BlockGenerator *copy =
-      new BlockGenerator({getPos().x, getPos().y}, data_.phase);
+    BlockGenerator* copy = new BlockGenerator ({ getPos().x, getPos().y }, data_.phase);
 
-  copy->setData(data_);
-  copy->copySample(&sample_);
-  copy->setRelFreq(rel_freq_);
-  copy->setFreqFactor(freq_factor_);
+    copy->setData (data_);
+    copy->copySample (&sample_);
+    copy->setRelFreq (rel_freq_);
+    copy->setFreqFactor (freq_factor_);
 
-  return copy;
+    return copy;
 }
 
-BlockGenerator::BlockGenerator(Vector2f pos, double phase) : Block(pos) {
-  type_ = BLOCK_GENERATOR;
-  data_.phase = phase;
-  fs_ = AudioEngine::getInstance().getSpec()->freq;
-  setWave(WAVE_SINE);
+BlockGenerator::BlockGenerator (Vector2f pos, double phase) : Block (pos)
+{
+    type_ = BLOCK_GENERATOR;
+    data_.phase = phase;
+    fs_ = AudioEngine::getInstance().getSpec()->freq;
+    setWave (WAVE_SINE);
 
-  data_.freq = SDL_pow(10, SDL_randf() - 1) * 500.0f;
-  setWave((WAVE_FORMS)(SDL_rand(4) + 1));
+    data_.freq = SDL_pow (10, SDL_randf() - 1) * 500.0f;
+    setWave ((WAVE_FORMS) (SDL_rand (4) + 1));
 
-  createAudioStream();
+    createAudioStream();
 }
 
-void BlockGenerator::createAudioStream() {
-  SDL_DestroyAudioStream(stream_);
+void BlockGenerator::createAudioStream()
+{
+    SDL_DestroyAudioStream (stream_);
 
-  SDL_AudioSpec *spec = AudioEngine::getInstance().getSpec();
-  stream_ = SDL_CreateAudioStream(spec, spec);
-  SDL_SetAudioStreamGetCallback(stream_, this->audioCallback, this);
+    SDL_AudioSpec* spec = AudioEngine::getInstance().getSpec();
+    stream_ = SDL_CreateAudioStream (spec, spec);
+    SDL_SetAudioStreamGetCallback (stream_, this->audioCallback, this);
 }
 
-BlockGenerator::~BlockGenerator() { SDL_DestroyAudioStream(stream_); }
+BlockGenerator::~BlockGenerator()
+{
+    SDL_DestroyAudioStream (stream_);
+}
 
-double BlockGenerator::getPhase() {
-  if (is_in_area_)
-    cur_note_sample_pos_++;
+double BlockGenerator::getPhase()
+{
+    if (is_in_area_)
+        cur_note_sample_pos_++;
 
-  if (getWaveForm() != WAVE_SAMPLE) {
-    double curr_freq = getFrequency();
-    data_.phase = SDL_fmod(data_.phase + (curr_freq / fs_), 1.0);
-    last_phase_value_ = data_.phase;
-  } else if (sample_.getSize() > 0) {
-    double root = sample_.getRoot();
+    if (getWaveForm() != WAVE_SAMPLE)
+    {
+        double curr_freq = getFrequency();
+        data_.phase = SDL_fmod (data_.phase + (curr_freq / fs_), 1.0);
+        last_phase_value_ = data_.phase;
+    }
+    else if (sample_.getSize() > 0)
+    {
+        double root = sample_.getRoot();
 
-    if (sample_.getTrigger() && sample_.getPlayType() == ONE_SHOT) {
-      data_.phase = 0.0; // first sample of retrigger should always be [0]
-      sample_.setTrigger(false);
-    } else
-      data_.phase = data_.phase + getFrequency() / (root * sample_.getSize());
+        if (sample_.getTrigger() && sample_.getPlayType() == ONE_SHOT)
+        {
+            data_.phase = 0.0; // first sample of retrigger should always be [0]
+            sample_.setTrigger (false);
+        }
+        else
+            data_.phase = data_.phase + getFrequency() / (root * sample_.getSize());
 
-    if (data_.phase > 1.0) {
-      sample_.setPlayed(true);
+        if (data_.phase > 1.0)
+        {
+            sample_.setPlayed (true);
+        }
+
+        data_.phase = SDL_fmod (data_.phase, 1.0);
+    }
+    else
+        data_.phase = 0.0;
+
+    data_.phase = SDL_clamp (data_.phase, 0.0, 1.0);
+    if (data_.phase == 1.0)
+        data_.phase = 0.0;
+    return data_.phase;
+}
+
+void BlockGenerator::audioCallback (void* userdata,
+                                    SDL_AudioStream* stream,
+                                    int additional_amount,
+                                    int total_amount)
+{
+    BlockGenerator* block = (BlockGenerator*) userdata;
+
+    int fs = AudioEngine::getInstance().getSpec()->freq;
+
+    additional_amount /= sizeof (float);
+    while (additional_amount > 0)
+    {
+        float samples[BUFFER_SIZE] = {};
+        const int total = SDL_min (additional_amount, BUFFER_SIZE);
+        int i;
+
+        std::array<float, WAVE_SIZE>* simple_wave;
+        Sample* sample = block->getSample();
+
+        if (block->getWaveForm() != WAVE_SAMPLE)
+            simple_wave = AudioEngine::getWaveTable (block->getWaveForm(), block->getFrequency());
+
+        for (i = 0; i < total; i++)
+        {
+            double freq = block->getFrequency();
+            double amp = block->getAmp();
+
+            if (freq == 0.0f)
+            {
+                block->getPhase();
+                continue;
+            }
+            if (block->getBypass())
+            {
+                samples[i] = 0.0f;
+                continue;
+            }
+            if (block->getWaveForm() != WAVE_SAMPLE)
+            {
+                double idx = block->getPhase() * (WAVE_SIZE);
+
+                samples[i] = amp * interpTable (simple_wave->data(), WAVE_SIZE, idx);
+                if (ADJUST_AMP_BY_CREST)
+                    samples[i] *= block->getData()->crest
+                                  * ONE_DIV_SQRT_THREE; // TODO: find better way as to not
+                // go over +-1.0f
+            }
+            else
+            {
+                if (sample->getSize() != 0
+                    && (! sample->isPlayed() || sample->getPlayType() == REPEAT))
+                {
+                    double idx = 0.0;
+
+                    float phase = block->getPhase();
+                    long size = block->getSample()->getSize();
+                    idx = SDL_fmod (phase * size, size);
+
+                    samples[i] = amp * interpTable (sample->getWave(), sample->getSize(), idx);
+                }
+                else
+                    samples[i] = 0.0f;
+            }
+        }
+
+        SDL_PutAudioStreamData (stream, samples, total * sizeof (float));
+        additional_amount -= total;
+    }
+}
+
+void BlockGenerator::setWave (WAVE_FORMS waveform)
+{
+    data_.waveform = waveform;
+
+    constexpr double PI = std::numbers::pi;
+    constexpr double TWOPI = 2 * PI;
+
+    if (waveform == WAVE_SAMPLE)
+    {
+        data_.disp_wave = *sample_.getDispWave();
     }
 
-    data_.phase = SDL_fmod(data_.phase, 1.0);
-  } else
-    data_.phase = 0.0;
-
-  data_.phase = SDL_clamp(data_.phase, 0.0, 1.0);
-  if (data_.phase == 1.0)
-    data_.phase = 0.0;
-  return data_.phase;
-}
-
-void BlockGenerator::audioCallback(void *userdata, SDL_AudioStream *stream,
-                                   int additional_amount, int total_amount) {
-  BlockGenerator *block = (BlockGenerator *)userdata;
-
-  int fs = AudioEngine::getInstance().getSpec()->freq;
-
-  additional_amount /= sizeof(float);
-  while (additional_amount > 0) {
-    float samples[BUFFER_SIZE] = {};
-    const int total = SDL_min(additional_amount, BUFFER_SIZE);
-    int i;
-
-    std::array<float, WAVE_SIZE> *simple_wave;
-    Sample *sample = block->getSample();
-
-    if (block->getWaveForm() != WAVE_SAMPLE)
-      simple_wave = AudioEngine::getWaveTable(block->getWaveForm(),
-                                              block->getFrequency());
-
-    for (i = 0; i < total; i++) {
-      double freq = block->getFrequency();
-      double amp = block->getAmp();
-
-      if (freq == 0.0f) {
-        block->getPhase();
-        continue;
-      }
-      if (block->getBypass()) {
-        samples[i] = 0.0f;
-        continue;
-      }
-      if (block->getWaveForm() != WAVE_SAMPLE) {
-        double idx = block->getPhase() * (WAVE_SIZE);
-
-        samples[i] = amp * interpTable(simple_wave->data(), WAVE_SIZE, idx);
-        if (ADJUST_AMP_BY_CREST)
-          samples[i] *= block->getData()->crest *
-                        ONE_DIV_SQRT_THREE; // TODO: find better way as to not
-                                            // go over +-1.0f
-      } else {
-        if (sample->getSize() != 0 &&
-            (!sample->isPlayed() || sample->getPlayType() == REPEAT)) {
-          double idx = 0.0;
-
-          float phase = block->getPhase();
-          long size = block->getSample()->getSize();
-          idx = SDL_fmod(phase * size, size);
-
-          samples[i] =
-              amp * interpTable(sample->getWave(), sample->getSize(), idx);
-        } else
-          samples[i] = 0.0f;
-      }
+    else if (waveform == WAVE_SINE)
+    {
+        data_.disp_wave = {};
+        for (int i = 0; i < WAVE_SIZE; i++)
+            data_.disp_wave[i] = sinf (TWOPI * i / WAVE_SIZE);
     }
 
-    SDL_PutAudioStreamData(stream, samples, total * sizeof(float));
-    additional_amount -= total;
-  }
-}
-
-void BlockGenerator::setWave(WAVE_FORMS waveform) {
-  data_.waveform = waveform;
-
-  constexpr double PI = std::numbers::pi;
-  constexpr double TWOPI = 2 * PI;
-
-  if (waveform == WAVE_SAMPLE) {
-    data_.disp_wave = *sample_.getDispWave();
-  }
-
-  else if (waveform == WAVE_SINE) {
-    data_.disp_wave = {};
-    for (int i = 0; i < WAVE_SIZE; i++)
-      data_.disp_wave[i] = sinf(TWOPI * i / WAVE_SIZE);
-  }
-
-  else if (waveform == WAVE_SAW) {
-    for (int i = 0; i < WAVE_SIZE; i++)
-      data_.disp_wave[i] = 1.0f - (2.0f * i / WAVE_SIZE);
-  }
-
-  else if (waveform == WAVE_SQUARE) {
-    for (int i = 0; i < WAVE_SIZE; i++)
-      data_.disp_wave[i] = (i < WAVE_SIZE / 2) ? 1.0f : -1.0f;
-  }
-
-  else if (waveform == WAVE_TRIANGLE) {
-    for (int i = 0; i < WAVE_SIZE; i++) {
-      if (i < WAVE_SIZE / 4)
-        data_.disp_wave[i] = 4.0f * i / WAVE_SIZE;
-      else if (i < 3 * WAVE_SIZE / 4)
-        data_.disp_wave[i] = 2.0f - 4.0f * i / WAVE_SIZE;
-      else
-        data_.disp_wave[i] = -4.0f + 4.0f * i / WAVE_SIZE;
+    else if (waveform == WAVE_SAW)
+    {
+        for (int i = 0; i < WAVE_SIZE; i++)
+            data_.disp_wave[i] = 1.0f - (2.0f * i / WAVE_SIZE);
     }
-  }
 
-  data_.crest = calcCrest(data_.disp_wave);
+    else if (waveform == WAVE_SQUARE)
+    {
+        for (int i = 0; i < WAVE_SIZE; i++)
+            data_.disp_wave[i] = (i < WAVE_SIZE / 2) ? 1.0f : -1.0f;
+    }
+
+    else if (waveform == WAVE_TRIANGLE)
+    {
+        for (int i = 0; i < WAVE_SIZE; i++)
+        {
+            if (i < WAVE_SIZE / 4)
+                data_.disp_wave[i] = 4.0f * i / WAVE_SIZE;
+            else if (i < 3 * WAVE_SIZE / 4)
+                data_.disp_wave[i] = 2.0f - 4.0f * i / WAVE_SIZE;
+            else
+                data_.disp_wave[i] = -4.0f + 4.0f * i / WAVE_SIZE;
+        }
+    }
+
+    data_.crest = calcCrest (data_.disp_wave);
 }
 
-void BlockGenerator::setInArea(bool in_area) {
-  is_in_area_ = in_area;
-  if (in_area) {
-    sample_.setPlayType(ONE_SHOT);
-    env_amp_ = 0.0;
+void BlockGenerator::setInArea (bool in_area)
+{
+    is_in_area_ = in_area;
+    if (in_area)
+    {
+        sample_.setPlayType (ONE_SHOT);
+        env_amp_ = 0.0;
+        cur_note_sample_pos_ = 0;
+    }
+    else
+        sample_.setPlayType (REPEAT);
+    sample_.setPlayed (false);
+}
+
+void BlockGenerator::setFrequency (pitch_t freq)
+{
+    last_freq_ = data_.freq;
+    if (freq == 0.0f)
+    {
+        data_.freq = 0.0f;
+        return;
+    }
+
+    gliss_freq_ = last_freq_;
     cur_note_sample_pos_ = 0;
-  } else
-    sample_.setPlayType(REPEAT);
-  sample_.setPlayed(false);
-}
+    double new_freq =
+        SDL_clamp ((freq + rel_freq_) * freq_factor_, 10.0, static_cast<float> (fs_) / 2);
 
-void BlockGenerator::setFrequency(pitch_t freq) {
-  last_freq_ = data_.freq;
-  if (freq == 0.0f) {
-    data_.freq = 0.0f;
-    return;
-  }
-
-  gliss_freq_ = last_freq_;
-  cur_note_sample_pos_ = 0;
-  double new_freq = SDL_clamp((freq + rel_freq_) * freq_factor_, 10.0, fs_ / 2);
-
-  if (last_freq_ != new_freq && getWaveForm() == WAVE_SAMPLE) {
-    sample_.setPlayed(false);
-    sample_.setTrigger(true);
-  }
-
-  data_.freq = new_freq;
-}
-
-void BlockGenerator::setTimes(double note, double gliss, double attack,
-                              double release) {
-  note_len_samples_ = note * fs_;
-  gliss_len_samples_ = gliss * fs_;
-  attack_len_samples_ = attack * fs_;
-  release_start_time_samples_ = release * fs_;
-
-  if (note < 0.25) {
-    double scale_factor = note / 0.25;
-    min_env_time_samples_ =
-        static_cast<Uint64>(MIN_ENV_TIME_S * fs_ * scale_factor);
-    min_env_time_samples_ =
-        std::max(min_env_time_samples_, static_cast<Uint64>(MIN_ENV_SAMPLES));
-  } else {
-    min_env_time_samples_ = MIN_ENV_TIME_S * fs_;
-  }
-}
-
-double BlockGenerator::getAmp() {
-  double target_amp = 0.0;
-
-  if (!is_in_area_)
-    target_amp = data_.amp;
-  else if (!data_.freq)
-    target_amp = 0.0;
-  else if (gliss_len_samples_ != 0 && attack_len_samples_ == 0 &&
-           release_start_time_samples_ == note_len_samples_)
-    target_amp = data_.amp;
-  else {
-    Uint64 effective_attack_len_samples = attack_len_samples_;
-    if (attack_len_samples_ < min_env_time_samples_)
-      effective_attack_len_samples = min_env_time_samples_;
-
-    Uint64 release_len_samples_ =
-        note_len_samples_ - release_start_time_samples_;
-    Uint64 effective_release_start_time_samples = release_start_time_samples_;
-    if (release_len_samples_ < min_env_time_samples_)
-      effective_release_start_time_samples =
-          note_len_samples_ - min_env_time_samples_;
-
-    // handle overlap
-    if (effective_attack_len_samples > effective_release_start_time_samples)
-      effective_attack_len_samples = effective_release_start_time_samples;
-    if (effective_release_start_time_samples < effective_attack_len_samples)
-      effective_release_start_time_samples = effective_attack_len_samples;
-
-    // ATTACK (linear)
-    if (cur_note_sample_pos_ < effective_attack_len_samples) {
-      double factor = static_cast<double>(cur_note_sample_pos_) /
-                      static_cast<double>(effective_attack_len_samples);
-      target_amp = data_.amp * factor;
+    if (last_freq_ != new_freq && getWaveForm() == WAVE_SAMPLE)
+    {
+        sample_.setPlayed (false);
+        sample_.setTrigger (true);
     }
-    // RELEASE (exponential)
-    else if (cur_note_sample_pos_ >= effective_release_start_time_samples) {
-      Uint64 release_elapsed_samples_ =
-          cur_note_sample_pos_ - effective_release_start_time_samples;
-      Uint64 effective_release_len_samples_ =
-          note_len_samples_ - effective_release_start_time_samples;
 
-      // double factor = 1.0 / (1.0 + ENV_TIME_CONST *
-      // static_cast<double>(release_elapsed_samples_) /
-      // static_cast<double>(effective_release_len_samples_));
-      double factor = SDL_exp(
-          -ENV_TIME_CONST * static_cast<double>(release_elapsed_samples_) /
-          static_cast<double>(effective_release_len_samples_));
-      target_amp = data_.amp * factor;
-    }
-    // SUSTAIN
-    else {
-      target_amp = data_.amp;
-    }
-  }
-
-  // Apply smoothing to prevent clicks
-  constexpr double SMOOTHING_FACTOR =
-      0.998; // Adjust this value as needed (closer to 1.0 = more smoothing)
-  env_amp_ =
-      env_amp_ * SMOOTHING_FACTOR + target_amp * (1.0 - SMOOTHING_FACTOR);
-
-  return SDL_clamp(env_amp_, 0.0, 1.0);
+    data_.freq = new_freq;
 }
 
-double BlockGenerator::getFrequency() {
-  constexpr float e = 10e-3;
-  if (!is_in_area_ || last_freq_ == 0.0f || gliss_len_samples_ == 0 ||
-      std::abs(1.0 - data_.freq / gliss_freq_) < e)
-    return data_.freq;
+void BlockGenerator::setTimes (double note, double gliss, double attack, double release)
+{
+    note_len_samples_ = note * fs_;
+    gliss_len_samples_ = gliss * fs_;
+    attack_len_samples_ = attack * fs_;
+    release_start_time_samples_ = release * fs_;
 
-  double factor = static_cast<double>(cur_note_sample_pos_) /
-                  static_cast<double>(gliss_len_samples_);
-  factor = SDL_clamp(factor, 0.0, 1.0);
-  double ratio = data_.freq / last_freq_;
-  gliss_freq_ = last_freq_ * pow(ratio, factor);
-
-  return gliss_freq_;
+    if (note < 0.25)
+    {
+        double scale_factor = note / 0.25;
+        min_env_time_samples_ = static_cast<Uint64> (MIN_ENV_TIME_S * fs_ * scale_factor);
+        min_env_time_samples_ =
+            std::max (min_env_time_samples_, static_cast<Uint64> (MIN_ENV_SAMPLES));
+    }
+    else
+    {
+        min_env_time_samples_ = MIN_ENV_TIME_S * fs_;
+    }
 }
 
-void BlockGenerator::drawGUI() {
-  if (!viewGUI_)
-    return;
+double BlockGenerator::getAmp()
+{
+    double target_amp = 0.0;
 
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
-  ImVec2 margins = ImGui::GetStyle().WindowPadding;
+    if (! is_in_area_)
+        target_amp = data_.amp;
+    else if (! data_.freq)
+        target_amp = 0.0;
+    else if (gliss_len_samples_ != 0 && attack_len_samples_ == 0
+             && release_start_time_samples_ == note_len_samples_)
+        target_amp = data_.amp;
+    else
+    {
+        Uint64 effective_attack_len_samples = attack_len_samples_;
+        if (attack_len_samples_ < min_env_time_samples_)
+            effective_attack_len_samples = min_env_time_samples_;
 
-  ImGui::SetNextWindowSize(
-      {IMGUI_WIN_SIZE.x * RENDER_SCALE, IMGUI_WIN_SIZE.y * RENDER_SCALE});
-  ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
+        Uint64 release_len_samples_ = note_len_samples_ - release_start_time_samples_;
+        Uint64 effective_release_start_time_samples = release_start_time_samples_;
+        if (release_len_samples_ < min_env_time_samples_)
+            effective_release_start_time_samples = note_len_samples_ - min_env_time_samples_;
 
-  ImGui::Begin(
-      std::format("generator block @ [{}, {}]", rect_.x, rect_.y).c_str(),
-      &viewGUI_, flags);
+        // handle overlap
+        if (effective_attack_len_samples > effective_release_start_time_samples)
+            effective_attack_len_samples = effective_release_start_time_samples;
+        if (effective_release_start_time_samples < effective_attack_len_samples)
+            effective_release_start_time_samples = effective_attack_len_samples;
 
-  ImGui::DragFloat("amplitude", &data_.amp, 0.001f, 0.0f, 1.0f, "% .3f",
-                   ImGuiSliderFlags_Logarithmic);
-  if (!is_in_area_)
-    ImGui::SliderFloat("frequency", &data_.freq, 20.0f, 20000.0f, "% .2fHz",
-                       ImGuiSliderFlags_Logarithmic);
-  else {
-    ImGui::SliderFloat("relative frequency", &rel_freq_, -20.0f, 20.0f,
-                       "%.2fHz", ImGuiSliderFlags_Logarithmic);
-    ImGui::SliderFloat("frequency factor", &freq_factor_, 1.0f / 16.0f, 16.0f,
-                       "%.2f", ImGuiSliderFlags_Logarithmic);
-  }
+        // ATTACK (linear)
+        if (cur_note_sample_pos_ < effective_attack_len_samples)
+        {
+            double factor = static_cast<double> (cur_note_sample_pos_)
+                            / static_cast<double> (effective_attack_len_samples);
+            target_amp = data_.amp * factor;
+        }
+        // RELEASE (exponential)
+        else if (cur_note_sample_pos_ >= effective_release_start_time_samples)
+        {
+            Uint64 release_elapsed_samples_ =
+                cur_note_sample_pos_ - effective_release_start_time_samples;
+            Uint64 effective_release_len_samples_ =
+                note_len_samples_ - effective_release_start_time_samples;
 
-  // ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
-
-  const char *preview = data_.waveform == WAVE_SAW        ? "saw"
-                        : data_.waveform == WAVE_SINE     ? "sine"
-                        : data_.waveform == WAVE_SQUARE   ? "square"
-                        : data_.waveform == WAVE_TRIANGLE ? "triangle"
-                                                          : "sample";
-
-  if (ImGui::BeginCombo("waveform", preview)) {
-    if (ImGui::Selectable("sample"))
-      setWave(WAVE_SAMPLE);
-    if (ImGui::Selectable("saw"))
-      setWave(WAVE_SAW);
-    if (ImGui::Selectable("sine"))
-      setWave(WAVE_SINE);
-    if (ImGui::Selectable("square"))
-      setWave(WAVE_SQUARE);
-    if (ImGui::Selectable("triangle"))
-      setWave(WAVE_TRIANGLE);
-    ImGui::EndCombo();
-  }
-
-  if (data_.waveform == WAVE_SAMPLE) {
-    if (ImGui::Button("load sample", {ICON_SIZE * RENDER_SCALE * 2, 0})) {
-      sample_.open();
+            // double factor = 1.0 / (1.0 + ENV_TIME_CONST *
+            // static_cast<double>(release_elapsed_samples_) /
+            // static_cast<double>(effective_release_len_samples_));
+            double factor =
+                SDL_exp (-ENV_TIME_CONST * static_cast<double> (release_elapsed_samples_)
+                         / static_cast<double> (effective_release_len_samples_));
+            target_amp = data_.amp * factor;
+        }
+        // SUSTAIN
+        else
+        {
+            target_amp = data_.amp;
+        }
     }
-    ImGui::SameLine();
-    ImGui::Text(sample_.getName().c_str());
 
-    if (is_in_area_) {
-      const char *preview =
-          sample_.getPlayType() == REPEAT ? "repeat" : "oneshot";
-      if (ImGui::BeginCombo("play type", preview)) {
-        if (ImGui::Selectable("repeat"))
-          sample_.setPlayType(REPEAT);
-        if (ImGui::Selectable("oneshot"))
-          sample_.setPlayType(ONE_SHOT);
+    // Apply smoothing to prevent clicks
+    constexpr double SMOOTHING_FACTOR =
+        0.998; // Adjust this value as needed (closer to 1.0 = more smoothing)
+    env_amp_ = env_amp_ * SMOOTHING_FACTOR + target_amp * (1.0 - SMOOTHING_FACTOR);
+
+    return SDL_clamp (env_amp_, 0.0, 1.0);
+}
+
+double BlockGenerator::getFrequency()
+{
+    constexpr float e = 10e-3;
+    if (! is_in_area_ || last_freq_ == 0.0f || gliss_len_samples_ == 0
+        || std::abs (1.0 - data_.freq / gliss_freq_) < e)
+        return data_.freq;
+
+    double factor =
+        static_cast<double> (cur_note_sample_pos_) / static_cast<double> (gliss_len_samples_);
+    factor = SDL_clamp (factor, 0.0, 1.0);
+    double ratio = data_.freq / last_freq_;
+    gliss_freq_ = last_freq_ * pow (ratio, factor);
+
+    return gliss_freq_;
+}
+
+void BlockGenerator::drawGUI()
+{
+    if (! viewGUI_)
+        return;
+
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
+    ImVec2 margins = ImGui::GetStyle().WindowPadding;
+
+    ImGui::SetNextWindowSize ({ IMGUI_WIN_SIZE.x * RENDER_SCALE, IMGUI_WIN_SIZE.y * RENDER_SCALE });
+    ImGui::SetNextWindowPos (ImGui::GetMousePos(), ImGuiCond_Appearing);
+
+    ImGui::Begin (std::format ("generator block @ [{}, {}]", rect_.x, rect_.y).c_str(),
+                  &viewGUI_,
+                  flags);
+
+    ImGui::DragFloat ("amplitude",
+                      &data_.amp,
+                      0.001f,
+                      0.0f,
+                      1.0f,
+                      "% .3f",
+                      ImGuiSliderFlags_Logarithmic);
+    if (! is_in_area_)
+        ImGui::SliderFloat ("frequency",
+                            &data_.freq,
+                            20.0f,
+                            20000.0f,
+                            "% .2fHz",
+                            ImGuiSliderFlags_Logarithmic);
+    else
+    {
+        ImGui::SliderFloat ("relative frequency",
+                            &rel_freq_,
+                            -20.0f,
+                            20.0f,
+                            "%.2fHz",
+                            ImGuiSliderFlags_Logarithmic);
+        ImGui::SliderFloat ("frequency factor",
+                            &freq_factor_,
+                            1.0f / 16.0f,
+                            16.0f,
+                            "%.2f",
+                            ImGuiSliderFlags_Logarithmic);
+    }
+
+    // ImGui::SliderFloat("Pan", &data_.pan, -1.0f, 1.0f, "% .1f");
+
+    const char* preview = data_.waveform == WAVE_SAW        ? "saw"
+                          : data_.waveform == WAVE_SINE     ? "sine"
+                          : data_.waveform == WAVE_SQUARE   ? "square"
+                          : data_.waveform == WAVE_TRIANGLE ? "triangle"
+                                                            : "sample";
+
+    if (ImGui::BeginCombo ("waveform", preview))
+    {
+        if (ImGui::Selectable ("sample"))
+            setWave (WAVE_SAMPLE);
+        if (ImGui::Selectable ("saw"))
+            setWave (WAVE_SAW);
+        if (ImGui::Selectable ("sine"))
+            setWave (WAVE_SINE);
+        if (ImGui::Selectable ("square"))
+            setWave (WAVE_SQUARE);
+        if (ImGui::Selectable ("triangle"))
+            setWave (WAVE_TRIANGLE);
         ImGui::EndCombo();
-      }
     }
 
-    pitch_t root = sample_.getRoot();
-    if (ImGui::SliderFloat("sample root frequency", &root, 1.0f, 10'000.0f,
-                           "%.2fHz", ImGuiSliderFlags_Logarithmic))
-      sample_.setRoot(root);
-  }
+    if (data_.waveform == WAVE_SAMPLE)
+    {
+        if (ImGui::Button ("load sample", { ICON_SIZE * RENDER_SCALE * 2, 0 }))
+        {
+            sample_.open();
+        }
+        ImGui::SameLine();
+        ImGui::Text ("%s", sample_.getName().c_str());
 
-  if (!sample_.empty() && sample_.isNewLoad())
-    setWave(WAVE_SAMPLE);
+        if (is_in_area_)
+        {
+            const char* preview = sample_.getPlayType() == REPEAT ? "repeat" : "oneshot";
+            if (ImGui::BeginCombo ("play type", preview))
+            {
+                if (ImGui::Selectable ("repeat"))
+                    sample_.setPlayType (REPEAT);
+                if (ImGui::Selectable ("oneshot"))
+                    sample_.setPlayType (ONE_SHOT);
+                ImGui::EndCombo();
+            }
+        }
 
-  ImGui::PlotLines("##waveform", data_.disp_wave.data(), data_.disp_wave.size(),
-                   0, "WAVEFORM", -1.0f, 1.0f,
-                   {ICON_SIZE * RENDER_SCALE * 8 - margins.x * 2,
-                    ICON_SIZE * RENDER_SCALE * 2 - margins.y * 2});
+        pitch_t root = sample_.getRoot();
+        if (ImGui::SliderFloat ("sample root frequency",
+                                &root,
+                                1.0f,
+                                10'000.0f,
+                                "%.2fHz",
+                                ImGuiSliderFlags_Logarithmic))
+            sample_.setRoot (root);
+    }
 
-  ImGui::End();
+    if (! sample_.empty() && sample_.isNewLoad())
+        setWave (WAVE_SAMPLE);
+
+    ImGui::PlotLines ("##waveform",
+                      data_.disp_wave.data(),
+                      data_.disp_wave.size(),
+                      0,
+                      "WAVEFORM",
+                      -1.0f,
+                      1.0f,
+                      { ICON_SIZE * RENDER_SCALE * 8 - margins.x * 2,
+                        ICON_SIZE * RENDER_SCALE * 2 - margins.y * 2 });
+
+    ImGui::End();
 }
 
 //--------------------------------------------------------
-BlockSequencer::BlockSequencer(Vector2f pos) : Block(pos) {
-  type_ = BLOCK_SEQUENCER;
-  rect_ = {pos.x, pos.y, 1.0f, 1.0f};
+BlockSequencer::BlockSequencer (Vector2f pos) : Block (pos)
+{
+    type_ = BLOCK_SEQUENCER;
+    rect_ = { pos.x, pos.y, 1.0f, 1.0f };
 
-  is_active_ = false;
+    is_active_ = false;
 
-  pitch_type_ = PITCH_ABS_FREQUENCY;
-  pitch_ = 440.0f;
+    pitch_type_ = PITCH_ABS_FREQUENCY;
+    pitch_ = 440.0f;
 
-  if (SEQUENCER_RANDOMIZED)
-    randomize();
+    if (SEQUENCER_RANDOMIZED)
+        randomize();
 }
 
-void BlockSequencer::randomize() {
-  pitch_type_ = (pitch_type_t)SDL_rand(4);
+void BlockSequencer::randomize()
+{
+    pitch_type_ = (pitch_type_t) SDL_rand (4);
 
-  // just some random values in decently pleasant ranges...
-  if (pitch_type_ == PITCH_ABS_FREQUENCY || pitch_type_ == PITCH_NOTE ||
-      pitch_type_ == PITCH_INTERVAL)
-    do
-      pitch_ = SDL_pow(1000, SDL_randf() - 1) * 20000.0f;
-    while (pitch_ < 50.0f || pitch_ > 880.0f);
+    // just some random values in decently pleasant ranges...
+    if (pitch_type_ == PITCH_ABS_FREQUENCY || pitch_type_ == PITCH_NOTE
+        || pitch_type_ == PITCH_INTERVAL)
+        do
+            pitch_ = SDL_pow (1000, SDL_randf() - 1) * 20000.0f;
+        while (pitch_ < 50.0f || pitch_ > 880.0f);
 
-  if (pitch_type_ == PITCH_REL_FREQUENCY)
-    pitch_ = SDL_randf() * 500.0f - 250.0f;
+    if (pitch_type_ == PITCH_REL_FREQUENCY)
+        pitch_ = SDL_randf() * 500.0f - 250.0f;
 
-  if (pitch_type_ == PITCH_INTERVAL) {
-    octave_subdivision_ = SDL_rand(24) + 1;
-    interval_ = SDL_rand(octave_subdivision_) + 1;
-  }
+    if (pitch_type_ == PITCH_INTERVAL)
+    {
+        octave_subdivision_ = SDL_rand (24) + 1;
+        interval_ = SDL_rand (octave_subdivision_) + 1;
+    }
 }
 
-BlockSequencer *BlockSequencer::clone() {
-  BlockSequencer *copy = new BlockSequencer(*this);
+BlockSequencer* BlockSequencer::clone()
+{
+    BlockSequencer* copy = new BlockSequencer (*this);
 
-  for (auto area : copy->getAreas())
-    removeArea(area);
-  copy->setActive(false);
+    for (auto area : copy->getAreas())
+        removeArea (area);
+    copy->setActive (false);
 
-  return copy;
+    return copy;
 }
 
-void BlockSequencer::drawGUI() {
-  if (!viewGUI_)
-    return;
+void BlockSequencer::drawGUI()
+{
+    if (! viewGUI_)
+        return;
 
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
-  ImGui::SetNextWindowSize(
-      {IMGUI_WIN_SIZE.x * RENDER_SCALE, IMGUI_WIN_SIZE.y * RENDER_SCALE});
-  ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize ({ IMGUI_WIN_SIZE.x * RENDER_SCALE, IMGUI_WIN_SIZE.y * RENDER_SCALE });
+    ImGui::SetNextWindowPos (ImGui::GetMousePos(), ImGuiCond_Appearing);
 
-  ImGui::Begin(
-      std::format("sequencer block @ [{}, {}]", rect_.x, rect_.y).c_str(),
-      &viewGUI_, flags);
+    ImGui::Begin (std::format ("sequencer block @ [{}, {}]", rect_.x, rect_.y).c_str(),
+                  &viewGUI_,
+                  flags);
 
-  const char *preview =
-      pitch_type_ == PITCH_REL_FREQUENCY   ? "relative frequency"
-      : pitch_type_ == PITCH_ABS_FREQUENCY ? "absolute frequency"
-      : pitch_type_ == PITCH_INTERVAL      ? "interval"
-      : pitch_type_ == PITCH_NOTE          ? "note"
-                                           : "unknown";
+    const char* preview = pitch_type_ == PITCH_REL_FREQUENCY   ? "relative frequency"
+                          : pitch_type_ == PITCH_ABS_FREQUENCY ? "absolute frequency"
+                          : pitch_type_ == PITCH_INTERVAL      ? "interval"
+                          : pitch_type_ == PITCH_NOTE          ? "note"
+                                                               : "unknown";
 
-  if (ImGui::BeginCombo("Type", preview)) {
-    if (ImGui::Selectable("relative frequency"))
-      setPitchType(PITCH_REL_FREQUENCY);
-    if (ImGui::Selectable("absolute frequency"))
-      setPitchType(PITCH_ABS_FREQUENCY);
-    if (ImGui::Selectable("interval"))
-      setPitchType(PITCH_INTERVAL);
-    if (ImGui::Selectable("note"))
-      setPitchType(PITCH_NOTE);
-    ImGui::EndCombo();
-  }
-
-  if (pitch_type_ == PITCH_REL_FREQUENCY)
-    ImGui::SliderFloat("frequency diff.", &pitch_, -1000.0f, 1000.0f, "%.2f",
-                       ImGuiSliderFlags_Logarithmic);
-
-  if (pitch_type_ == PITCH_ABS_FREQUENCY)
-    ImGui::SliderFloat("frequency", &pitch_, 20.0f, 20000.0f, "% .2f",
-                       ImGuiSliderFlags_Logarithmic);
-
-  if (pitch_type_ == PITCH_INTERVAL) {
-    ImGui::SliderFloat("interval", &interval_, -octave_subdivision_ * 2,
-                       octave_subdivision_ * 2, "%.1f",
-                       ImGuiSliderFlags_NoRoundToFormat);
-    ImGui::SliderFloat("octave subdivision", &octave_subdivision_, 1.0f, 24.0f,
-                       "%.1f", ImGuiSliderFlags_NoRoundToFormat);
-    if (octave_subdivision_ <= 0.0f)
-      octave_subdivision_ = 1.0f;
-  }
-
-  if (pitch_type_ == PITCH_NOTE) {
-    auto [note, octave] = freqToNote(pitch_);
-    ImGui::SetNextItemWidth(128);
-    ImGui::SliderInt("octave", &octave, 0, 10);
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(128);
-    if (ImGui::BeginCombo("note", note.c_str())) {
-      if (ImGui::Selectable("C"))
-        note = "C";
-      if (ImGui::Selectable("C#"))
-        note = "C#";
-      if (ImGui::Selectable("D"))
-        note = "D";
-      if (ImGui::Selectable("D#"))
-        note = "D#";
-      if (ImGui::Selectable("E"))
-        note = "E";
-      if (ImGui::Selectable("F"))
-        note = "F";
-      if (ImGui::Selectable("F#"))
-        note = "F#";
-      if (ImGui::Selectable("G"))
-        note = "G";
-      if (ImGui::Selectable("G#"))
-        note = "G#";
-      if (ImGui::Selectable("A"))
-        note = "A";
-      if (ImGui::Selectable("A#"))
-        note = "A#";
-      if (ImGui::Selectable("B"))
-        note = "B";
-      ImGui::EndCombo();
+    if (ImGui::BeginCombo ("Type", preview))
+    {
+        if (ImGui::Selectable ("relative frequency"))
+            setPitchType (PITCH_REL_FREQUENCY);
+        if (ImGui::Selectable ("absolute frequency"))
+            setPitchType (PITCH_ABS_FREQUENCY);
+        if (ImGui::Selectable ("interval"))
+            setPitchType (PITCH_INTERVAL);
+        if (ImGui::Selectable ("note"))
+            setPitchType (PITCH_NOTE);
+        ImGui::EndCombo();
     }
 
-    pitch_ = noteToFreq(note, octave);
-  }
+    if (pitch_type_ == PITCH_REL_FREQUENCY)
+        ImGui::SliderFloat ("frequency diff.",
+                            &pitch_,
+                            -1000.0f,
+                            1000.0f,
+                            "%.2f",
+                            ImGuiSliderFlags_Logarithmic);
 
-  ImGui::End();
+    if (pitch_type_ == PITCH_ABS_FREQUENCY)
+        ImGui::SliderFloat ("frequency",
+                            &pitch_,
+                            20.0f,
+                            20000.0f,
+                            "% .2f",
+                            ImGuiSliderFlags_Logarithmic);
+
+    if (pitch_type_ == PITCH_INTERVAL)
+    {
+        ImGui::SliderFloat ("interval",
+                            &interval_,
+                            -octave_subdivision_ * 2,
+                            octave_subdivision_ * 2,
+                            "%.1f",
+                            ImGuiSliderFlags_NoRoundToFormat);
+        ImGui::SliderFloat ("octave subdivision",
+                            &octave_subdivision_,
+                            1.0f,
+                            24.0f,
+                            "%.1f",
+                            ImGuiSliderFlags_NoRoundToFormat);
+        if (octave_subdivision_ <= 0.0f)
+            octave_subdivision_ = 1.0f;
+    }
+
+    if (pitch_type_ == PITCH_NOTE)
+    {
+        auto [note, octave] = freqToNote (pitch_);
+        ImGui::SetNextItemWidth (128);
+        ImGui::SliderInt ("octave", &octave, 0, 10);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth (128);
+        if (ImGui::BeginCombo ("note", note.c_str()))
+        {
+            if (ImGui::Selectable ("C"))
+                note = "C";
+            if (ImGui::Selectable ("C#"))
+                note = "C#";
+            if (ImGui::Selectable ("D"))
+                note = "D";
+            if (ImGui::Selectable ("D#"))
+                note = "D#";
+            if (ImGui::Selectable ("E"))
+                note = "E";
+            if (ImGui::Selectable ("F"))
+                note = "F";
+            if (ImGui::Selectable ("F#"))
+                note = "F#";
+            if (ImGui::Selectable ("G"))
+                note = "G";
+            if (ImGui::Selectable ("G#"))
+                note = "G#";
+            if (ImGui::Selectable ("A"))
+                note = "A";
+            if (ImGui::Selectable ("A#"))
+                note = "A#";
+            if (ImGui::Selectable ("B"))
+                note = "B";
+            ImGui::EndCombo();
+        }
+
+        pitch_ = noteToFreq (note, octave);
+    }
+
+    ImGui::End();
 }
 
-void BlockSequencer::addArea(Area *area) {
-  if (std::find(areas_.begin(), areas_.end(), area) == areas_.end())
-    areas_.push_back(area);
+void BlockSequencer::addArea (Area* area)
+{
+    if (std::find (areas_.begin(), areas_.end(), area) == areas_.end())
+        areas_.push_back (area);
 }
 
-void BlockSequencer::removeArea(Area *area) {
-  auto it = std::find(areas_.begin(), areas_.end(), area);
-  if (it != areas_.end())
-    areas_.erase(it);
+void BlockSequencer::removeArea (Area* area)
+{
+    auto it = std::find (areas_.begin(), areas_.end(), area);
+    if (it != areas_.end())
+        areas_.erase (it);
 }
 
-SDL_FRect *BlockSequencer::getFRect() {
-  if (!is_active_)
-    render_rect_ = Block::smallerFRect(rect_);
-  else
-    render_rect_ = rect_;
+SDL_FRect* BlockSequencer::getFRect()
+{
+    if (! is_active_)
+        render_rect_ = Block::smallerFRect (rect_);
+    else
+        render_rect_ = rect_;
 
-  render_rect_ = Camera::resizeFRect(render_rect_);
-  return &render_rect_;
+    render_rect_ = Camera::resizeFRect (render_rect_);
+    return &render_rect_;
 }

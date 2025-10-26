@@ -1,187 +1,191 @@
 #pragma once
-#include "camera.h"
 #include "sample.h"
 #include "util.h"
 #include <SDL3/SDL.h>
-#include <memory>
 #include <vector>
 
 class Area;
 
-class Block {
+class Block
+{
 public:
-  Block(Vector2f);
-  SDL_FRect *getFRect();
-  SDL_FRect smallerFRect(SDL_FRect rect);
-  Vector2f getPos() { return Vector2f(rect_.x, rect_.y); }
-  void setPos(Vector2f pos) {
-    pos = floorVec(pos);
-    rect_.x = pos.x;
-    rect_.y = pos.y;
-  }
-  block_type_t getType() { return type_; }
-  virtual Block *clone() = 0;
+    Block (Vector2f);
+    SDL_FRect* getFRect();
+    SDL_FRect smallerFRect (SDL_FRect rect);
+    Vector2f getPos() { return Vector2f (rect_.x, rect_.y); }
+    void setPos (Vector2f pos)
+    {
+        pos = floorVec (pos);
+        rect_.x = pos.x;
+        rect_.y = pos.y;
+    }
+    block_type_t getType() { return type_; }
+    virtual Block* clone() = 0;
+    virtual ~Block() {};
 
-  virtual void drawGUI() = 0;
-  void toggleGUI() { viewGUI_ = !viewGUI_; }
-  void setGUI(bool view) { viewGUI_ = view; }
+    virtual void drawGUI() = 0;
+    void toggleGUI() { viewGUI_ = ! viewGUI_; }
+    void setGUI (bool view) { viewGUI_ = view; }
 
-  bool isInArea() { return is_in_area_; }
+    bool isInArea() { return is_in_area_; }
 
-  std::string getText(int i) { return text_.at(i); }
-  void setText(std::string text, int i) { text_.at(i) = text; }
+    std::string getText (int i) { return text_.at (i); }
+    void setText (std::string text, int i) { text_.at (i) = text; }
 
-  SDL_Texture *getTextTexture(int i) { return text_texture_.at(i); }
-  void setTextTexture(SDL_Texture *text_texture, int i) {
-    text_texture_.at(i) = text_texture;
-  }
+    SDL_Texture* getTextTexture (int i) { return text_texture_.at (i); }
+    void setTextTexture (SDL_Texture* text_texture, int i) { text_texture_.at (i) = text_texture; }
 
-  Vector2f getValueTextSize() { return value_text_size_; }
-  void setValueTextSize(Vector2f size) { value_text_size_ = size; }
+    Vector2f getValueTextSize() { return value_text_size_; }
+    void setValueTextSize (Vector2f size) { value_text_size_ = size; }
 
 protected:
-  bool viewGUI_ = false;
-  block_type_t type_;
-  bool is_in_area_ = false;
-  SDL_FRect rect_{0, 0, 1.0f, 1.0f};
-  SDL_FRect render_rect_;
+    bool viewGUI_ = false;
+    block_type_t type_;
+    bool is_in_area_ = false;
+    SDL_FRect rect_ { 0, 0, 1.0f, 1.0f };
+    SDL_FRect render_rect_;
 
-  std::array<std::string, 2> text_ = {"", ""};
-  std::array<SDL_Texture *, 2> text_texture_ = {nullptr, nullptr};
-  Vector2f value_text_size_ = {0.0f, 0.0f};
+    std::array<std::string, 2> text_ = { "", "" };
+    std::array<SDL_Texture*, 2> text_texture_ = { nullptr, nullptr };
+    Vector2f value_text_size_ = { 0.0f, 0.0f };
 };
 
-typedef struct generator_data_t {
-  WAVE_FORMS waveform;
-  std::array<float, WAVE_SIZE> disp_wave;
-  float crest;
-  float amp;
-  float pan;
-  float freq;
-  double phase;
+typedef struct generator_data_t
+{
+    WAVE_FORMS waveform;
+    std::array<float, WAVE_SIZE> disp_wave;
+    float crest;
+    float amp;
+    float pan;
+    float freq;
+    double phase;
 } generator_data_t;
 
-class BlockGenerator : public Block {
+class BlockGenerator : public Block
+{
 public:
-  BlockGenerator(Vector2f, double phase = 0.0f);
-  ~BlockGenerator();
-  BlockGenerator *clone() override;
-  void createAudioStream();
+    BlockGenerator (Vector2f, double phase = 0.0f);
+    ~BlockGenerator();
+    BlockGenerator* clone() override;
+    void createAudioStream();
 
-  void setInArea(bool in_area);
+    void setInArea (bool in_area);
 
-  SDL_AudioStream *getStream() { return stream_; }
-  void drawGUI() override;
+    SDL_AudioStream* getStream() { return stream_; }
+    void drawGUI() override;
 
-  generator_data_t *getData() { return &data_; }
-  void setData(generator_data_t data) {
-    float tmp_phase = data_.phase;
-    data_ = data;
-    data_.phase = tmp_phase;
-  }
+    generator_data_t* getData() { return &data_; }
+    void setData (generator_data_t data)
+    {
+        float tmp_phase = data_.phase;
+        data_ = data;
+        data_.phase = tmp_phase;
+    }
 
-  void setFrequency(pitch_t freq);
-  double getFrequency();
+    void setFrequency (pitch_t freq);
+    double getFrequency();
 
-  double getPhase();
+    double getPhase();
 
-  void setWave(WAVE_FORMS waveform);
-  WAVE_FORMS getWaveForm() { return data_.waveform; }
-  Sample *getSample() { return &sample_; }
-  void copySample(Sample *sample);
+    void setWave (WAVE_FORMS waveform);
+    WAVE_FORMS getWaveForm() { return data_.waveform; }
+    Sample* getSample() { return &sample_; }
+    void copySample (Sample* sample);
 
-  double getAmp();
-  double getDataAmp() { return data_.amp; }
-  void setAmp(double amp) { data_.amp = amp; }
+    double getAmp();
+    double getDataAmp() { return data_.amp; }
+    void setAmp (double amp) { data_.amp = amp; }
 
-  pitch_t getRelFreq() { return rel_freq_; }
-  void setRelFreq(pitch_t rel_freq) { rel_freq_ = rel_freq; }
-  float getFreqFactor() { return freq_factor_; }
-  void setFreqFactor(float freq_factor) { freq_factor_ = freq_factor; }
+    pitch_t getRelFreq() { return rel_freq_; }
+    void setRelFreq (pitch_t rel_freq) { rel_freq_ = rel_freq; }
+    float getFreqFactor() { return freq_factor_; }
+    void setFreqFactor (float freq_factor) { freq_factor_ = freq_factor; }
 
-  void setBypass(bool bypass) { bypass_ = bypass; }
-  bool getBypass() { return bypass_; }
+    void setBypass (bool bypass) { bypass_ = bypass; }
+    bool getBypass() { return bypass_; }
 
-  void setTimes(double note, double gliss, double attack, double release);
+    void setTimes (double note, double gliss, double attack, double release);
 
-  void resetSteps() { cur_note_sample_pos_ = 0; }
+    void resetSteps() { cur_note_sample_pos_ = 0; }
 
 private:
-  bool bypass_ = false;
-  SDL_AudioStream *stream_ = nullptr;
-  generator_data_t data_ = {.waveform = WAVE_SINE,
-                            .disp_wave = {},
-                            .crest = 1.0f,
-                            .amp = 0.5f,
-                            .pan = 0.0f,
-                            .freq = 440.0f,
-                            .phase = 0};
-  int fs_;
+    bool bypass_ = false;
+    SDL_AudioStream* stream_ = nullptr;
+    generator_data_t data_ = { .waveform = WAVE_SINE,
+                               .disp_wave = {},
+                               .crest = 1.0f,
+                               .amp = 0.5f,
+                               .pan = 0.0f,
+                               .freq = 440.0f,
+                               .phase = 0 };
+    int fs_;
 
-  double gliss_freq_ = -1.0f;
-  double last_freq_ = -1.0f;
-  Uint64 gliss_len_samples_ = 0;
+    double gliss_freq_ = -1.0f;
+    double last_freq_ = -1.0f;
+    Uint64 gliss_len_samples_ = 0;
 
-  double env_amp_ = 0.0f;
-  Uint64 attack_len_samples_ = 0;
-  Uint64 release_start_time_samples_ = 0;
-  Uint64 note_len_samples_ = 0;
-  Uint64 min_env_time_samples_ = 0;
+    double env_amp_ = 0.0f;
+    Uint64 attack_len_samples_ = 0;
+    Uint64 release_start_time_samples_ = 0;
+    Uint64 note_len_samples_ = 0;
+    Uint64 min_env_time_samples_ = 0;
 
-  Uint64 cur_note_sample_pos_ = 0;
+    Uint64 cur_note_sample_pos_ = 0;
 
-  double last_phase_freq_ = 0.0f;
-  double last_phase_value_ = 0.0f;
+    double last_phase_freq_ = 0.0f;
+    double last_phase_value_ = 0.0f;
 
-  pitch_t rel_freq_ = 0.0f;
-  float freq_factor_ = 1.0f;
+    pitch_t rel_freq_ = 0.0f;
+    float freq_factor_ = 1.0f;
 
-  Sample sample_ = {};
+    Sample sample_ = {};
 
-  static void audioCallback(void *userdata, SDL_AudioStream *stream,
-                            int additional_amount, int total_amount);
+    static void audioCallback (void* userdata,
+                               SDL_AudioStream* stream,
+                               int additional_amount,
+                               int total_amount);
 };
 
-class BlockSequencer : public Block {
+class BlockSequencer : public Block
+{
 public:
-  BlockSequencer(Vector2f);
-  ~BlockSequencer() = default;
+    BlockSequencer (Vector2f);
+    ~BlockSequencer() = default;
 
-  BlockSequencer *clone() override;
-  void drawGUI() override;
-  SDL_FRect *getFRect();
+    BlockSequencer* clone() override;
+    void drawGUI() override;
+    SDL_FRect* getFRect();
 
-  void setActive(bool active) { is_active_ = active; }
+    void setActive (bool active) { is_active_ = active; }
 
-  void setPitch(pitch_t pitch) { pitch_ = pitch; }
-  pitch_t getPitch() { return pitch_; }
+    void setPitch (pitch_t pitch) { pitch_ = pitch; }
+    pitch_t getPitch() { return pitch_; }
 
-  void setPitchType(pitch_type_t pitch_type) { pitch_type_ = pitch_type; }
-  pitch_type_t getPitchType() { return pitch_type_; }
+    void setPitchType (pitch_type_t pitch_type) { pitch_type_ = pitch_type; }
+    pitch_type_t getPitchType() { return pitch_type_; }
 
-  void addArea(Area *area);
-  void removeArea(Area *area);
-  auto getAreas() { return areas_; }
+    void addArea (Area* area);
+    void removeArea (Area* area);
+    auto getAreas() { return areas_; }
 
-  std::pair<float, float> getInterval() {
-    return {interval_, octave_subdivision_};
-  }
-  void setInterval(float interval, float oct_sub) {
-    interval_ = interval;
-    octave_subdivision_ = oct_sub;
-  }
+    std::pair<float, float> getInterval() { return { interval_, octave_subdivision_ }; }
+    void setInterval (float interval, float oct_sub)
+    {
+        interval_ = interval;
+        octave_subdivision_ = oct_sub;
+    }
 
-  bool hasNoAreas() { return areas_.empty(); }
+    bool hasNoAreas() { return areas_.empty(); }
 
-  void randomize();
+    void randomize();
 
 private:
-  bool is_active_ = false;
-  pitch_t pitch_;
-  pitch_type_t pitch_type_;
+    bool is_active_ = false;
+    pitch_t pitch_;
+    pitch_type_t pitch_type_;
 
-  float interval_ = 7;
-  float octave_subdivision_ = 12;
+    float interval_ = 7;
+    float octave_subdivision_ = 12;
 
-  std::vector<Area *> areas_;
+    std::vector<Area*> areas_;
 };

@@ -4,342 +4,395 @@
 #include <algorithm>
 #include <format>
 
-bool Area::isInside(Vector2f pos) {
-  pos = floorVec(pos);
-  for (auto &field : positions_)
-    if (field == pos)
-      return true;
+bool Area::isInside (Vector2f pos)
+{
+    pos = floorVec (pos);
+    for (auto& field : positions_)
+        if (field == pos)
+            return true;
 
-  return false;
-}
-
-Area::Area() {
-  positions_.reserve(64);
-  blocks_.reserve(64);
-  sequence_.reserve(64);
-}
-
-void Area::addPositions(std::vector<Vector2f> positions) {
-  for (auto &pos : positions)
-    positions_.push_back(pos);
-}
-
-bool Area::addPosition(Vector2f pos) {
-  pos = floorVec(pos);
-  if (std::find(positions_.begin(), positions_.end(), pos) != positions_.end())
     return false;
-  positions_.push_back(pos);
-  return true;
 }
 
-void Area::removePosition(Vector2f pos) {
-  pos = floorVec(pos);
-
-  positions_.erase(std::remove_if(positions_.begin(), positions_.end(),
-                                  [pos](auto p) { return p == pos; }),
-                   positions_.end());
+Area::Area()
+{
+    positions_.reserve (64);
+    blocks_.reserve (64);
+    sequence_.reserve (64);
 }
 
-Block *Area::addBlock(Block *block) {
-  if (!block || block->getType() != BLOCK_GENERATOR)
+void Area::addPositions (std::vector<Vector2f> positions)
+{
+    for (auto& pos : positions)
+        positions_.push_back (pos);
+}
+
+bool Area::addPosition (Vector2f pos)
+{
+    pos = floorVec (pos);
+    if (std::find (positions_.begin(), positions_.end(), pos) != positions_.end())
+        return false;
+    positions_.push_back (pos);
+    return true;
+}
+
+void Area::removePosition (Vector2f pos)
+{
+    pos = floorVec (pos);
+
+    positions_.erase (
+        std::remove_if (positions_.begin(), positions_.end(), [pos] (auto p) { return p == pos; }),
+        positions_.end());
+}
+
+Block* Area::addBlock (Block* block)
+{
+    if (! block || block->getType() != BLOCK_GENERATOR)
+        return nullptr;
+
+    blocks_.push_back ((BlockGenerator*) block);
+    blocks_.back()->setInArea (true);
+    updateNoteLength (blocks_.back());
+    blocks_.back()->setFrequency (0.0f);
+    return block;
+}
+
+void Area::removeBlock (Block* block)
+{
+    blocks_.erase (
+        std::remove_if (blocks_.begin(), blocks_.end(), [block] (auto b) { return b == block; }),
+        blocks_.end());
+
+    if (block && block->getType() == BLOCK_GENERATOR)
+        ((BlockGenerator*) block)->setInArea (false);
+}
+
+bool Area::removeBlock (Vector2f pos)
+{
+    pos = floorVec (pos);
+
+    for (auto& block : blocks_)
+        if (block->getPos() == pos)
+        {
+            removeBlock (block);
+            return true;
+        }
+
+    return false;
+}
+
+Block* Area::getBlock (Vector2f pos)
+{
+    pos = floorVec (pos);
+
+    for (auto& block : blocks_)
+        if (block->getPos() == pos)
+            return block;
+
     return nullptr;
-
-  blocks_.push_back((BlockGenerator *)block);
-  blocks_.back()->setInArea(true);
-  updateNoteLength(blocks_.back());
-  blocks_.back()->setFrequency(0.0f);
-  return block;
 }
 
-void Area::removeBlock(Block *block) {
-  blocks_.erase(std::remove_if(blocks_.begin(), blocks_.end(),
-                               [block](auto b) { return b == block; }),
-                blocks_.end());
+BlockSequencer* Area::getSequencer (Vector2f pos)
+{
+    pos = floorVec (pos);
 
-  if (block && block->getType() == BLOCK_GENERATOR)
-    ((BlockGenerator *)block)->setInArea(false);
+    for (auto& sequencer : sequence_)
+        if (sequencer && sequencer->getPos() == pos)
+            return sequencer;
+
+    return nullptr;
 }
 
-bool Area::removeBlock(Vector2f pos) {
-  pos = floorVec(pos);
+Block* Area::addSequencer (BlockSequencer* sequencer)
+{
+    sequence_.push_back (sequencer);
+    sequencer->addArea (this);
 
-  for (auto &block : blocks_)
-    if (block->getPos() == pos) {
-      removeBlock(block);
-      return true;
-    }
-
-  return false;
+    updateSequence();
+    return sequencer;
 }
 
-Block *Area::getBlock(Vector2f pos) {
-  pos = floorVec(pos);
-
-  for (auto &block : blocks_)
-    if (block->getPos() == pos)
-      return block;
-
-  return nullptr;
-}
-
-BlockSequencer *Area::getSequencer(Vector2f pos) {
-  pos = floorVec(pos);
-
-  for (auto &sequencer : sequence_)
-    if (sequencer && sequencer->getPos() == pos)
-      return sequencer;
-
-  return nullptr;
-}
-
-Block *Area::addSequencer(BlockSequencer *sequencer) {
-  sequence_.push_back(sequencer);
-  sequencer->addArea(this);
-
-  updateSequence();
-  return sequencer;
-}
-
-void Area::removeSequencer(BlockSequencer *sequencer) {
-  if (sequence_.erase(
-          std::remove_if(sequence_.begin(), sequence_.end(),
-                         [sequencer](auto s) { return s == sequencer; }),
-          sequence_.end()) != sequence_.end()) {
-    sequencer->removeArea(this);
-    if (sequencer->hasNoAreas()) {
-      // delete sequencer;
-      sequencer = nullptr;
-    }
-  }
-  updateSequence();
-}
-
-bool Area::removeSequencer(Vector2f pos) {
-  for (auto sequencer : sequence_)
-    if (sequencer && sequencer->getPos() == pos) {
-      removeSequencer(sequencer);
-      return true;
-    }
-  return false;
-}
-
-void Area::removeDanglingSequencers() {
-  for (auto sequencer : sequence_) {
-    if (!sequencer)
-      continue;
-
-    auto pos = sequencer->getPos();
-    if (!isInside({pos.x + 1, pos.y}) && !isInside({pos.x - 1, pos.y}) &&
-        !isInside({pos.x, pos.y + 1}) && !isInside({pos.x, pos.y - 1})) {
-      sequence_.erase(
-          std::remove_if(sequence_.begin(), sequence_.end(),
-                         [sequencer](auto s) { return s == sequencer; }),
-          sequence_.end());
-      sequencer->removeArea(this);
-
-      if (sequencer->hasNoAreas())
-        delete sequencer;
-    }
-  }
-}
-
-Vector2f Area::getTopLeft() {
-  Vector2f top_left = {GRID_SIZE + 1, GRID_SIZE + 1};
-
-  for (auto &pos : positions_) // find topleft most position, top > left
-  {
-    if (pos.y < top_left.y)
-      top_left = pos;
-    else if (pos.y == top_left.y && pos.x < top_left.x)
-      top_left = pos;
-  }
-
-  return top_left;
-}
-
-void Area::cleanupSequence() {
-  // remove nullptrs
-  sequence_.erase(std::remove_if(sequence_.begin(), sequence_.end(),
-                                 [](BlockSequencer *sequencer) {
-                                   return sequencer == nullptr;
-                                 }),
-                  sequence_.end());
-
-  // remove duplicates
-  std::sort(sequence_.begin(), sequence_.end());
-  sequence_.erase(std::unique(sequence_.begin(), sequence_.end()),
-                  sequence_.end());
-
-  removeDanglingSequencers();
-}
-
-void Area::updateSequence() {
-  std::vector<BlockSequencer *> new_sequence;
-
-  cleanupSequence();
-
-  int dir = 0;
-  auto cur_pos = getAdjacentPositions(getTopLeft()).at(dir);
-  auto start_pos = cur_pos;
-  auto next_dir = [](int dir, int n_times = 1) { return (dir + n_times) % 4; };
-
-  do // directions: 0 = up, 1 = left, 2 = down, 3 = right | normal direction
-     // from side of area
-  {
-    // i know this looks convoluted, but i swear this makes sense...
-    auto adj_pos = getAdjacentPositions(cur_pos);
-    new_sequence.push_back(getSequencer(cur_pos));
-
-    if (!isInside(getAdjacentPositions(adj_pos.at(next_dir(dir)))
-                      .at(next_dir(dir, 2))))
-    // outer corner / left rotation
+void Area::removeSequencer (BlockSequencer* sequencer)
+{
+    if (sequence_.erase (std::remove_if (sequence_.begin(),
+                                         sequence_.end(),
+                                         [sequencer] (auto s) { return s == sequencer; }),
+                         sequence_.end())
+        != sequence_.end())
     {
-      cur_pos =
-          getAdjacentPositions(adj_pos.at(next_dir(dir))).at(next_dir(dir, 2));
-      dir = next_dir(dir);
-      continue;
+        sequencer->removeArea (this);
+        if (sequencer->hasNoAreas())
+        {
+            // delete sequencer;
+            sequencer = nullptr;
+        }
     }
-
-    if (!isInside(adj_pos.at(next_dir(dir)))) // continue straight?
-    {
-      cur_pos = adj_pos.at(next_dir(dir));
-      continue;
-    }
-
-    // around the inner corner / right rotation
-    // cur_pos = cur_pos;  //position stays the same because in inner corner two
-    // sides of an area block touch sequencer block
-    dir = next_dir(dir, 3); // rotate 3 times effectively
-  } while (cur_pos != start_pos);
-
-  sequence_ = new_sequence;
+    updateSequence();
 }
 
-void Area::setNotes(pitch_t freq) {
-  for (auto block : blocks_)
-    if (block->getType() == BLOCK_GENERATOR)
-      ((BlockGenerator *)block)->setFrequency(freq);
+bool Area::removeSequencer (Vector2f pos)
+{
+    for (auto sequencer : sequence_)
+        if (sequencer && sequencer->getPos() == pos)
+        {
+            removeSequencer (sequencer);
+            return true;
+        }
+    return false;
+}
+
+void Area::removeDanglingSequencers()
+{
+    for (auto sequencer : sequence_)
+    {
+        if (! sequencer)
+            continue;
+
+        auto pos = sequencer->getPos();
+        if (! isInside ({ pos.x + 1, pos.y }) && ! isInside ({ pos.x - 1, pos.y })
+            && ! isInside ({ pos.x, pos.y + 1 }) && ! isInside ({ pos.x, pos.y - 1 }))
+        {
+            sequence_.erase (std::remove_if (sequence_.begin(),
+                                             sequence_.end(),
+                                             [sequencer] (auto s) { return s == sequencer; }),
+                             sequence_.end());
+            sequencer->removeArea (this);
+
+            if (sequencer->hasNoAreas())
+                delete sequencer;
+        }
+    }
+}
+
+Vector2f Area::getTopLeft()
+{
+    Vector2f top_left = { GRID_SIZE + 1, GRID_SIZE + 1 };
+
+    for (auto& pos : positions_) // find topleft most position, top > left
+    {
+        if (pos.y < top_left.y)
+            top_left = pos;
+        else if (pos.y == top_left.y && pos.x < top_left.x)
+            top_left = pos;
+    }
+
+    return top_left;
+}
+
+void Area::cleanupSequence()
+{
+    // remove nullptrs
+    sequence_.erase (std::remove_if (sequence_.begin(),
+                                     sequence_.end(),
+                                     [] (BlockSequencer* sequencer)
+                                     { return sequencer == nullptr; }),
+                     sequence_.end());
+
+    // remove duplicates
+    std::sort (sequence_.begin(), sequence_.end());
+    sequence_.erase (std::unique (sequence_.begin(), sequence_.end()), sequence_.end());
+
+    removeDanglingSequencers();
+}
+
+void Area::updateSequence()
+{
+    std::vector<BlockSequencer*> new_sequence;
+
+    cleanupSequence();
+
+    int dir = 0;
+    auto cur_pos = getAdjacentPositions (getTopLeft()).at (dir);
+    auto start_pos = cur_pos;
+    auto next_dir = [] (int dir, int n_times = 1) { return (dir + n_times) % 4; };
+
+    do // directions: 0 = up, 1 = left, 2 = down, 3 = right | normal direction
+    // from side of area
+    {
+        // i know this looks convoluted, but i swear this makes sense...
+        auto adj_pos = getAdjacentPositions (cur_pos);
+        new_sequence.push_back (getSequencer (cur_pos));
+
+        if (! isInside (getAdjacentPositions (adj_pos.at (next_dir (dir))).at (next_dir (dir, 2))))
+        // outer corner / left rotation
+        {
+            cur_pos = getAdjacentPositions (adj_pos.at (next_dir (dir))).at (next_dir (dir, 2));
+            dir = next_dir (dir);
+            continue;
+        }
+
+        if (! isInside (adj_pos.at (next_dir (dir)))) // continue straight?
+        {
+            cur_pos = adj_pos.at (next_dir (dir));
+            continue;
+        }
+
+        // around the inner corner / right rotation
+        // cur_pos = cur_pos;  //position stays the same because in inner corner two
+        // sides of an area block touch sequencer block
+        dir = next_dir (dir, 3); // rotate 3 times effectively
+    } while (cur_pos != start_pos);
+
+    sequence_ = new_sequence;
+}
+
+void Area::setNotes (pitch_t freq)
+{
+    for (auto block : blocks_)
+        if (block->getType() == BLOCK_GENERATOR)
+            ((BlockGenerator*) block)->setFrequency (freq);
 };
 
-void Area::resetSteps() {
-  last_note_idx_ = sequence_.size() - 1;
-  cur_note_idx_ = 0;
-  step_counter_ = 0;
-  for (auto &block : blocks_)
-    block->resetSteps();
+void Area::resetSteps()
+{
+    last_note_idx_ = sequence_.size() - 1;
+    cur_note_idx_ = 0;
+    step_counter_ = 0;
+    for (auto& block : blocks_)
+        block->resetSteps();
 }
 
-void Area::setStepCounter(const Uint64 step_counter, bool wrap_around) {
-  step_counter_ = step_counter;
-  if (wrap_around)
-    stepSequence(true);
+void Area::setStepCounter (const Uint64 step_counter, bool wrap_around)
+{
+    step_counter_ = step_counter;
+    if (wrap_around)
+        stepSequence (true);
 }
 
-void Area::stepSequence(bool force) {
-  step_counter_ = ++step_counter_ % TICKS_PER_BAR;
+void Area::stepSequence (bool force)
+{
+    step_counter_ = ++step_counter_ % TICKS_PER_BAR;
 
-  double subdivision_interval = TICKS_PER_BAR / bpm_subdivision_;
-  if (SDL_ceil(SDL_fmod(step_counter_, subdivision_interval)) != 0 && !force)
-    return;
+    double subdivision_interval = static_cast<double> (TICKS_PER_BAR) / bpm_subdivision_;
+    if (SDL_ceil (SDL_fmod (step_counter_, subdivision_interval)) != 0 && ! force)
+        return;
 
-  // updateNoteLength();
+    // updateNoteLength();
 
-  last_note_idx_ = cur_note_idx_;
-  cur_note_idx_ = cur_note_idx_ >= sequence_.size() - 1 ? 0 : cur_note_idx_ + 1;
+    last_note_idx_ = cur_note_idx_;
+    cur_note_idx_ = cur_note_idx_ >= sequence_.size() - 1 ? 0 : cur_note_idx_ + 1;
 
-  if (sequence_.size() > last_note_idx_)
-    if (sequence_.at(last_note_idx_))
-      sequence_.at(last_note_idx_)->setActive(false);
+    if (sequence_.size() > last_note_idx_)
+        if (sequence_.at (last_note_idx_))
+            sequence_.at (last_note_idx_)->setActive (false);
 
-  if (!sequence_.at(cur_note_idx_))
-    setNotes(0.0f);
-  else {
-    sequence_.at(cur_note_idx_)->setActive(true);
-
-    pitch_type_t pitch_type = sequence_.at(cur_note_idx_)->getPitchType();
-    switch (pitch_type) {
-    case PITCH_ABS_FREQUENCY:
-    case PITCH_NOTE:
-      last_freq_ = sequence_.at(cur_note_idx_)->getPitch();
-      break;
-    case PITCH_REL_FREQUENCY:
-      last_freq_ += sequence_.at(cur_note_idx_)->getPitch();
-      break;
-    case PITCH_INTERVAL:
-      auto [interval, oct_sub] = sequence_.at(cur_note_idx_)->getInterval();
-      last_freq_ = last_freq_ * intervalToRatio(interval, oct_sub);
-      break;
-    }
-
-    if (pitch_type == PITCH_REL_FREQUENCY || pitch_type == PITCH_INTERVAL)
-    // wrap around [20;20'000] Hz range if relative pitch change
+    if (! sequence_.at (cur_note_idx_))
+        setNotes (0.0f);
+    else
     {
-      while (last_freq_ < 20.0f)
-        last_freq_ += 20000.0f - 20.0f;
-      while (last_freq_ > 20000.0f)
-        last_freq_ -= 20000.0 - 20.0f;
-    }
-    // }
+        sequence_.at (cur_note_idx_)->setActive (true);
 
-    setNotes(last_freq_);
-  }
+        pitch_type_t pitch_type = sequence_.at (cur_note_idx_)->getPitchType();
+        switch (pitch_type)
+        {
+            case PITCH_ABS_FREQUENCY:
+            case PITCH_NOTE:
+                last_freq_ = sequence_.at (cur_note_idx_)->getPitch();
+                break;
+            case PITCH_REL_FREQUENCY:
+                last_freq_ += sequence_.at (cur_note_idx_)->getPitch();
+                break;
+            case PITCH_INTERVAL:
+                auto [interval, oct_sub] = sequence_.at (cur_note_idx_)->getInterval();
+                last_freq_ = last_freq_ * intervalToRatio (interval, oct_sub);
+                break;
+        }
+
+        if (pitch_type == PITCH_REL_FREQUENCY || pitch_type == PITCH_INTERVAL)
+        // wrap around [20;20'000] Hz range if relative pitch change
+        {
+            while (last_freq_ < 20.0f)
+                last_freq_ += 20000.0f - 20.0f;
+            while (last_freq_ > 20000.0f)
+                last_freq_ -= 20000.0 - 20.0f;
+        }
+        // }
+
+        setNotes (last_freq_);
+    }
 };
 
-void Area::stopSequence() {
-  cur_note_idx_ = 0;
-  last_note_idx_ = sequence_.size() - 1;
+void Area::stopSequence()
+{
+    cur_note_idx_ = 0;
+    last_note_idx_ = sequence_.size() - 1;
 }
 
-void Area::updateNoteLength(BlockGenerator *block) {
-  note_length_ = (60.0f / (bpm_subdivision_ * AudioEngine::getBPM()));
+void Area::updateNoteLength (BlockGenerator* block)
+{
+    note_length_ = (60.0f / (bpm_subdivision_ * AudioEngine::getBPM()));
 
-  double attack_time = (attack_percent_ / 100.0f) * note_length_;
-  double release_time = (1.0 - (release_percent_ / 100.0f)) * note_length_;
-  double gliss_time = (gliss_percent_ / 100.0f) * note_length_;
+    double attack_time = (attack_percent_ / 100.0f) * note_length_;
+    double release_time = (1.0 - (release_percent_ / 100.0f)) * note_length_;
+    double gliss_time = (gliss_percent_ / 100.0f) * note_length_;
 
-  if (block) {
-    block->setTimes(note_length_, gliss_time, attack_time, release_time);
-    return;
-  }
+    if (block)
+    {
+        block->setTimes (note_length_, gliss_time, attack_time, release_time);
+        return;
+    }
 
-  for (auto block : blocks_)
-    block->setTimes(note_length_, gliss_time, attack_time, release_time);
+    for (auto block : blocks_)
+        block->setTimes (note_length_, gliss_time, attack_time, release_time);
 }
 
-void Area::drawGUI() {
-  if (!viewGUI_)
-    return;
-  ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
-  ImGui::SetNextWindowSize(
-      {IMGUI_WIN_SIZE.x * RENDER_SCALE, IMGUI_WIN_SIZE.y * RENDER_SCALE});
-  ImGui::SetNextWindowPos(ImGui::GetMousePos(), ImGuiCond_Appearing);
-  ImGui::Begin(
-      std::format("Area @ [{}, {}]", getTopLeft().x, getTopLeft().y).c_str(),
-      &viewGUI_, flags);
+void Area::drawGUI()
+{
+    if (! viewGUI_)
+        return;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize ({ IMGUI_WIN_SIZE.x * RENDER_SCALE, IMGUI_WIN_SIZE.y * RENDER_SCALE });
+    ImGui::SetNextWindowPos (ImGui::GetMousePos(), ImGuiCond_Appearing);
+    ImGui::Begin (std::format ("Area @ [{}, {}]", getTopLeft().x, getTopLeft().y).c_str(),
+                  &viewGUI_,
+                  flags);
 
-  if (ImGui::DragInt("bpm subdivision", &bpm_subdivision_, 1, 1, 32, "1/%d",
-                     ImGuiSliderFlags_Logarithmic)) {
-    updateNoteLength();
-  }
+    if (ImGui::DragInt ("bpm subdivision",
+                        &bpm_subdivision_,
+                        1,
+                        1,
+                        32,
+                        "1/%d",
+                        ImGuiSliderFlags_Logarithmic))
+    {
+        updateNoteLength();
+    }
 
-  ImGui::DragFloat("amplitude", &amp_, 0.001f, 0.0f, 1.0f, "% .3f",
-                   ImGuiSliderFlags_Logarithmic);
+    ImGui::DragFloat ("amplitude",
+                      &amp_,
+                      0.001f,
+                      0.0f,
+                      1.0f,
+                      "% .3f",
+                      ImGuiSliderFlags_Logarithmic);
 
-  if (ImGui::SliderFloat("glissando", &gliss_percent_, 0.0f, 100.0f, "%.1f %%",
-                         ImGuiSliderFlags_AlwaysClamp))
-    updateNoteLength();
-  if (ImGui::SliderFloat("attack", &attack_percent_, 0.0f, 100.0f, "%.1f %%",
-                         ImGuiSliderFlags_AlwaysClamp)) {
-    release_percent_ =
-        SDL_clamp(release_percent_, 0.0, 100.0f - attack_percent_);
-    updateNoteLength();
-  }
-  if (ImGui::SliderFloat("release", &release_percent_, 0.0f, 100.0f, "%.1f %%",
-                         ImGuiSliderFlags_AlwaysClamp)) {
-    attack_percent_ =
-        SDL_clamp(attack_percent_, 0.0, 100.0f - release_percent_);
-    updateNoteLength();
-  }
+    if (ImGui::SliderFloat ("glissando",
+                            &gliss_percent_,
+                            0.0f,
+                            100.0f,
+                            "%.1f %%",
+                            ImGuiSliderFlags_AlwaysClamp))
+        updateNoteLength();
+    if (ImGui::SliderFloat ("attack",
+                            &attack_percent_,
+                            0.0f,
+                            100.0f,
+                            "%.1f %%",
+                            ImGuiSliderFlags_AlwaysClamp))
+    {
+        release_percent_ = SDL_clamp (release_percent_, 0.0, 100.0f - attack_percent_);
+        updateNoteLength();
+    }
+    if (ImGui::SliderFloat ("release",
+                            &release_percent_,
+                            0.0f,
+                            100.0f,
+                            "%.1f %%",
+                            ImGuiSliderFlags_AlwaysClamp))
+    {
+        attack_percent_ = SDL_clamp (attack_percent_, 0.0, 100.0f - release_percent_);
+        updateNoteLength();
+    }
 
-  ImGui::End();
+    ImGui::End();
 }

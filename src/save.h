@@ -4,27 +4,28 @@
 #include <SDL3/SDL_filesystem.h>
 #include <json.hpp>
 
-
 #include "interface.h"
 
-class SaveLoad {
+class SaveLoad
+{
 public:
-  static void clearPath() {
-    save_path = "";
-    Interface::getInstance().updateTitle(SaveLoad::getPath());
-  }
-  static std::string getPath() { return save_path; }
+    static void clearPath()
+    {
+        save_path = "";
+        Interface::getInstance().updateTitle (SaveLoad::getPath());
+    }
+    static std::string getPath() { return save_path; }
 
-  static void save(bool save_as);
-  static void load();
-  static void loadPath(std::string path);
+    static void save (bool save_as);
+    static void load();
+    static void loadPath (std::string path);
 
-  static void saveJSON(std::string path, Grid *grid);
-  static void loadJSON(std::string path, Grid *grid);
+    static void saveJSON (std::string path, Grid* grid);
+    static void loadJSON (std::string path, Grid* grid);
 
 private:
-  static std::string save_path;
-  static const inline char *work_dir = SDL_GetBasePath();
-  static const inline SDL_DialogFileFilter save_filter = {
-      "gemuPG grid file (*.gemupg)", "gemupg"};
+    static std::string save_path;
+    static const inline char* work_dir = SDL_GetBasePath();
+    static const inline SDL_DialogFileFilter save_filter = { "gemuPG grid file (*.gemupg)",
+                                                             "gemupg" };
 };

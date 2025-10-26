@@ -1,42 +1,41 @@
 #pragma once
 #include "command.h"
-#include "interface.h"
-#include "save.h"
 #include "util.h"
 
-
-class Input {
+class Input
+{
 public:
-  static Input &getInstance() {
-    static Input instance;
-    return instance;
-  }
+    static Input& getInstance()
+    {
+        static Input instance;
+        return instance;
+    }
 
-  void handleEvent(SDL_Event *);
+    void handleEvent (SDL_Event*);
 
 private:
-  CommandManager cmd_mgr;
+    CommandManager cmd_mgr;
 
-  void handleMouseWheel(SDL_Event *);
-  void handleMouse(SDL_Event *);
-  void updateMousePos(SDL_Event *);
-  void handleCamPan(SDL_Event *);
-  void handlePlacement(SDL_Event *);
-  void handleKeys(SDL_Event *);
-  void handleLoseFocus();
+    void handleMouseWheel (SDL_Event*);
+    void handleMouse (SDL_Event*);
+    void updateMousePos (SDL_Event*);
+    void handleCamPan (SDL_Event*);
+    void handlePlacement (SDL_Event*);
+    void handleKeys (SDL_Event*);
+    void handleLoseFocus();
 
-  void handleUndoRedo(SDL_Event *);
-  void handleSaveLoad(SDL_Event *);
-  void handleShortcuts(SDL_Event *);
-  void handleCopyPaste(SDL_Event *);
+    void handleUndoRedo (SDL_Event*);
+    void handleSaveLoad (SDL_Event*);
+    void handleShortcuts (SDL_Event*);
+    void handleCopyPaste (SDL_Event*);
 
-  bool isKeyDown(SDL_Keycode);
-  void updateKeys(SDL_Event *);
-  std::vector<SDL_Keycode> keys_down_;
+    bool isKeyDown (SDL_Keycode);
+    void updateKeys (SDL_Event*);
+    std::vector<SDL_Keycode> keys_down_;
 
-  Input() = default;
-  Input(const Input &) = delete;
-  Input &operator=(const Input &) = delete;
+    Input() = default;
+    Input (const Input&) = delete;
+    Input& operator= (const Input&) = delete;
 
-  Vector2f mouse_pos_ = {0.0f, 0.0f};
+    Vector2f mouse_pos_ = { 0.0f, 0.0f };
 };

@@ -1,6 +1,7 @@
 .vs
 .vscode
 .idea
+.zed
 .cache
 .VSCodeCounter
 CMakeSettings.json

@@ -95,6 +95,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE "include" "include/imgui")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
+# Mark SDL3 and SDL3_ttf includes as SYSTEM to suppress warnings from their headers
+target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
+    $<TARGET_PROPERTY:SDL3::SDL3,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:SDL3_ttf::SDL3_ttf,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
 
 if(EMSCRIPTEN)
     target_link_options(${PROJECT_NAME} PRIVATE

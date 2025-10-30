@@ -159,16 +159,23 @@ void Grid::drawBlocks (SDL_Renderer* renderer)
             if (SDL_HasRectIntersectionFloat (block->getFRect(), &render_frect))
                 drawGenerator (renderer, (BlockGenerator*) block);
 
-    for (auto& area : areas_)
+    for (int i_area = 0; i_area < areas_.size(); i_area++)
     {
-        for (auto& block : area->getBlocks())
+        auto area = areas_[i_area];
+        for (int i_block = 0; i_block < area->getBlocks().size(); i_block++)
+        {
+            auto& block = area->getBlocks()[i_block];
             if (SDL_HasRectIntersectionFloat (block->getFRect(), &render_frect))
                 drawGenerator (renderer, (BlockGenerator*) block);
+        }
 
-        for (auto& sequencer : area->getSequence())
+        for (int i_seq = 0; i_seq < area->getSequence().size(); i_seq++)
+        {
+            auto& sequencer = area->getSequence()[i_seq];
             if (sequencer)
                 if (SDL_HasRectIntersectionFloat (sequencer->getFRect(), &render_frect))
                     drawSequencer (renderer, sequencer);
+        }
     }
 }
 
@@ -179,8 +186,9 @@ void Grid::drawAreas (SDL_Renderer* renderer)
     SDL_FRect render_frect;
     SDL_GetRenderViewport (renderer, &render_rect);
     SDL_RectToFRect (&render_rect, &render_frect);
-    for (auto& area : areas_)
+    for (int i = 0; i < areas_.size(); i++)
     {
+        auto& area = areas_[i];
         for (auto& pos : area->getPositions())
         {
             SDL_FRect rect = { Camera::worldToScreen (pos).x,
@@ -403,14 +411,17 @@ void Grid::mergeAreas (Area* into, Area* from)
         return;
 
     into->addPositions (from->getPositions());
-    for (auto& block : from->getBlocks())
+    for (int i = 0; i < from->getBlocks().size(); i++)
     {
+        auto& block = from->getBlocks()[i];
         from->removeBlock (block);
         into->addBlock (block);
     }
 
-    for (auto& sequencer : from->getSequence())
+    for (int i = 0; i < from->getSequence().size(); i++)
     {
+        auto& sequencer = from->getSequence()[i];
+
         if (! sequencer)
             continue;
         into->addSequencer (sequencer);
@@ -461,8 +472,8 @@ Area* Grid::addArea (Vector2f pos)
     if (getArea (pos))
         return nullptr;
 
-    for (auto area : areas_)
-        if (area->getSequencer (pos))
+    for (int i = 0; i < areas_.size(); i++)
+        if (areas_[i]->getSequencer (pos))
             return nullptr;
 
     Area* area = connectAreas (pos); // adds position already
@@ -472,6 +483,7 @@ Area* Grid::addArea (Vector2f pos)
         area->addPosition (pos);
         areas_.push_back (area);
     }
+    printf ("areas_ size: %zu", areas_.size());
 
     for (auto adj_pos : getAdjacentPositions (pos))
         if (sequencerExists (adj_pos))
@@ -586,6 +598,8 @@ void Grid::stopSequence()
 {
     for (auto& area : areas_)
         area->stopSequence();
+
+    bypassGenerators (true);
 }
 
 void Grid::bypassGenerators (bool bypass)

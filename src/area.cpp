@@ -145,7 +145,7 @@ void Area::removeDanglingSequencers()
 {
     for (int i = 0; i < sequence_.size(); i++)
     {
-        auto sequencer = sequence_[i];
+        auto& sequencer = sequence_[i];
         if (! sequencer)
             continue;
 
@@ -265,7 +265,7 @@ void Area::stepSequence (bool force)
     step_counter_ = ++step_counter_ % TICKS_PER_BAR;
 
     double subdivision_interval = static_cast<double> (TICKS_PER_BAR) / bpm_subdivision_;
-    if (SDL_ceil (SDL_fmod (step_counter_, subdivision_interval)) != 0 && ! force)
+    if (! force && SDL_ceil (SDL_fmod (step_counter_, subdivision_interval)) != 0)
         return;
 
     // updateNoteLength();

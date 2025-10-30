@@ -146,9 +146,12 @@ void Interface::drawBlocks()
 void Interface::drawSequencerGUI()
 {
     std::vector<BlockSequencer*> sequencers;
-    for (auto area : grid_.getAreas())
-        for (auto sequencer : area->getSequence())
-            sequencers.push_back (sequencer);
+    for (int i = 0; i < grid_.getAreas().size(); i++)
+    {
+        auto& area = grid_.getAreas()[i];
+        for (int i = 0; i < area->getSequence().size(); i++)
+            sequencers.push_back (area->getSequence()[i]);
+    }
 
     // remove nullptrs
     sequencers.erase (std::remove_if (sequencers.begin(),

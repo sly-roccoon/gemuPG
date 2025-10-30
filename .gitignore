@@ -6,6 +6,8 @@
 .VSCodeCounter
 CMakeSettings.json
 
+__cmake_systeminformation/
+
 vcpkg_installed/
 build*/
 webasm/

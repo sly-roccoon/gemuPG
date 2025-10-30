@@ -18,7 +18,7 @@ public:
     Block* addBlock (Block*);
     void removeBlock (Block*);
     bool removeBlock (Vector2f);
-    auto getBlocks() { return blocks_; }
+    const std::vector<BlockGenerator*>& getBlocks() { return blocks_; }
     Block* getBlock (Vector2f);
 
     Block* addSequencer (BlockSequencer*);

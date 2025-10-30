@@ -2,7 +2,6 @@
 
 ## 📝 Tasks
 
-- [ ] fix play/pause on file IO
 - [ ] fix sample artifacts
 - [ ] add area step desync/offset option
 - [ ] add generator phase rotation option
@@ -26,6 +25,7 @@
 
 ## ✅ Completed
 
+- [x] fix play/pause on file IO
 - [x] fix clock timing not taking processing time into account, probably need to get buffer size in ms or sth...
 - [x] Update README.md
 - [x] go over block.cpp to fix clicking/glissandi etc.

@@ -143,8 +143,9 @@ bool Area::removeSequencer (Vector2f pos)
 
 void Area::removeDanglingSequencers()
 {
-    for (auto sequencer : sequence_)
+    for (int i = 0; i < sequence_.size(); i++)
     {
+        auto sequencer = sequence_[i];
         if (! sequencer)
             continue;
 

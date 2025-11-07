@@ -86,6 +86,7 @@ public:
     double getFrequency();
 
     double getPhase();
+    double getPrevPhase() const { return last_phase_value_; }
 
     void setWave (WAVE_FORMS waveform);
     WAVE_FORMS getWaveForm() { return data_.waveform; }
@@ -139,6 +140,13 @@ private:
     float freq_factor_ = 1.0f;
 
     Sample sample_ = {};
+
+    static constexpr size_t K_MAX = 8;
+    std::array<float, BUFFER_SIZE * K_MAX> oversampled_buf_ {};
+    std::array<float, BUFFER_SIZE> amp_buf_ {};
+
+    size_t current_K_ = 1;
+    double last_playback_rate_ = 1.0;
 
     static void audioCallback (void* userdata,
                                SDL_AudioStream* stream,

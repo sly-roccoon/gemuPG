@@ -2,7 +2,8 @@
 
 ## 📝 Tasks
 
-- [ ] fix sample artifacts
+- [ ] find better samples
+- [ ] add sample reverse option
 - [ ] add area step desync/offset option
 - [ ] add generator phase rotation option
 - [ ] add emscripten javascript file io
@@ -25,6 +26,7 @@
 
 ## ✅ Completed
 
+- [x] fix sample artifacts
 - [x] fix play/pause on file IO
 - [x] fix clock timing not taking processing time into account, probably need to get buffer size in ms or sth...
 - [x] Update README.md

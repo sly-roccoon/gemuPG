@@ -2,6 +2,20 @@
 #include "audio.h"
 #include <vector>
 
+void Sample::processOversampled (float* samples, int n_samples, int oversampling_factor)
+{
+    // fs' = fs * K, cutoff = ~0.45 * fs (Hz)
+    const int fs = AudioEngine::getInstance().getSampleRate();
+    const int fs_oversampled = fs * oversampling_factor;
+    const double cutoff_hz = 0.45 * fs; // anything above fs/2 will alias after decimation
+
+    for (auto& filter : filters_)
+    {
+        filter.setParams (fs_oversampled, cutoff_hz);
+        filter.process (samples, n_samples);
+    }
+}
+
 void Sample::convertAudio()
 {
     if (sample_)
@@ -78,6 +92,8 @@ void Sample::copyWave (float* src, size_t size)
 
 Sample::Sample() : spec_ { *AudioEngine::getInstance().getSpec() }
 {
+    for (auto& filter : filters_)
+        filter.init (AudioEngine::getInstance().getSampleRate());
 }
 
 Sample::~Sample()

@@ -1,54 +1,60 @@
 #include "audio.h"
 #include "interface.h"
+#include "util.h"
 #include <cmath>
-#include <numbers>
 
 void LowPassFilter::init (int sample_rate)
 {
     fs_ = sample_rate;
     fc_ = 20'000.0;
-    d_ = 1.0 / std::sqrt (2.0);
+    d_ = ONE_DIV_SQRT_TWO;
 
     calculateCoefficients();
 }
 
 void LowPassFilter::calculateCoefficients()
 {
-    double F = 1.0 / std::tan (std::numbers::pi * fc_ / fs_);
+    double omega = 2.0 * std::numbers::pi * fc_ / fs_;
+    double alpha = sin (omega) / (2 * d_);
 
-    b_.at (0) = 1.0f / (1 + 2 * d_ * F + F * F);
-    b_.at (1) = 2 * b_.at (0);
-    b_.at (2) = b_.at (0);
+    double b0 = (1 - cos (omega)) / 2;
+    double b1 = 1 - cos (omega);
+    double b2 = (1 - cos (omega)) / 2;
+    double a0 = 1 + alpha;
+    double a1 = -2 * cos (omega);
+    double a2 = 1 - alpha;
 
-    a_.at (0) = 0;
-    a_.at (1) = 2 * b_.at (0) * (1.0 - F * F);
-    a_.at (2) = b_.at (0) * (1.0 - 2.0 * d_ * F + F * F);
+    // Normalize
+    b_[0] = b0 / a0;
+    b_[1] = b1 / a0;
+    b_[2] = b2 / a0;
+    a_[0] = a1 / a0;
+    a_[1] = a2 / a0;
+}
+
+void LowPassFilter::setParams (int fs, double fc, double Q)
+{
+    fs_ = fs;
+    fc_ = fc;
+    d_ = Q;
+    calculateCoefficients();
 }
 
 void LowPassFilter::process (float* samples, int n_samples)
 {
-    for (int sample = 0; sample < n_samples; sample++)
+    for (int n = 0; n < n_samples; ++n)
     {
-        prev_x_[2] = prev_x_[1];
+        float x = samples[n];
+        float y = b_[0] * x + b_[1] * prev_x_[0] + b_[2] * prev_x_[1] - a_[0] * prev_y_[0]
+                  - a_[1] * prev_y_[1];
+
+        samples[n] = y;
+
+        // Shift state
         prev_x_[1] = prev_x_[0];
-        prev_x_[0] = samples[sample];
-
-        samples[sample] = 0.0f;
-        for (int i = 0; i < b_.size(); i++)
-        {
-            samples[sample] += b_[i] * prev_x_[i] - a_[i] * prev_y_[i];
-        }
-
-        prev_y_[2] = prev_y_[1];
-        prev_y_[1] = samples[sample];
-
-        for (int i = 0; i < 3; i++)
-        {
-            if (std::isnan (prev_x_[i]))
-                prev_x_.at (i) = 0.0;
-            if (std::isnan (prev_y_[i]))
-                prev_y_.at (i) = 0.0;
-        }
+        prev_x_[0] = x;
+        prev_y_[1] = prev_y_[0];
+        prev_y_[0] = y;
     }
 }
 
@@ -209,11 +215,6 @@ AudioEngine::AudioEngine()
     updateStepTick (bpm_);
 
     SDL_ResumeAudioStreamDevice (stream_);
-
-    // #ifndef EMSCRIPTEN
-    // 	Clock::getInstance().setTimerID(SDL_AddTimerNS(0, Clock::stepCallback,
-    // nullptr)); #else 	SDL_DetachThread(SDL_CreateThread(Clock::stepThread,
-    // "clockThread", (void *)NULL)); #endif
 }
 
 void AudioEngine::destroy()

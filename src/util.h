@@ -4,6 +4,7 @@
 #include <imgui.h>
 
 #include <array>
+#include <numbers>
 #include <string>
 
 #define DRAW_DEBUG false
@@ -11,7 +12,8 @@
 
 constexpr const char* TITLE = "gemuPG";
 constexpr bool ADJUST_AMP_BY_CREST = true;
-constexpr float ONE_DIV_SQRT_THREE = 0.5773502691896258;
+constexpr double ONE_DIV_SQRT_THREE = std::numbers::inv_sqrt3;
+constexpr double ONE_DIV_SQRT_TWO = 1.0 / std::numbers::sqrt2;
 
 constexpr unsigned int DEFAULT_WIDTH = 1280;
 constexpr unsigned int DEFAULT_HEIGHT = 960;

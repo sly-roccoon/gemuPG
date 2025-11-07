@@ -1,5 +1,6 @@
 #pragma once
 
+#include "audio.h"
 #include "util.h"
 #include <SDL3/SDL.h>
 #include <array>
@@ -55,6 +56,10 @@ public:
     sample_play_type_t getPlayType() { return play_type_; };
     void setPlayType (sample_play_type_t play_type) { play_type_ = play_type; }
 
+    void overSample (float* samples, size_t n_samples, float playback_rate);
+    void getPitchedSample (float* samples, size_t n_samples, double freq);
+    void processOversampled (float* data, int len, int oversampling_factor);
+
 private:
     std::string path_ = "";
     std::string name_ = "";
@@ -78,6 +83,8 @@ private:
     sample_play_type_t play_type_ = REPEAT;
 
     static const inline SDL_DialogFileFilter wav_filter = { "WAV (*.wav)", "wav" };
+
+    std::array<LowPassFilter, n_filters> filters_ {};
 
     void convertAudio();
 };

@@ -15,12 +15,14 @@ public:
         d_ (0.0),
         b_ { 0.0, 0.0, 0.0 },
         a_ { 0.0, 0.0, 0.0 },
-        prev_x_ { 0.0f, 0.0f, 0.0f },
-        prev_y_ { 0.0f, 0.0f, 0.0f }
+        prev_x_ { 0.0f, 0.0f },
+        prev_y_ { 0.0f, 0.0f }
     {
     }
     void init (int sample_rate);
     void process (float* samples, int n_samples);
+
+    void setParams (int sample_rate, double cutoff_hz, double Q = ONE_DIV_SQRT_TWO);
 
 private:
     int fs_;
@@ -30,8 +32,8 @@ private:
     std::array<double, 3> b_;
     std::array<double, 3> a_;
 
-    std::array<float, 3> prev_x_;
-    std::array<float, 3> prev_y_;
+    std::array<float, 2> prev_x_;
+    std::array<float, 2> prev_y_;
     void calculateCoefficients();
 };
 
@@ -85,7 +87,7 @@ private:
     AudioEngine& operator= (const AudioEngine&) = delete;
 
     float volume_ = 0.5f;
-    std::array<LowPassFilter, n_filters> filters_;
+    std::array<LowPassFilter, n_filters> filters_ {};
 
     float output_[BUFFER_SIZE] = {};
     static std::map<std::pair<WAVE_FORMS, int>, std::array<float, WAVE_SIZE>>

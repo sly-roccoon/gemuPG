@@ -94,6 +94,7 @@ add_executable(${PROJECT_NAME} ${gemupg_SOURCES} ${IMGUI_SOURCES} bt.rc)
 target_include_directories(${PROJECT_NAME} PRIVATE ${gemupg_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE "include" "include/imgui")
 
+# TODO: reduce linked libraries to actually used ones...
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_ttf::SDL3_ttf)
 # Mark SDL3 and SDL3_ttf includes as SYSTEM to suppress warnings from their headers
 target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE

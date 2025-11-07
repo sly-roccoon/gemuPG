@@ -85,11 +85,13 @@ double BlockGenerator::getPhase()
     if (is_in_area_)
         cur_note_sample_pos_++;
 
+    const double prev_phase = data_.phase;
+
     if (getWaveForm() != WAVE_SAMPLE)
     {
         double curr_freq = getFrequency();
         data_.phase = SDL_fmod (data_.phase + (curr_freq / fs_), 1.0);
-        last_phase_value_ = data_.phase;
+        last_phase_value_ = prev_phase;
     }
     else if (sample_.getSize() > 0)
     {
@@ -109,6 +111,7 @@ double BlockGenerator::getPhase()
         }
 
         data_.phase = SDL_fmod (data_.phase, 1.0);
+        last_phase_value_ = prev_phase;
     }
     else
         data_.phase = 0.0;
@@ -117,6 +120,17 @@ double BlockGenerator::getPhase()
     if (data_.phase == 1.0)
         data_.phase = 0.0;
     return data_.phase;
+}
+
+static inline size_t next_pow2_ceil (double x)
+{
+    if (x <= 1.0)
+        return 1;
+    size_t p = 1;
+    size_t v = static_cast<size_t> (std::ceil (x));
+    while (p < v)
+        p <<= 1;
+    return p;
 }
 
 void BlockGenerator::audioCallback (void* userdata,
@@ -141,23 +155,24 @@ void BlockGenerator::audioCallback (void* userdata,
         if (block->getWaveForm() != WAVE_SAMPLE)
             simple_wave = AudioEngine::getWaveTable (block->getWaveForm(), block->getFrequency());
 
-        for (i = 0; i < total; i++)
+        if (block->getWaveForm() != WAVE_SAMPLE)
         {
-            double freq = block->getFrequency();
-            double amp = block->getAmp();
+            for (i = 0; i < total; i++)
+            {
+                double freq = block->getFrequency();
+                double amp = block->getAmp();
 
-            if (freq == 0.0f)
-            {
-                block->getPhase();
-                continue;
-            }
-            if (block->getBypass())
-            {
-                samples[i] = 0.0f;
-                continue;
-            }
-            if (block->getWaveForm() != WAVE_SAMPLE)
-            {
+                if (freq == 0.0f)
+                {
+                    block->getPhase();
+                    continue;
+                }
+                if (block->getBypass())
+                {
+                    samples[i] = 0.0f;
+                    continue;
+                }
+
                 double idx = block->getPhase() * (WAVE_SIZE);
 
                 samples[i] = amp * interpTable (simple_wave->data(), WAVE_SIZE, idx);
@@ -166,21 +181,73 @@ void BlockGenerator::audioCallback (void* userdata,
                                   * ONE_DIV_SQRT_THREE; // TODO: find better way as to not
                 // go over +-1.0f
             }
+        }
+        else if (block->getWaveForm() == WAVE_SAMPLE)
+        {
+            Sample* sample = block->getSample();
+            const int size = sample->getSize();
+            if (size == 0 || (sample->isPlayed() && sample->getPlayType() != REPEAT))
+            {
+                // Fill silence if nothing to play
+                for (int i = 0; i < total; ++i)
+                    samples[i] = 0.0f;
+            }
             else
             {
-                if (sample->getSize() != 0
-                    && (! sample->isPlayed() || sample->getPlayType() == REPEAT))
+                // playback_rate = freq/root
+                const double root = sample->getRoot();
+
+                double freq = block->getFrequency();
+                double playback_rate = freq / root;
+                size_t K = std::min (next_pow2_ceil (playback_rate), K_MAX);
+
+                block->current_K_ = K;
+
+                float* overs = block->oversampled_buf_.data();
+                float* amps = block->amp_buf_.data();
+                float* wave = sample->getWave();
+
+                // Build oversampled stream by splitting each output step into K sub-steps
+                for (int i = 0; i < total; ++i)
                 {
-                    double idx = 0.0;
+                    if (freq == 0.0f)
+                    {
+                        block->getPhase();
+                        continue;
+                    }
+                    if (block->getBypass())
+                    {
+                        samples[i] = 0.0f;
+                        continue;
+                    }
 
-                    float phase = block->getPhase();
-                    long size = block->getSample()->getSize();
-                    idx = SDL_fmod (phase * size, size);
+                    double phase_after = block->getPhase();
+                    double phase_before = block->getPrevPhase();
 
-                    samples[i] = amp * interpTable (sample->getWave(), sample->getSize(), idx);
+                    amps[i] = static_cast<float> (block->getAmp());
+
+                    double start = phase_before;
+                    double end = phase_after;
+                    if (end < start)
+                        end += 1.0;
+
+                    for (size_t m = 0; m < K; ++m)
+                    {
+                        double t = static_cast<double> (m + 1) / static_cast<double> (K);
+                        double ph = start + (end - start) * t;
+                        ph = std::fmod (ph, 1.0);
+                        const double idx = ph * static_cast<double> (size);
+                        overs[i * K + m] = interpTable (wave, size, idx);
+                    }
                 }
-                else
-                    samples[i] = 0.0f;
+
+                if (K > 1)
+                    sample->processOversampled (overs,
+                                                total * static_cast<int> (K),
+                                                static_cast<int> (K));
+
+                for (int i = 0; i < total; ++i)
+                    samples[i] = overs[i * K + (K - 1)] * amps[i];
             }
         }
 

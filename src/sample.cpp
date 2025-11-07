@@ -171,7 +171,7 @@ void Sample::updateWave()
 
     for (int i = 0; i < WAVE_SIZE; i++)
     {
-        int idx = floor (static_cast<float> (i * sample_size_) / WAVE_SIZE);
+        int idx = SDL_floor (static_cast<float> (i * sample_size_) / WAVE_SIZE);
 
         disp_wave_.at (i) = static_cast<float> (sample_[idx]);
     }

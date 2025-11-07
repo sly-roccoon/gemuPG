@@ -127,7 +127,7 @@ static inline size_t next_pow2_ceil (double x)
     if (x <= 1.0)
         return 1;
     size_t p = 1;
-    size_t v = static_cast<size_t> (std::ceil (x));
+    size_t v = static_cast<size_t> (SDL_ceil (x));
     while (p < v)
         p <<= 1;
     return p;
@@ -188,18 +188,16 @@ void BlockGenerator::audioCallback (void* userdata,
             const int size = sample->getSize();
             if (size == 0 || (sample->isPlayed() && sample->getPlayType() != REPEAT))
             {
-                // Fill silence if nothing to play
                 for (int i = 0; i < total; ++i)
                     samples[i] = 0.0f;
             }
             else
             {
-                // playback_rate = freq/root
                 const double root = sample->getRoot();
 
                 double freq = block->getFrequency();
                 double playback_rate = freq / root;
-                size_t K = std::min (next_pow2_ceil (playback_rate), K_MAX);
+                size_t K = SDL_min (next_pow2_ceil (playback_rate), K_MAX);
 
                 block->current_K_ = K;
 
@@ -235,7 +233,7 @@ void BlockGenerator::audioCallback (void* userdata,
                     {
                         double t = static_cast<double> (m + 1) / static_cast<double> (K);
                         double ph = start + (end - start) * t;
-                        ph = std::fmod (ph, 1.0);
+                        ph = SDL_fmod (ph, 1.0);
                         const double idx = ph * static_cast<double> (size);
                         overs[i * K + m] = interpTable (wave, size, idx);
                     }
@@ -272,7 +270,7 @@ void BlockGenerator::setWave (WAVE_FORMS waveform)
     {
         data_.disp_wave = {};
         for (int i = 0; i < WAVE_SIZE; i++)
-            data_.disp_wave[i] = sinf (TWOPI * i / WAVE_SIZE);
+            data_.disp_wave[i] = SDL_sinf (TWOPI * i / WAVE_SIZE);
     }
 
     else if (waveform == WAVE_SAW)
@@ -437,7 +435,7 @@ double BlockGenerator::getFrequency()
         static_cast<double> (cur_note_sample_pos_) / static_cast<double> (gliss_len_samples_);
     factor = SDL_clamp (factor, 0.0, 1.0);
     double ratio = data_.freq / last_freq_;
-    gliss_freq_ = last_freq_ * pow (ratio, factor);
+    gliss_freq_ = last_freq_ * SDL_pow (ratio, factor);
 
     return gliss_freq_;
 }

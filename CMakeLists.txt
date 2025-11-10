@@ -13,11 +13,7 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 if(EMSCRIPTEN)
-    set(CMAKE_EXECUTABLE_SUFFIX ".html")
     set(SDL_SHARED OFF)
-    set(SDL_PTHREADS ON)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
     set(CMAKE_EXECUTABLE_SUFFIX ".html" CACHE INTERNAL "")
 endif()
 
@@ -101,18 +97,6 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
     $<TARGET_PROPERTY:SDL3::SDL3,INTERFACE_INCLUDE_DIRECTORIES>
     $<TARGET_PROPERTY:SDL3_ttf::SDL3_ttf,INTERFACE_INCLUDE_DIRECTORIES>
 )
-
-
-if(EMSCRIPTEN)
-    target_link_options(${PROJECT_NAME} PRIVATE
-        "-s PTHREAD_POOL_SIZE=16"
-        "-sPROXY_TO_PTHREAD"
-        "-sUSE_PTHREADS=1"
-        "-sENVIRONMENT=web"
-        "-sALLOW_MEMORY_GROWTH=1"
-        "-sMAXIMUM_MEMORY=1gb"
-    )
-endif()
 
 target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/fp:fast>

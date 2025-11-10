@@ -262,12 +262,12 @@ void Area::setStepCounter (const Uint64 step_counter, bool wrap_around)
 
 void Area::stepSequence (bool force)
 {
-    step_counter_ = ++step_counter_ % TICKS_PER_BAR;
+    step_counter_ = ++step_counter_ % (2 * TICKS_PER_BAR);
 
     double subdivision_interval = static_cast<double> (TICKS_PER_BAR) / bpm_subdivision_;
 
     bool should_step = false;
-    if (step_counter_ > subdivision_interval)
+    if (step_counter_ >= subdivision_interval)
     {
         should_step = true;
         step_counter_ -= subdivision_interval;

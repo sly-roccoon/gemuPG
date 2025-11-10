@@ -28,7 +28,7 @@ constexpr float TEXT_VALUE_SIZE_DIV = 2;
 
 constexpr float DEFAULT_BPM = 60.0f;
 constexpr unsigned int TICKS_PER_BAR =
-    960; // LCM 1 through 12 https://billydm.github.io/blog/time-keeping/
+    8'640; // LCM 1 through 12 https://billydm.github.io/blog/time-keeping/
 
 constexpr bool SEQUENCER_RANDOMIZED = true;
 

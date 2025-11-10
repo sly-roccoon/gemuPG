@@ -265,7 +265,14 @@ void Area::stepSequence (bool force)
     step_counter_ = ++step_counter_ % TICKS_PER_BAR;
 
     double subdivision_interval = static_cast<double> (TICKS_PER_BAR) / bpm_subdivision_;
-    if (! force && SDL_ceil (SDL_fmod (step_counter_, subdivision_interval)) != 0)
+
+    bool should_step = false;
+    if (step_counter_ > subdivision_interval)
+    {
+        should_step = true;
+        step_counter_ -= subdivision_interval;
+    }
+    if (! (force || should_step))
         return;
 
     // updateNoteLength();

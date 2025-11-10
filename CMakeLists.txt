@@ -106,10 +106,11 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE
 if(EMSCRIPTEN)
     target_link_options(${PROJECT_NAME} PRIVATE
         "-s PTHREAD_POOL_SIZE=16"
-        "-pthread"
+        "-sPROXY_TO_PTHREAD"
+        "-sUSE_PTHREADS=1"
+        "-sENVIRONMENT=web"
         "-sALLOW_MEMORY_GROWTH=1"
         "-sMAXIMUM_MEMORY=1gb"
-        "-sPROXY_TO_PTHREAD"
     )
 endif()
 

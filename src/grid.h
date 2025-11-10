@@ -49,8 +49,8 @@ private:
     void splitAreas (Area*);
     std::array<Area*, 4> getAdjacentAreas (Vector2f);
 
-    std::vector<Area*> areas_;
-    std::vector<Block*> blocks_;
+    std::vector<Area*> areas_ {};
+    std::vector<Block*> blocks_ {};
 
     std::shared_ptr<Block> copy_block_ = nullptr;
 
